@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>구슬 홀짝 게임 (Odd or Even)</title>
+  <style>
+    :root {
+      --bg: #0f141c;
+      --card-bg: #18202c;
+      --fill-faint: rgba(255, 255, 255, 0.05);
+      --fill-soft: rgba(255, 255, 255, 0.1);
+      --text-main: #f0f4f8;
+      --text-sub: #94a3b8;
+      --danger: #ef4444;
+      --primary: #3b82f6;
+      --odd-color: #f43f5e;
+      --even-color: #06b6d4;
+      --gold: #fbbf24;
+      --radius-card: 16px;
+      --radius-cta: 12px;
+      --radius-pill: 9999px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", Roboto, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px;
+      overflow-x: hidden;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 440px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* Header stats */
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--card-bg);
+      padding: 12px 18px;
+      border-radius: var(--radius-card);
+      border: 1px solid var(--fill-soft);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    .stat-box {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      color: var(--text-sub);
+      text-transform: uppercase;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    .stat-val {
+      font-size: 19px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .chips-val {
+      color: var(--gold);
+    }
+
+    .streak-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      background: rgba(244, 63, 94, 0.15);
+      color: #fb7185;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(244, 63, 94, 0.3);
+    }
+
+    /* Main game area */
+    .game-arena {
+      background: var(--card-bg);
+      border-radius: var(--radius-card);
+      border: 1px solid var(--fill-soft);
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+      min-height: 250px;
+      justify-content: center;
+    }
+
+    .pouch-wrapper {
+      position: relative;
+      width: 130px;
+      height: 130px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .pouch-svg {
+      width: 100%;
+      height: 100%;
+      filter: drop-shadow(0 8px 16px rgba(0,0,0,0.4));
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .shaking {
+      animation: shake 0.5s infinite;
+    }
+
+    @keyframes shake {
+      0% { transform: translate(1px, 1px) rotate(0deg); }
+      20% { transform: translate(-3px, 0px) rotate(-4deg); }
+      40% { transform: translate(2px, -2px) rotate(3deg); }
+      60% { transform: translate(-3px, 1px) rotate(-3deg); }
+      80% { transform: translate(2px, 1px) rotate(2deg); }
+      100% { transform: translate(1px, -1px) rotate(0deg); }
+    }
+
+    .result-display {
+      margin-top: 14px;
+      text-align: center;
+      min-height: 48px;
+    }
+
+    .status-text {
+      font-size: 15px;
+      color: var(--text-sub);
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .revealed-number {
+      font-size: 26px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes popIn {
+      0% { opacity: 0; transform: scale(0.6); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    .marbles-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 6px;
+      max-width: 280px;
+      margin-top: 10px;
+    }
+
+    .marble {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #ffd700, #b45309);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.4);
+      animation: drop 0.25s ease-out;
+    }
+
+    @keyframes drop {
+      from { transform: translateY(-15px) scale(0.5); opacity: 0; }
+      to { transform: translateY(0) scale(1); opacity: 1; }
+    }
+
+    /* Betting controls */
+    .bet-section {
+      background: var(--card-bg);
+      border-radius: var(--radius-card);
+      border: 1px solid var(--fill-soft);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .bet-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .bet-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-sub);
+    }
+
+    .bet-amount-display {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--gold);
+    }
+
+    .chip-buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    .chip-btn {
+      background: var(--fill-faint);
+      border: 1px solid var(--fill-soft);
+      color: var(--text-main);
+      padding: 9px 0;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .chip-btn:active {
+      transform: scale(0.96);
+    }
+
+    .chip-btn.selected {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+    }
+
+    /* Choice buttons (Odd / Even) */
+    .action-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .choice-btn {
+      padding: 16px;
+      border-radius: var(--radius-cta);
+      border: none;
+      font-size: 18px;
+      font-weight: 800;
+      color: #fff;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    }
+
+    .choice-btn:active:not(:disabled) {
+      transform: scale(0.97);
+    }
+
+    .choice-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      filter: grayscale(0.5);
+    }
+
+    .odd-btn {
+      background: linear-gradient(135deg, #f43f5e, #be123c);
+    }
+
+    .odd-btn:hover:not(:disabled) {
+      box-shadow: 0 6px 16px rgba(244, 63, 94, 0.4);
+    }
+
+    .even-btn {
+      background: linear-gradient(135deg, #0ea5e9, #0369a1);
+    }
+
+    .even-btn:hover:not(:disabled) {
+      box-shadow: 0 6px 16px rgba(14, 165, 233, 0.4);
+    }
+
+    .sub-tag {
+      font-size: 11px;
+      font-weight: 600;
+      opacity: 0.85;
+      letter-spacing: 0.5px;
+    }
+
+    /* History list */
+    .history-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-card);
+      border: 1px solid var(--fill-soft);
+      padding: 14px 16px;
+    }
+
+    .history-header {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-sub);
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .history-list {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+
+    .history-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 44px;
+      padding: 6px 4px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      background: var(--fill-faint);
+      border: 1px solid var(--fill-soft);
+    }
+
+    .history-item.win {
+      border-color: rgba(34, 197, 94, 0.4);
+      color: #4ade80;
+    }
+
+    .history-item.lose {
+      border-color: rgba(239, 68, 68, 0.4);
+      color: #f87171;
+    }
+
+    .footer-actions {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 4px;
+    }
+
+    .text-btn {
+      background: none;
+      border: none;
+      color: var(--text-sub);
+      font-size: 12px;
+      cursor: pointer;
+      text-decoration: underline;
+      padding: 4px 8px;
+    }
+
+    .text-btn:hover {
+      color: var(--text-main);
+    }
+
+    /* Confetti canvas */
+    #confettiCanvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 10;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Header Stats -->
+  <div class="header-bar">
+    <div class="stat-box">
+      <span class="stat-label">보유 칩</span>
+      <span class="stat-val chips-val" id="chipsDisplay">🪙 1,000</span>
+    </div>
+    <div class="stat-box" style="align-items: center;">
+      <span class="stat-label">연승</span>
+      <span class="streak-badge" id="streakBadge">🔥 0연승</span>
+    </div>
+    <div class="stat-box" style="align-items: flex-end;">
+      <span class="stat-label">전적 / 승률</span>
+      <span class="stat-val" id="winRateDisplay" style="font-size: 15px; color: var(--text-sub);">0전 0승 (0%)</span>
+    </div>
+  </div>
+
+  <!-- Arena -->
+  <div class="game-arena">
+    <canvas id="confettiCanvas"></canvas>
+    
+    <div class="pouch-wrapper" id="pouchEl">
+      <svg class="pouch-svg" id="pouchSvg" viewBox="0 0 100 100">
+        <!-- Pouch string & ribbon -->
+        <path d="M30 35 Q50 40 70 35" stroke="#f59e0b" stroke-width="4" fill="none" stroke-linecap="round"/>
+        <!-- Pouch bag body -->
+        <path d="M28 35 C20 50 15 80 50 88 C85 80 80 50 72 35 C65 30 65 22 50 22 C35 22 35 30 28 35 Z" fill="#b91c1c" stroke="#991b1b" stroke-width="2"/>
+        <!-- Top folds -->
+        <path d="M30 24 Q50 30 70 24 Q65 18 50 18 Q35 18 30 24 Z" fill="#dc2626"/>
+        <!-- Gold emblem -->
+        <circle cx="50" cy="58" r="14" fill="#fbbf24" stroke="#d97706" stroke-width="2"/>
+        <text x="50" y="63" font-size="12" font-weight="900" text-anchor="middle" fill="#78350f">?</text>
+      </svg>
+    </div>
+
+    <div class="result-display">
+      <div class="status-text" id="statusText">베팅 금액을 정하고 [홀] 또는 [짝]을 고르세요!</div>
+      <div class="revealed-number" id="revealedNumber" style="display: none;"></div>
+      <div class="marbles-grid" id="marblesGrid"></div>
+    </div>
+  </div>
+
+  <!-- Betting controls -->
+  <div class="bet-section">
+    <div class="bet-header">
+      <span class="bet-title">베팅할 칩</span>
+      <span class="bet-amount-display" id="betAmountDisplay">100 칩</span>
+    </div>
+    <div class="chip-buttons">
+      <button class="chip-btn selected" onclick="setBet(100)">100</button>
+      <button class="chip-btn" onclick="setBet(250)">250</button>
+      <button class="chip-btn" onclick="setBet(500)">500</button>
+      <button class="chip-btn" onclick="setBet('max')">ALL IN</button>
+    </div>
+
+    <div class="action-buttons">
+      <button class="choice-btn odd-btn" id="btnOdd" onclick="playGame('odd')">
+        <span>홀 (ODD)</span>
+        <span class="sub-tag">1, 3, 5, 7, 9...</span>
+      </button>
+      <button class="choice-btn even-btn" id="btnEven" onclick="playGame('even')">
+        <span>짝 (EVEN)</span>
+        <span class="sub-tag">2, 4, 6, 8, 10...</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- History -->
+  <div class="history-card">
+    <div class="history-header">
+      <span>최근 전적 기록</span>
+      <span id="historyCount">0회</span>
+    </div>
+    <div class="history-list" id="historyList">
+      <span style="font-size: 12px; color: var(--text-sub);">아직 진행된 게임이 없습니다.</span>
+    </div>
+  </div>
+
+  <div class="footer-actions">
+    <button class="text-btn" onclick="restartGame()">게임 초기화</button>
+  </div>
+</div>
+
+<script>
+  // Web Audio Synthesizer
+  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  function playTone(freq, type, duration, delay = 0) {
+    setTimeout(() => {
+      try {
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {}
+    }, delay * 1000);
+  }
+
+  function soundClick() { playTone(600, 'sine', 0.08); }
+  function soundShake() { playTone(180, 'triangle', 0.12); }
+  function soundWin() {
+    playTone(523.25, 'triangle', 0.15, 0);
+    playTone(659.25, 'triangle', 0.15, 0.1);
+    playTone(783.99, 'triangle', 0.25, 0.2);
+    playTone(1046.5, 'triangle', 0.4, 0.3);
+  }
+  function soundLose() {
+    playTone(392, 'sawtooth', 0.18, 0);
+    playTone(329.63, 'sawtooth', 0.3, 0.15);
+  }
+
+  // Game State
+  function defaultState() {
+    return {
+      chips: 1000,
+      currentBet: 100,
+      streak: 0,
+      bestStreak: 0,
+      gamesPlayed: 0,
+      gamesWon: 0,
+      history: []
+    };
+  }
+
+  const STORAGE_KEY = 'roaming_odd_even_game';
+  function loadSavedState() {
+    try {
+      const data = localStorage.getItem(STORAGE_KEY);
+      return data ? JSON.parse(data) : defaultState();
+    } catch(e) {
+      return defaultState();
+    }
+  }
+
+  let state = loadSavedState();
+  let isPlaying = false;
+
+  function saveState() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    } catch(e) {}
+  }
+
+  function render() {
+    document.getElementById('chipsDisplay').textContent = `🪙 ${state.chips.toLocaleString()}`;
+    document.getElementById('streakBadge').textContent = `🔥 ${state.streak}연승`;
+
+    const rate = state.gamesPlayed > 0 ? Math.round((state.gamesWon / state.gamesPlayed) * 100) : 0;
+    document.getElementById('winRateDisplay').textContent = `${state.gamesPlayed}전 ${state.gamesWon}승 (${rate}%)`;
+
+    const betVal = state.currentBet === 'max' ? state.chips : Math.min(state.currentBet, state.chips);
+    document.getElementById('betAmountDisplay').textContent = `${betVal.toLocaleString()} 칩`;
+
+    const listEl = document.getElementById('historyList');
+    if (state.history.length === 0) {
+      listEl.innerHTML = '<span style="font-size: 12px; color: var(--text-sub);">아직 진행된 게임이 없습니다.</span>';
+    } else {
+      listEl.innerHTML = '';
+      state.history.slice(-10).reverse().forEach(item => {
+        const div = document.createElement('div');
+        div.className = `history-item ${item.won ? 'win' : 'lose'}`;
+        div.innerHTML = `<span>${item.resultNum}</span><span>${item.won ? '승' : '패'}</span>`;
+        listEl.appendChild(div);
+      });
+    }
+    document.getElementById('historyCount').textContent = `${state.history.length}회`;
+  }
+
+  function setBet(val) {
+    if (isPlaying) return;
+    soundClick();
+    state.currentBet = val;
+    document.querySelectorAll('.chip-btn').forEach(btn => btn.classList.remove('selected'));
+    if (val === 100) document.querySelectorAll('.chip-btn')[0].classList.add('selected');
+    else if (val === 250) document.querySelectorAll('.chip-btn')[1].classList.add('selected');
+    else if (val === 500) document.querySelectorAll('.chip-btn')[2].classList.add('selected');
+    else if (val === 'max') document.querySelectorAll('.chip-btn')[3].classList.add('selected');
+    render();
+  }
+
+  function getEffectiveBet() {
+    if (state.currentBet === 'max') return state.chips;
+    return Math.min(state.currentBet, state.chips);
+  }
+
+  function playGame(pick) {
+    if (isPlaying) return;
+    const bet = getEffectiveBet();
+    if (bet <= 0) {
+      alert("배팅할 칩이 부족합니다! 초기화하거나 지원금을 받으세요.");
+      return;
+    }
+
+    isPlaying = true;
+    soundClick();
+    document.getElementById('btnOdd').disabled = true;
+    document.getElementById('btnEven').disabled = true;
+
+    const statusText = document.getElementById('statusText');
+    const revealedNumber = document.getElementById('revealedNumber');
+    const marblesGrid = document.getElementById('marblesGrid');
+    const pouchEl = document.getElementById('pouchEl');
+
+    revealedNumber.style.display = 'none';
+    marblesGrid.innerHTML = '';
+    statusText.textContent = "주머니를 흔드는 중...";
+    statusText.style.color = "var(--text-sub)";
+    pouchEl.classList.add('shaking');
+
+    soundShake();
+    setTimeout(soundShake, 250);
+    setTimeout(soundShake, 500);
+
+    const marbleCount = Math.floor(Math.random() * 18) + 1;
+    const isOdd = marbleCount % 2 !== 0;
+    const won = (isOdd && pick === 'odd') || (!isOdd && pick === 'even');
+
+    setTimeout(() => {
+      pouchEl.classList.remove('shaking');
+      marblesGrid.innerHTML = '';
+      for (let i = 0; i < marbleCount; i++) {
+        const m = document.createElement('div');
+        m.className = 'marble';
+        m.style.animationDelay = `${i * 0.03}s`;
+        marblesGrid.appendChild(m);
+      }
+
+      revealedNumber.style.display = 'flex';
+      const typeText = isOdd ? '홀(ODD)' : '짝(EVEN)';
+      const typeColor = isOdd ? 'var(--odd-color)' : 'var(--even-color)';
+      revealedNumber.innerHTML = `구슬 <span style="color:${typeColor};">${marbleCount}개</span> (${typeText})`;
+
+      state.gamesPlayed++;
+      if (won) {
+        state.streak++;
+        if (state.streak > state.bestStreak) state.bestStreak = state.streak;
+        state.gamesWon++;
+        state.chips += bet;
+        statusText.textContent = `🎉 적중! +${bet.toLocaleString()} 칩 획득!`;
+        statusText.style.color = '#4ade80';
+        soundWin();
+        fireConfetti();
+      } else {
+        state.streak = 0;
+        state.chips -= bet;
+        statusText.textContent = `😢 아쉽네요! -${bet.toLocaleString()} 칩`;
+        statusText.style.color = '#f87171';
+        soundLose();
+
+        if (state.chips <= 0) {
+          setTimeout(() => {
+            state.chips = 500;
+            statusText.textContent = "🪙 칩이 모두 소진되어 로밍의 응원 지원금 500칩이 지급되었습니다!";
+            render();
+            saveState();
+          }, 1200);
+        }
+      }
+
+      state.history.push({
+        resultNum: marbleCount,
+        isOdd,
+        pick,
+        won,
+        change: won ? bet : -bet
+      });
+
+      render();
+      saveState();
+
+      isPlaying = false;
+      document.getElementById('btnOdd').disabled = false;
+      document.getElementById('btnEven').disabled = false;
+    }, 900);
+  }
+
+  function restartGame() {
+    if (!confirm("게임을 초기화하시겠습니까? 칩이 1,000개로 리셋됩니다.")) return;
+    soundClick();
+    state = defaultState();
+    render();
+    saveState();
+    document.getElementById('statusText').textContent = "베팅 금액을 정하고 [홀] 또는 [짝]을 고르세요!";
+    document.getElementById('statusText').style.color = "var(--text-sub)";
+    document.getElementById('revealedNumber').style.display = "none";
+    document.getElementById('marblesGrid').innerHTML = "";
+  }
+
+  function fireConfetti() {
+    const canvas = document.getElementById('confettiCanvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = canvas.parentElement.offsetWidth;
+    canvas.height = canvas.parentElement.offsetHeight;
+
+    const pieces = [];
+    const colors = ['#f43f5e', '#3b82f6', '#10b981', '#fbbf24', '#a855f7'];
+    for (let i = 0; i < 40; i++) {
+      pieces.push({
+        x: canvas.width / 2,
+        y: canvas.height / 2,
+        vx: (Math.random() - 0.5) * 8,
+        vy: (Math.random() - 0.8) * 8,
+        size: Math.random() * 6 + 4,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        rotation: Math.random() * 360,
+        vr: (Math.random() - 0.5) * 10,
+        life: 1
+      });
+    }
+
+    let frame = 0;
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      let alive = false;
+      pieces.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.2;
+        p.rotation += p.vr;
+        p.life -= 0.02;
+        if (p.life > 0) {
+          alive = true;
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate((p.rotation * Math.PI) / 180);
+          ctx.fillStyle = p.color;
+          ctx.globalAlpha = p.life;
+          ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+          ctx.restore();
+        }
+      });
+      if (alive && frame < 60) {
+        frame++;
+        requestAnimationFrame(animate);
+      } else {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+    }
+    animate();
+  }
+
+  render();
+</script>
+</body>
+</html>

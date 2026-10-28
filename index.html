@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🕹️ Mini Games Arcade</title>
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --panel-bg: #161b22;
+            --border-color: #30363d;
+            --accent-green: #2ea043;
+            --accent-blue: #58a6ff;
+            --accent-purple: #bc8cff;
+            --gold: #f1e05a;
+            --text-main: #f0f6fc;
+            --text-sub: #8b949e;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 16px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 520px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Hero Header */
+        .header {
+            text-align: center;
+            padding: 24px 16px;
+            background: linear-gradient(180deg, rgba(88, 166, 255, 0.1) 0%, rgba(22, 27, 34, 0.8) 100%);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+            margin-bottom: 6px;
+            background: linear-gradient(135deg, #f0f6fc 0%, #58a6ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header p {
+            color: var(--text-sub);
+            font-size: 0.9rem;
+        }
+
+        /* Section Title */
+        .section-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-left: 4px;
+        }
+
+        /* Game Cards Grid */
+        .game-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .game-card {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 18px;
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .game-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--accent-blue);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+        }
+
+        .game-card:active {
+            transform: scale(0.98);
+        }
+
+        .game-icon {
+            font-size: 2.8rem;
+            width: 64px;
+            height: 64px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            flex-shrink: 0;
+        }
+
+        .game-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .game-tag {
+            align-self: flex-start;
+            font-size: 0.7rem;
+            font-weight: 800;
+            padding: 2px 6px;
+            border-radius: 4px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        .tag-hot { background: rgba(218, 54, 51, 0.2); color: #f85149; border: 1px solid rgba(218, 54, 51, 0.3); }
+        .tag-classic { background: rgba(56, 139, 253, 0.2); color: #58a6ff; border: 1px solid rgba(56, 139, 253, 0.3); }
+        .tag-soon { background: rgba(139, 148, 158, 0.2); color: var(--text-sub); border: 1px solid var(--border-color); }
+
+        .game-title {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: var(--text-main);
+        }
+
+        .game-desc {
+            font-size: 0.8rem;
+            color: var(--text-sub);
+            line-height: 1.3;
+        }
+
+        .arrow-icon {
+            font-size: 1.2rem;
+            color: var(--text-sub);
+            font-weight: bold;
+        }
+
+        /* Coming Soon Banner */
+        .card-soon {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .card-soon:hover {
+            transform: none;
+            border-color: var(--border-color);
+            box-shadow: none;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            font-size: 0.75rem;
+            color: var(--text-sub);
+            padding: 12px 0 24px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Hero Header -->
+        <div class="header">
+            <h1>🕹️ MINI GAMES</h1>
+            <p>언제 어디서나 가볍게 즐기는 확률 미니게임 아케이드</p>
+        </div>
+
+        <div class="section-title">
+            <span>🔥 인기 게임 목록</span>
+        </div>
+
+        <!-- Games Grid -->
+        <div class="game-grid">
+            <!-- Game 1: Crash -->
+            <a href="crash/index.html" class="game-card">
+                <div class="game-icon">🚀</div>
+                <div class="game-info">
+                    <span class="game-tag tag-hot">HOT & DOPAMINE</span>
+                    <div class="game-title">로켓 크래시 (Rocket Crash)</div>
+                    <div class="game-desc">실시간 배수 상승! 폭발하기 전 짜릿한 캐시아웃 타이밍 탈출 게임</div>
+                </div>
+                <div class="arrow-icon">➔</div>
+            </a>
+
+            <!-- Game 2: Odd-Even -->
+            <a href="odd-even/index.html" class="game-card">
+                <div class="game-icon">🔮</div>
+                <div class="game-info">
+                    <span class="game-tag tag-classic">CLASSIC PROBABILITY</span>
+                    <div class="game-title">구슬 홀짝 (Odd-Even Game)</div>
+                    <div class="game-desc">1~18개 구슬 홀짝 예측, 올인 베팅, 12연승 보너스 & 사운드 이펙트</div>
+                </div>
+                <div class="arrow-icon">➔</div>
+            </a>
+
+            <!-- Coming Soon Card -->
+            <div class="game-card card-soon">
+                <div class="game-icon">🎰</div>
+                <div class="game-info">
+                    <span class="game-tag tag-soon">COMING SOON</span>
+                    <div class="game-title">777 라스베이거스 슬롯머신</div>
+                    <div class="game-desc">레버를 당겨 잭팟을 노리는 클래식 3릴 슬롯머신 (준비 중)</div>
+                </div>
+                <div class="arrow-icon" style="opacity: 0.3;">🔒</div>
+            </div>
+        </div>
+
+        <div class="footer">
+            Powered by RoyMing-Lab · Deployed with Vercel
+        </div>
+    </div>
+</body>
+</html>

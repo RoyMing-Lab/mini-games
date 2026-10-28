@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🚀 ROCKET CRASH - 극한의 배수 베팅 게임</title>
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --panel-bg: #161b22;
+            --border-color: #30363d;
+            --accent-green: #2ea043;
+            --accent-green-glow: rgba(46, 160, 67, 0.4);
+            --accent-red: #da3633;
+            --accent-red-glow: rgba(218, 54, 51, 0.4);
+            --gold: #f1e05a;
+            --text-main: #f0f6fc;
+            --text-sub: #8b949e;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 12px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 480px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        /* Top Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--panel-bg);
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .title {
+            font-size: 1.1rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            letter-spacing: -0.5px;
+        }
+
+        .balance-box {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 6px 12px;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .balance-amount {
+            font-weight: 800;
+            color: var(--gold);
+            font-size: 1rem;
+        }
+
+        /* History Bar */
+        .history-bar {
+            display: flex;
+            gap: 6px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+            scrollbar-width: none;
+        }
+        .history-bar::-webkit-scrollbar { display: none; }
+
+        .history-tag {
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 6px;
+            white-space: nowrap;
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+        }
+        .tag-crash { color: var(--accent-red); border-color: rgba(218,54,51,0.3); }
+        .tag-win { color: var(--accent-green); border-color: rgba(46,160,67,0.3); }
+        .tag-gold { color: var(--gold); border-color: rgba(241,224,90,0.3); }
+
+        /* Game Arena / Canvas Screen */
+        .screen {
+            position: relative;
+            width: 100%;
+            height: 260px;
+            background: radial-gradient(circle at center, #1a2332 0%, #0d1117 100%);
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .multiplier-overlay {
+            position: absolute;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            pointer-events: none;
+        }
+
+        .multiplier-val {
+            font-size: 3.6rem;
+            font-weight: 900;
+            letter-spacing: -1px;
+            text-shadow: 0 0 20px rgba(0,0,0,0.8);
+            font-variant-numeric: tabular-nums;
+            transition: color 0.1s;
+        }
+        .color-running { color: #fff; text-shadow: 0 0 15px var(--accent-green-glow); }
+        .color-crashed { color: var(--accent-red); text-shadow: 0 0 25px var(--accent-red-glow); animation: shake 0.3s; }
+        .color-cashed { color: var(--accent-green); text-shadow: 0 0 25px var(--accent-green-glow); }
+
+        .status-msg {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-sub);
+            margin-top: 4px;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-6px); }
+            40%, 80% { transform: translateX(6px); }
+        }
+
+        /* Control Panel */
+        .panel {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .input-row {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .label-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--text-sub);
+            font-weight: 600;
+        }
+
+        .bet-input-wrap {
+            display: flex;
+            background: #0d1117;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .bet-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-size: 1.1rem;
+            font-weight: 800;
+            padding: 10px 14px;
+            outline: none;
+        }
+
+        .btn-quick-group {
+            display: flex;
+            gap: 4px;
+            padding: 4px;
+            background: #0d1117;
+            border-radius: 8px;
+        }
+
+        .btn-quick {
+            flex: 1;
+            background: #21262d;
+            border: 1px solid var(--border-color);
+            color: var(--text-sub);
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 6px 0;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.1s;
+        }
+        .btn-quick:active {
+            background: #30363d;
+            color: #fff;
+        }
+
+        /* Big Action Button */
+        .btn-action {
+            width: 100%;
+            height: 56px;
+            border-radius: 12px;
+            border: none;
+            font-size: 1.25rem;
+            font-weight: 900;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.1s;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.4);
+        }
+        .btn-action:active {
+            transform: scale(0.98);
+        }
+
+        .btn-bet {
+            background: linear-gradient(135deg, #238636, #2ea043);
+            color: #fff;
+        }
+        .btn-bet:hover { background: #2ea043; }
+
+        .btn-cashout {
+            background: linear-gradient(135deg, #e3b341, #f1e05a);
+            color: #0d1117;
+            animation: pulse-gold 1s infinite alternate;
+        }
+        @keyframes pulse-gold {
+            from { box-shadow: 0 0 10px rgba(241, 224, 90, 0.4); }
+            to { box-shadow: 0 0 25px rgba(241, 224, 90, 0.8); }
+        }
+
+        .btn-waiting {
+            background: #21262d;
+            color: var(--text-sub);
+            cursor: not-allowed;
+        }
+
+        /* Stats & Relief */
+        .stats-row {
+            display: flex;
+            justify-content: space-around;
+            padding: 8px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            font-size: 0.75rem;
+            color: var(--text-sub);
+        }
+        .stat-item b {
+            color: var(--text-main);
+            margin-left: 2px;
+        }
+
+        .relief-btn {
+            background: none;
+            border: 1px dashed var(--border-color);
+            color: var(--text-sub);
+            font-size: 0.8rem;
+            padding: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: none;
+            text-align: center;
+        }
+        .relief-btn:hover {
+            color: var(--gold);
+            border-color: var(--gold);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div style="display:flex; align-items:center; gap:8px;"><a href="../index.html" style="text-decoration:none; color:#8b949e; font-size:0.85rem; display:flex; align-items:center; gap:4px; padding:4px 8px; background:rgba(255,255,255,0.05); border-radius:6px; border:1px solid #30363d;">🏠 로비</a><div class="title">🚀 ROCKET CRASH</div></div>
+            <div class="balance-box">
+                <span style="font-size: 0.9rem;">💰</span>
+                <span class="balance-amount" id="balanceDisplay">10,000</span>
+            </div>
+        </div>
+
+        <!-- History Bar -->
+        <div class="history-bar" id="historyBar">
+            <div class="history-tag tag-win">2.40x</div>
+            <div class="history-tag tag-crash">1.12x</div>
+            <div class="history-tag tag-gold">14.80x</div>
+            <div class="history-tag tag-win">3.15x</div>
+            <div class="history-tag tag-crash">1.05x</div>
+        </div>
+
+        <!-- Canvas Game Screen -->
+        <div class="screen" id="screenBox">
+            <canvas id="gameCanvas"></canvas>
+            <div class="multiplier-overlay">
+                <div class="multiplier-val color-running" id="multiplierText">1.00x</div>
+                <div class="status-msg" id="statusMsg">베팅 후 준비해 주세요</div>
+            </div>
+        </div>
+
+        <!-- Betting Controls -->
+        <div class="panel">
+            <div class="input-row">
+                <div class="label-row">
+                    <span>베팅 금액 (Chips)</span>
+                    <span id="winEstimate">예상 획득: -</span>
+                </div>
+                <div class="bet-input-wrap">
+                    <input type="number" id="betAmount" class="bet-input" value="1000" min="100" step="100">
+                </div>
+            </div>
+
+            <div class="btn-quick-group">
+                <button class="btn-quick" onclick="adjustBet('100')">+100</button>
+                <button class="btn-quick" onclick="adjustBet('1000')">+1K</button>
+                <button class="btn-quick" onclick="adjustBet('half')">1/2</button>
+                <button class="btn-quick" onclick="adjustBet('double')">2X</button>
+                <button class="btn-quick" onclick="adjustBet('all')">ALL IN</button>
+            </div>
+
+            <!-- Big Action Button -->
+            <button id="mainActionBtn" class="btn-action btn-bet" onclick="handleMainAction()">
+                베팅 시작하기
+            </button>
+
+            <!-- Relief Button (shown when broke) -->
+            <button id="reliefBtn" class="relief-btn" onclick="claimRelief()">
+                💸 파산하셨나요? 5,000칩 긴급 지원받기
+            </button>
+
+            <!-- Stats Bar -->
+            <div class="stats-row">
+                <div class="stat-item">판수: <b id="statGames">0</b></div>
+                <div class="stat-item">승률: <b id="statWinRate">0%</b></div>
+                <div class="stat-item">최고 배수: <b id="statMaxMult">0.00x</b></div>
+                <div class="stat-item">순수익: <b id="statProfit">0</b></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Game State
+        let balance = 10000;
+        let bet = 1000;
+        let isBetPlaced = false;
+        let gameState = 'IDLE'; // IDLE, COUNTDOWN, RUNNING, CRASHED, CASHED_OUT
+        let currentMultiplier = 1.00;
+        let crashPoint = 1.00;
+        let roundStartTime = 0;
+        let animationFrameId = null;
+
+        // Stats
+        let totalGames = 0;
+        let wins = 0;
+        let maxMultiplier = 0;
+        let netProfit = 0;
+
+        // Elements
+        const balanceEl = document.getElementById('balanceDisplay');
+        const betInput = document.getElementById('betAmount');
+        const multiplierEl = document.getElementById('multiplierText');
+        const statusMsgEl = document.getElementById('statusMsg');
+        const actionBtn = document.getElementById('mainActionBtn');
+        const winEstimateEl = document.getElementById('winEstimate');
+        const historyBarEl = document.getElementById('historyBar');
+        const reliefBtn = document.getElementById('reliefBtn');
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Web Audio Context
+        let audioCtx = null;
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        function playSound(type, freq = 440) {
+            if (!audioCtx) return;
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                const now = audioCtx.currentTime;
+                if (type === 'tick') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(freq, now);
+                    gain.gain.setValueAtTime(0.05, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+                    osc.start(now);
+                    osc.stop(now + 0.05);
+                } else if (type === 'crash') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(150, now);
+                    osc.frequency.exponentialRampToValueAtTime(30, now + 0.4);
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+                    osc.start(now);
+                    osc.stop(now + 0.4);
+                } else if (type === 'cashout') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(523.25, now); // C5
+                    osc.frequency.setValueAtTime(659.25, now + 0.08); // E5
+                    osc.frequency.setValueAtTime(783.99, now + 0.16); // G5
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+                    osc.start(now);
+                    osc.stop(now + 0.35);
+                }
+            } catch(e) {}
+        }
+
+        // Resize Canvas
+        function resizeCanvas() {
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        // Generate Crash Point (Provably fair style curve with 3% house edge)
+        function generateCrashPoint() {
+            const e = 2 ** 32;
+            const h = crypto.getRandomValues(new Uint32Array(1))[0];
+            if (h % 33 === 0) return 1.00; // 3% instant crash at 1.00x
+            const r = (100 * e - h) / (e - h);
+            const crash = Math.floor(r) / 100;
+            return Math.max(1.01, crash);
+        }
+
+        // Bet adjustments
+        function adjustBet(action) {
+            let val = parseInt(betInput.value) || 0;
+            if (action === '100') val += 100;
+            else if (action === '1000') val += 1000;
+            else if (action === 'half') val = Math.floor(val / 2);
+            else if (action === 'double') val = val * 2;
+            else if (action === 'all') val = balance;
+
+            val = Math.max(100, Math.min(balance, val));
+            betInput.value = val;
+        }
+
+        // Handle Main Button
+        function handleMainAction() {
+            initAudio();
+            if (gameState === 'IDLE' || gameState === 'CRASHED' || gameState === 'CASHED_OUT') {
+                startBet();
+            } else if (gameState === 'RUNNING') {
+                cashOut();
+            }
+        }
+
+        function startBet() {
+            const amount = parseInt(betInput.value);
+            if (isNaN(amount) || amount < 100) {
+                alert('최소 베팅 금액은 100칩입니다.');
+                return;
+            }
+            if (amount > balance) {
+                alert('보유 칩이 부족합니다!');
+                return;
+            }
+
+            bet = amount;
+            balance -= bet;
+            updateBalance();
+
+            gameState = 'COUNTDOWN';
+            let count = 3;
+            statusMsgEl.textContent = `로켓 발사 준비 중... ${count}초`;
+            actionBtn.className = 'btn-action btn-waiting';
+            actionBtn.textContent = '발사 대기 중...';
+
+            const countdownInterval = setInterval(() => {
+                count--;
+                if (count > 0) {
+                    statusMsgEl.textContent = `로켓 발사 준비 중... ${count}초`;
+                    playSound('tick', 300 + (3 - count) * 100);
+                } else {
+                    clearInterval(countdownInterval);
+                    launchRocket();
+                }
+            }, 800);
+        }
+
+        function launchRocket() {
+            gameState = 'RUNNING';
+            crashPoint = generateCrashPoint();
+            currentMultiplier = 1.00;
+            roundStartTime = performance.now();
+
+            multiplierEl.className = 'multiplier-val color-running';
+            statusMsgEl.textContent = '상승 중! 언제 터질지 모릅니다!';
+
+            actionBtn.className = 'btn-action btn-cashout';
+            actionBtn.textContent = `CASH OUT (+${Math.floor(bet * 1.00).toLocaleString()})`;
+
+            animateRocket();
+        }
+
+        function animateRocket() {
+            if (gameState !== 'RUNNING' && gameState !== 'CASHED_OUT') return;
+
+            const elapsed = (performance.now() - roundStartTime) / 1000; // seconds
+            // Multiplier growth curve: exponential growth
+            currentMultiplier = parseFloat((1.0 + 0.06 * Math.pow(elapsed * 2, 1.8)).toFixed(2));
+
+            // Sound tick
+            if (Math.random() < 0.15) {
+                playSound('tick', Math.min(1200, 300 + currentMultiplier * 50));
+            }
+
+            if (currentMultiplier >= crashPoint) {
+                // CRASH!
+                triggerCrash();
+                return;
+            }
+
+            // Update UI
+            multiplierEl.textContent = currentMultiplier.toFixed(2) + 'x';
+            if (gameState === 'RUNNING') {
+                const currentWin = Math.floor(bet * currentMultiplier);
+                actionBtn.textContent = `CASH OUT (+${currentWin.toLocaleString()})`;
+                winEstimateEl.textContent = `예상 획득: ${currentWin.toLocaleString()}`;
+            }
+
+            drawChart();
+            animationFrameId = requestAnimationFrame(animateRocket);
+        }
+
+        function cashOut() {
+            if (gameState !== 'RUNNING') return;
+            gameState = 'CASHED_OUT';
+
+            const winAmount = Math.floor(bet * currentMultiplier);
+            balance += winAmount;
+            wins++;
+            totalGames++;
+            const profit = winAmount - bet;
+            netProfit += profit;
+            if (currentMultiplier > maxMultiplier) maxMultiplier = currentMultiplier;
+
+            updateBalance();
+            updateStats();
+            playSound('cashout');
+
+            multiplierEl.className = 'multiplier-val color-cashed';
+            statusMsgEl.textContent = `🎉 캐시아웃 성공! +${winAmount.toLocaleString()} 칩`;
+            actionBtn.className = 'btn-action btn-bet';
+            actionBtn.textContent = '다음 라운드 준비';
+
+            addHistory(currentMultiplier, true);
+        }
+
+        function triggerCrash() {
+            gameState = 'CRASHED';
+            currentMultiplier = crashPoint;
+            multiplierEl.textContent = crashPoint.toFixed(2) + 'x';
+            multiplierEl.className = 'multiplier-val color-crashed';
+            statusMsgEl.textContent = `💥 로켓 폭발! (Crashed at ${crashPoint.toFixed(2)}x)`;
+
+            playSound('crash');
+
+            if (actionBtn.className.includes('btn-cashout')) {
+                totalGames++;
+                netProfit -= bet;
+                updateStats();
+                actionBtn.className = 'btn-action btn-bet';
+                actionBtn.textContent = '다시 도전하기';
+                addHistory(crashPoint, false);
+            }
+
+            drawChart(true);
+            checkRelief();
+        }
+
+        function drawChart(crashed = false) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const w = canvas.width;
+            const h = canvas.height;
+
+            // Draw grid lines
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+            ctx.lineWidth = 1;
+            for (let y = h - 30; y > 0; y -= 40) {
+                ctx.beginPath();
+                ctx.moveTo(30, y);
+                ctx.lineTo(w, y);
+                ctx.stroke();
+            }
+
+            // Draw rocket curve
+            const maxDisplayMult = Math.max(3, currentMultiplier * 1.2);
+            const progress = Math.min(1, (currentMultiplier - 1.0) / (maxDisplayMult - 1.0));
+
+            const startX = 30;
+            const startY = h - 20;
+            const endX = startX + (w - 60) * Math.min(1, progress * 1.1);
+            const endY = startY - (h - 60) * progress;
+
+            ctx.beginPath();
+            ctx.moveTo(startX, startY);
+            ctx.quadraticCurveTo(startX + (endX - startX) * 0.7, startY, endX, endY);
+
+            ctx.lineWidth = 4;
+            ctx.strokeStyle = crashed ? '#da3633' : '#2ea043';
+            ctx.shadowColor = crashed ? '#da3633' : '#2ea043';
+            ctx.shadowBlur = 15;
+            ctx.stroke();
+            ctx.shadowBlur = 0;
+
+            // Draw rocket icon / dot
+            ctx.beginPath();
+            ctx.arc(endX, endY, crashed ? 8 : 6, 0, Math.PI * 2);
+            ctx.fillStyle = crashed ? '#da3633' : '#f1e05a';
+            ctx.fill();
+
+            if (!crashed) {
+                ctx.font = '16px sans-serif';
+                ctx.fillText('🚀', endX - 8, endY - 10);
+            } else {
+                ctx.font = '20px sans-serif';
+                ctx.fillText('💥', endX - 10, endY - 10);
+            }
+        }
+
+        function addHistory(mult, isWin) {
+            const tag = document.createElement('div');
+            let tagClass = 'tag-crash';
+            if (mult >= 10.0) tagClass = 'tag-gold';
+            else if (isWin || mult >= 2.0) tagClass = 'tag-win';
+
+            tag.className = `history-tag ${tagClass}`;
+            tag.textContent = mult.toFixed(2) + 'x';
+            historyBarEl.insertBefore(tag, historyBarEl.firstChild);
+            if (historyBarEl.children.length > 15) {
+                historyBarEl.removeChild(historyBarEl.lastChild);
+            }
+        }
+
+        function updateBalance() {
+            balanceEl.textContent = balance.toLocaleString();
+            checkRelief();
+        }
+
+        function updateStats() {
+            document.getElementById('statGames').textContent = totalGames;
+            const rate = totalGames > 0 ? ((wins / totalGames) * 100).toFixed(0) : 0;
+            document.getElementById('statWinRate').textContent = rate + '%';
+            document.getElementById('statMaxMult').textContent = maxMultiplier.toFixed(2) + 'x';
+            const profitEl = document.getElementById('statProfit');
+            profitEl.textContent = (netProfit >= 0 ? '+' : '') + netProfit.toLocaleString();
+            profitEl.style.color = netProfit >= 0 ? 'var(--accent-green)' : 'var(--accent-red)';
+        }
+
+        function checkRelief() {
+            if (balance < 100) {
+                reliefBtn.style.display = 'block';
+            } else {
+                reliefBtn.style.display = 'none';
+            }
+        }
+
+        function claimRelief() {
+            balance += 5000;
+            updateBalance();
+            alert('💸 긴급 지원금 5,000칩이 지급되었습니다! 이번엔 꼭 대박 나세요!');
+        }
+
+        // Initialize empty chart
+        drawChart();
+    </script>
+</body>
+</html>
