@@ -50,6 +50,47 @@
       gap: 16px;
     }
 
+    /* Top Navigation */
+    .top-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--card-bg);
+      padding: 10px 16px;
+      border-radius: var(--radius-card);
+      border: 1px solid var(--fill-soft);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    .lobby-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: var(--fill-faint);
+      color: var(--text-sub);
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: none;
+      border: 1px solid var(--fill-soft);
+      transition: all 0.2s;
+    }
+
+    .lobby-btn:hover {
+      color: var(--text-main);
+      border-color: var(--text-sub);
+    }
+
+    .game-nav-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
     /* Header stats */
     .header-bar {
       display: flex;
@@ -393,6 +434,13 @@
 <body>
 
 <div class="container">
+  <!-- Top Navigation -->
+  <div class="top-nav">
+    <a href="../index.html" class="lobby-btn">🏠 로비</a>
+    <div class="game-nav-title">🔮 구슬 홀짝 게임</div>
+    <div style="width: 58px;"></div>
+  </div>
+
   <!-- Header Stats -->
   <div class="header-bar">
     <div class="stat-box">
