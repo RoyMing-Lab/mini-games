@@ -6,12 +6,18 @@
 
 ## 🎮 수록 게임 목록
 
-### 1. 🚀 [로켓 크래시 (Rocket Crash)](crash/index.html)
+### 1. 🎰 [777 라스베이거스 슬롯머신 (Vegas Slots)](slot-machine/index.html)
+- 클래식 3릴 슬롯머신, 중앙 페이라인 당첨 구조.
+- 777 메가 잭팟 100배, 다이아 50배, BAR 25배 등 다양한 배당.
+- ⭐ 스캐터 3개 당첨 시 5회 VIP 프리 스핀(모든 당첨 2배 배당) 가동.
+- 릴 회전/정지/당첨/잭팟 Web Audio 효과음 및 컨페티 축하 연출, 파산 구호금.
+
+### 2. 🚀 [로켓 크래시 (Rocket Crash)](crash/index.html)
 - 1.00x부터 로켓처럼 치솟는 실시간 배수 탈출 게임!
 - 폭발(Crash)하기 전에 캐시아웃(Cash Out)하여 베팅액 × 배수 획득.
 - Web Audio API 사운드, 캔버스 애니메이션, 파산 구호금 지원.
 
-### 2. 🔮 [구슬 홀짝 게임 (Odd-Even Game)](odd-even/index.html)
+### 3. 🔮 [구슬 홀짝 게임 (Odd-Even Game)](odd-even/index.html)
 - 1~18개의 구슬 수를 보고 홀수/짝수를 맞히는 클래식 확률 게임.
 - 연승 보너스 배당, 올인 베팅, 구슬 낙하 및 컨페티 시각 효과.
 

@@ -1,0 +1,1387 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🎰 777 VEGAS SLOTS - 라스베이거스 잭팟 슬롯머신</title>
+    <style>
+        :root {
+            --bg-color: #0b0e14;
+            --panel-bg: #151922;
+            --panel-sub: #1c2230;
+            --border-color: #2d3548;
+            --accent-gold: #ffd700;
+            --accent-gold-glow: rgba(255, 215, 0, 0.4);
+            --accent-red: #ff3344;
+            --accent-red-glow: rgba(255, 51, 68, 0.4);
+            --accent-purple: #a855f7;
+            --accent-purple-glow: rgba(168, 85, 247, 0.4);
+            --accent-green: #10b981;
+            --text-main: #f3f4f6;
+            --text-sub: #9ca3af;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 12px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 460px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        /* Top Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--panel-bg);
+            padding: 12px 16px;
+            border-radius: 14px;
+            border: 1px solid var(--border-color);
+        }
+
+        .lobby-btn {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: var(--panel-sub);
+            color: var(--text-sub);
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-decoration: none;
+            border: 1px solid var(--border-color);
+            transition: all 0.2s;
+        }
+
+        .lobby-btn:hover {
+            color: var(--text-main);
+            border-color: var(--text-sub);
+        }
+
+        .title {
+            font-size: 1.1rem;
+            font-weight: 900;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #fff 0%, var(--accent-gold) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .balance-box {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 6px 12px;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .balance-amount {
+            font-weight: 800;
+            color: var(--accent-gold);
+            font-size: 0.95rem;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Free Spin Mode Banner */
+        .free-spin-banner {
+            display: none;
+            background: linear-gradient(90deg, #7e22ce, #ec4899, #7e22ce);
+            background-size: 200% auto;
+            animation: gradientShift 2s linear infinite;
+            color: #fff;
+            padding: 10px;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: 900;
+            font-size: 0.95rem;
+            letter-spacing: 0.5px;
+            box-shadow: 0 0 16px var(--accent-purple-glow);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 200% 50%; }
+        }
+
+        /* Slot Machine Cabinet */
+        .slot-cabinet {
+            background: linear-gradient(180deg, #1e2433 0%, #11151e 100%);
+            border: 3px solid #3b4559;
+            border-radius: 20px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6), inset 0 2px 4px rgba(255, 255, 255, 0.1);
+            position: relative;
+        }
+
+        .cabinet-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 4px;
+        }
+
+        .jackpot-display {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid #d97706;
+            border-radius: 10px;
+            padding: 6px 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            margin: 0 6px;
+            box-shadow: 0 0 10px rgba(217, 119, 6, 0.3);
+        }
+
+        .jackpot-label {
+            font-size: 0.7rem;
+            font-weight: 800;
+            color: #fbbf24;
+            letter-spacing: 1px;
+        }
+
+        .jackpot-value {
+            font-size: 1.15rem;
+            font-weight: 900;
+            color: var(--accent-gold);
+            text-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Reels Container */
+        .reels-stage {
+            background: #07090e;
+            border: 2px solid #282f40;
+            border-radius: 14px;
+            height: 240px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 10px 20px rgba(0, 0, 0, 0.9), inset 0 -10px 20px rgba(0, 0, 0, 0.9);
+            padding: 0 6px;
+        }
+
+        /* Payline Indicator */
+        .payline-indicator {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 80px;
+            transform: translateY(-50%);
+            border-top: 2px dashed rgba(255, 215, 0, 0.35);
+            border-bottom: 2px dashed rgba(255, 215, 0, 0.35);
+            pointer-events: none;
+            z-index: 5;
+            background: rgba(255, 215, 0, 0.03);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 4px;
+        }
+
+        .payline-marker {
+            font-size: 0.65rem;
+            font-weight: 900;
+            color: var(--accent-gold);
+            background: rgba(0, 0, 0, 0.6);
+            padding: 2px 4px;
+            border-radius: 4px;
+            border: 1px solid rgba(255, 215, 0, 0.5);
+        }
+
+        .payline-win {
+            border-top: 2px solid var(--accent-gold) !important;
+            border-bottom: 2px solid var(--accent-gold) !important;
+            background: rgba(255, 215, 0, 0.15) !important;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+            animation: pulseWin 0.6s infinite alternate;
+        }
+
+        @keyframes pulseWin {
+            0% { opacity: 0.8; }
+            100% { opacity: 1; filter: brightness(1.3); }
+        }
+
+        /* Individual Reel */
+        .reel {
+            width: 31%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.02) 0%, rgba(0, 0, 0, 0.3) 50%, rgba(255, 255, 255, 0.02) 100%);
+            border-radius: 8px;
+        }
+
+        .reel.anticipation {
+            box-shadow: 0 0 15px var(--accent-gold);
+            border: 1px solid var(--accent-gold);
+            animation: anticipationGlow 0.4s infinite alternate;
+        }
+
+        @keyframes anticipationGlow {
+            0% { filter: brightness(1); }
+            100% { filter: brightness(1.5); }
+        }
+
+        .reel-track {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            will-change: transform;
+        }
+
+        .reel-item {
+            height: 80px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.7rem;
+            user-select: none;
+            filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.5));
+            transition: transform 0.2s;
+        }
+
+        .reel-item.win-highlight {
+            transform: scale(1.18);
+            filter: drop-shadow(0 0 12px var(--accent-gold));
+        }
+
+        /* Win Message Display */
+        .win-display {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 10px;
+            text-align: center;
+            min-height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 0.95rem;
+            color: var(--text-sub);
+            transition: all 0.2s;
+        }
+
+        .win-display.big-win {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 51, 68, 0.2));
+            border-color: var(--accent-gold);
+            color: var(--accent-gold);
+            font-size: 1.1rem;
+            box-shadow: 0 0 16px rgba(255, 215, 0, 0.3);
+            animation: bounce 0.4s ease;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        /* Bet Controls */
+        .controls-panel {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .bet-adjust-row {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .bet-input-wrap {
+            flex: 1;
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .bet-input {
+            width: 100%;
+            background: var(--panel-sub);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-main);
+            font-size: 1rem;
+            font-weight: 800;
+            padding: 10px 12px;
+            outline: none;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .bet-input:focus {
+            border-color: var(--accent-gold);
+        }
+
+        .quick-chips-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 6px;
+        }
+
+        .chip-btn {
+            background: var(--panel-sub);
+            border: 1px solid var(--border-color);
+            color: var(--text-sub);
+            border-radius: 8px;
+            padding: 8px 0;
+            font-size: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .chip-btn:hover {
+            color: var(--text-main);
+            border-color: #4b5563;
+        }
+
+        .chip-btn:active {
+            transform: scale(0.95);
+            background: #283143;
+        }
+
+        /* Spin Action Row */
+        .spin-row {
+            display: flex;
+            gap: 10px;
+            align-items: stretch;
+        }
+
+        .auto-btn {
+            flex: 1;
+            background: var(--panel-sub);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            color: var(--text-sub);
+            font-size: 0.85rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+        }
+
+        .auto-btn.active {
+            background: rgba(168, 85, 247, 0.2);
+            border-color: var(--accent-purple);
+            color: var(--accent-purple);
+            box-shadow: 0 0 12px var(--accent-purple-glow);
+        }
+
+        .spin-btn {
+            flex: 2.5;
+            background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+            border: 2px solid #f87171;
+            border-radius: 14px;
+            color: #fff;
+            font-size: 1.25rem;
+            font-weight: 900;
+            padding: 16px 0;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4), inset 0 2px 4px rgba(255, 255, 255, 0.3);
+            letter-spacing: 1px;
+            transition: all 0.15s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .spin-btn:hover {
+            filter: brightness(1.1);
+            transform: translateY(-2px);
+        }
+
+        .spin-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
+        }
+
+        .spin-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            filter: grayscale(0.5);
+        }
+
+        /* Relief Button */
+        .relief-box {
+            display: none;
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(0, 0, 0, 0.3));
+            border: 1px dashed var(--accent-red);
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .relief-btn {
+            background: var(--accent-green);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 10px;
+            font-weight: 800;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .relief-btn:active {
+            transform: scale(0.97);
+        }
+
+        /* Paytable & Stats Toggle */
+        .tab-nav {
+            display: flex;
+            gap: 8px;
+            margin-top: 4px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-sub);
+            padding: 10px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active {
+            color: var(--text-main);
+            border-color: var(--accent-gold);
+            background: var(--panel-sub);
+        }
+
+        .tab-content {
+            display: none;
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 14px;
+        }
+
+        .tab-content.active {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        /* Paytable Grid */
+        .paytable-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+
+        .pay-item {
+            background: var(--panel-sub);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 8px 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+        }
+
+        .pay-sym {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 1.1rem;
+        }
+
+        .pay-sym-name {
+            font-size: 0.75rem;
+            color: var(--text-sub);
+            font-weight: 600;
+        }
+
+        .pay-mul {
+            font-weight: 800;
+            color: var(--accent-gold);
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .stat-card {
+            background: var(--panel-sub);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 8px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            color: var(--text-sub);
+            font-weight: 600;
+        }
+
+        .stat-val {
+            font-size: 0.95rem;
+            font-weight: 800;
+            color: var(--text-main);
+        }
+
+        /* History Tape */
+        .history-tape {
+            display: flex;
+            gap: 6px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+        }
+
+        .history-item {
+            background: var(--panel-sub);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 4px 8px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .hist-win { color: var(--accent-gold); border-color: rgba(255, 215, 0, 0.4); }
+        .hist-loss { color: var(--text-sub); }
+
+        /* Confetti Canvas */
+        #confettiCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 100;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="confettiCanvas"></canvas>
+
+    <div class="container">
+        <!-- Top Navigation & Balance -->
+        <div class="header">
+            <a href="../index.html" class="lobby-btn">🏠 로비</a>
+            <div class="title">🎰 777 VEGAS SLOTS</div>
+            <div class="balance-box">
+                <span>🪙</span>
+                <span class="balance-amount" id="balanceText">10,000</span>
+            </div>
+        </div>
+
+        <!-- Free Spin Mode Banner -->
+        <div class="free-spin-banner" id="freeSpinBanner">
+            🔥 VIP FREE SPINS: <span id="freeSpinCount">5</span>회 남음 (모든 당첨 2배!)
+        </div>
+
+        <!-- Slot Cabinet -->
+        <div class="slot-cabinet">
+            <!-- Cabinet Top Displays -->
+            <div class="cabinet-header">
+                <div class="jackpot-display">
+                    <span class="jackpot-label">👑 MEGA JACKPOT (777)</span>
+                    <span class="jackpot-value" id="jackpotDisplay">100X</span>
+                </div>
+            </div>
+
+            <!-- Reels Stage -->
+            <div class="reels-stage" id="reelsStage">
+                <!-- Center Payline Indicator -->
+                <div class="payline-indicator" id="paylineIndicator">
+                    <span class="payline-marker">LINE 1</span>
+                    <span class="payline-marker">LINE 1</span>
+                </div>
+
+                <!-- Reel 1 -->
+                <div class="reel" id="reel0">
+                    <div class="reel-track" id="track0"></div>
+                </div>
+
+                <!-- Reel 2 -->
+                <div class="reel" id="reel1">
+                    <div class="reel-track" id="track1"></div>
+                </div>
+
+                <!-- Reel 3 -->
+                <div class="reel" id="reel2">
+                    <div class="reel-track" id="track2"></div>
+                </div>
+            </div>
+
+            <!-- Win Result Announcement -->
+            <div class="win-display" id="winDisplay">
+                베팅 후 SPIN 버튼을 눌러 슬롯을 돌려보세요!
+            </div>
+        </div>
+
+        <!-- Bankruptcy Relief Box -->
+        <div class="relief-box" id="reliefBox">
+            <div style="font-size: 0.85rem; color: #f87171; font-weight: 700;">칩이 모두 소진되었습니다!</div>
+            <button class="relief-btn" onclick="claimRelief()">💸 긴급 구호금 5,000칩 받기</button>
+        </div>
+
+        <!-- Controls Panel -->
+        <div class="controls-panel">
+            <!-- Bet Input & Quick Adjust -->
+            <div class="bet-adjust-row">
+                <div class="bet-input-wrap">
+                    <input type="number" class="bet-input" id="betInput" value="500" min="100" step="100">
+                </div>
+            </div>
+
+            <div class="quick-chips-grid">
+                <button class="chip-btn" onclick="adjustBet('100')">+100</button>
+                <button class="chip-btn" onclick="adjustBet('500')">+500</button>
+                <button class="chip-btn" onclick="adjustBet('1000')">+1K</button>
+                <button class="chip-btn" onclick="adjustBet('half')">1/2</button>
+                <button class="chip-btn" onclick="adjustBet('double')">2X</button>
+                <button class="chip-btn" onclick="adjustBet('all')" style="color: var(--accent-gold); font-weight: 900;">ALL</button>
+            </div>
+
+            <!-- Spin / Auto Buttons -->
+            <div class="spin-row">
+                <button class="auto-btn" id="autoBtn" onclick="toggleAutoSpin()">
+                    <span style="font-size: 1.1rem;">⚡</span>
+                    <span id="autoBtnText">AUTO</span>
+                </button>
+                <button class="spin-btn" id="spinBtn" onclick="handleSpinClick()">
+                    <span>🎰</span>
+                    <span id="spinBtnText">SPIN</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Recent History Tape -->
+        <div class="history-tape" id="historyTape"></div>
+
+        <!-- Tabs: Paytable & Stats -->
+        <div class="tab-nav">
+            <button class="tab-btn active" onclick="switchTab('paytable')">📖 배당표 (Paytable)</button>
+            <button class="tab-btn" onclick="switchTab('stats')">📊 실시간 통계</button>
+        </div>
+
+        <!-- Tab 1: Paytable -->
+        <div class="tab-content active" id="tab-paytable">
+            <div class="paytable-grid">
+                <div class="pay-item">
+                    <div class="pay-sym"><span>7️⃣7️⃣7️⃣</span><span class="pay-sym-name">트리플 세븐</span></div>
+                    <span class="pay-mul">100X</span>
+                </div>
+                <div class="pay-item">
+                    <div class="pay-sym"><span>💎💎💎</span><span class="pay-sym-name">다이아몬드</span></div>
+                    <span class="pay-mul">50X</span>
+                </div>
+                <div class="pay-item">
+                    <div class="pay-sym"><span>🎰🎰🎰</span><span class="pay-sym-name">바 (BAR)</span></div>
+                    <span class="pay-mul">25X</span>
+                </div>
+                <div class="pay-item">
+                    <div class="pay-sym"><span>🔔🔔🔔</span><span class="pay-sym-name">골든 벨</span></div>
+                    <span class="pay-mul">15X</span>
+                </div>
+                <div class="pay-item">
+                    <div class="pay-sym"><span>🍉🍉🍉</span><span class="pay-sym-name">수박</span></div>
+                    <span class="pay-mul">10X</span>
+                </div>
+                <div class="pay-item">
+                    <div class="pay-sym"><span>🍇🍇🍇</span><span class="pay-sym-name">포도</span></div>
+                    <span class="pay-mul">8X</span>
+                </div>
+                <div class="pay-item">
+                    <div class="pay-sym"><span>🍋🍋🍋</span><span class="pay-sym-name">레몬</span></div>
+                    <span class="pay-mul">5X</span>
+                </div>
+                <div class="pay-item">
+                    <div class="pay-sym"><span>🍒🍒🍒</span><span class="pay-sym-name">체리 3개</span></div>
+                    <span class="pay-mul">3X</span>
+                </div>
+                <div class="pay-item" style="grid-column: span 2; background: rgba(168, 85, 247, 0.15); border-color: rgba(168, 85, 247, 0.4);">
+                    <div class="pay-sym"><span>⭐⭐⭐</span><span class="pay-sym-name">스캐터 보너스</span></div>
+                    <span class="pay-mul" style="color: #c084fc;">5 Free Spins (2X)</span>
+                </div>
+                <div class="pay-item" style="grid-column: span 2;">
+                    <div class="pay-sym"><span>🍒🍒 / 7️⃣7️⃣ / 💎💎</span><span class="pay-sym-name">앞 2릴 일치</span></div>
+                    <span class="pay-mul">2X ~ 10X</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 2: Stats -->
+        <div class="tab-content" id="tab-stats">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-label">총 스핀 횟수</span>
+                    <span class="stat-val" id="statSpins">0</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">당첨 횟수</span>
+                    <span class="stat-val" id="statWins">0</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">승률</span>
+                    <span class="stat-val" id="statWinRate">0%</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">순수익</span>
+                    <span class="stat-val" id="statProfit">0</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">최대 당첨금</span>
+                    <span class="stat-val" id="statMaxWin">0</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">잭팟(777) 횟수</span>
+                    <span class="stat-val" id="statJackpots">0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Game Config & Symbols ---
+        const SYMBOLS = [
+            { id: '7', char: '7️⃣', weight: 4, name: '777' },
+            { id: 'diamond', char: '💎', weight: 6, name: '다이아' },
+            { id: 'bar', char: '🎰', weight: 10, name: 'BAR' },
+            { id: 'bell', char: '🔔', weight: 14, name: '벨' },
+            { id: 'melon', char: '🍉', weight: 18, name: '수박' },
+            { id: 'grape', char: '🍇', weight: 22, name: '포도' },
+            { id: 'lemon', char: '🍋', weight: 26, name: '레몬' },
+            { id: 'cherry', char: '🍒', weight: 32, name: '체리' },
+            { id: 'star', char: '⭐', weight: 8, name: '스캐터' }
+        ];
+
+        // Cumulative weights for weighted random
+        const totalWeight = SYMBOLS.reduce((sum, s) => sum + s.weight, 0);
+
+        function getRandomSymbol() {
+            let rnd = Math.random() * totalWeight;
+            for (let s of SYMBOLS) {
+                if (rnd < s.weight) return s;
+                rnd -= s.weight;
+            }
+            return SYMBOLS[SYMBOLS.length - 1];
+        }
+
+        // --- State Variables ---
+        let balance = 10000;
+        let startingBalance = 10000;
+        let currentBet = 500;
+        let isSpinning = false;
+        let isAutoSpin = false;
+        let freeSpins = 0;
+        let freeSpinMultiplier = 1;
+        let totalSpins = 0;
+        let totalWins = 0;
+        let maxWin = 0;
+        let totalJackpots = 0;
+
+        const ITEM_HEIGHT = 80;
+        const STRIP_COUNT = 24;
+
+        // Reel track elements
+        const tracks = [
+            document.getElementById('track0'),
+            document.getElementById('track1'),
+            document.getElementById('track2')
+        ];
+        const reelElements = [
+            document.getElementById('reel0'),
+            document.getElementById('reel1'),
+            document.getElementById('reel2')
+        ];
+
+        // Track data
+        let reelStrips = [[], [], []];
+
+        // DOM elements
+        const balanceText = document.getElementById('balanceText');
+        const betInput = document.getElementById('betInput');
+        const spinBtn = document.getElementById('spinBtn');
+        const spinBtnText = document.getElementById('spinBtnText');
+        const autoBtn = document.getElementById('autoBtn');
+        const autoBtnText = document.getElementById('autoBtnText');
+        const winDisplay = document.getElementById('winDisplay');
+        const reliefBox = document.getElementById('reliefBox');
+        const freeSpinBanner = document.getElementById('freeSpinBanner');
+        const freeSpinCountText = document.getElementById('freeSpinCount');
+        const paylineIndicator = document.getElementById('paylineIndicator');
+        const historyTape = document.getElementById('historyTape');
+
+        // Stats DOM
+        const statSpins = document.getElementById('statSpins');
+        const statWins = document.getElementById('statWins');
+        const statWinRate = document.getElementById('statWinRate');
+        const statProfit = document.getElementById('statProfit');
+        const statMaxWin = document.getElementById('statMaxWin');
+        const statJackpots = document.getElementById('statJackpots');
+
+        // --- Web Audio Engine ---
+        let audioCtx = null;
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        function playSound(type) {
+            if (!audioCtx) return;
+            try {
+                const now = audioCtx.currentTime;
+                if (type === 'click') {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.frequency.setValueAtTime(600, now);
+                    gain.gain.setValueAtTime(0.08, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+                    osc.start(now);
+                    osc.stop(now + 0.05);
+                } else if (type === 'tick') {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(320 + Math.random() * 60, now);
+                    gain.gain.setValueAtTime(0.04, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+                    osc.start(now);
+                    osc.stop(now + 0.04);
+                } else if (type === 'stop') {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(140, now);
+                    osc.frequency.exponentialRampToValueAtTime(60, now + 0.12);
+                    gain.gain.setValueAtTime(0.25, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+                    osc.start(now);
+                    osc.stop(now + 0.12);
+                } else if (type === 'win') {
+                    [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        osc.connect(gain);
+                        gain.connect(audioCtx.destination);
+                        osc.type = 'triangle';
+                        osc.frequency.setValueAtTime(freq, now + idx * 0.08);
+                        gain.gain.setValueAtTime(0.18, now + idx * 0.08);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.08 + 0.25);
+                        osc.start(now + idx * 0.08);
+                        osc.stop(now + idx * 0.08 + 0.25);
+                    });
+                } else if (type === 'jackpot') {
+                    const notes = [523.25, 659.25, 783.99, 1046.50, 1318.51, 1567.98];
+                    notes.forEach((freq, idx) => {
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        osc.connect(gain);
+                        gain.connect(audioCtx.destination);
+                        osc.type = 'sawtooth';
+                        osc.frequency.setValueAtTime(freq, now + idx * 0.1);
+                        gain.gain.setValueAtTime(0.22, now + idx * 0.1);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.1 + 0.4);
+                        osc.start(now + idx * 0.1);
+                        osc.stop(now + idx * 0.1 + 0.4);
+                    });
+                } else if (type === 'scatter') {
+                    [440, 554.37, 659.25, 880, 1108.73].forEach((f, i) => {
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        osc.connect(gain);
+                        gain.connect(audioCtx.destination);
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(f, now + i * 0.09);
+                        gain.gain.setValueAtTime(0.2, now + i * 0.09);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.09 + 0.3);
+                        osc.start(now + i * 0.09);
+                        osc.stop(now + i * 0.09 + 0.3);
+                    });
+                } else if (type === 'bankrupt') {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(180, now);
+                    osc.frequency.linearRampToValueAtTime(45, now + 0.5);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+                    osc.start(now);
+                    osc.stop(now + 0.5);
+                }
+            } catch(e) {}
+        }
+
+        // --- Reel Setup ---
+        function initReels() {
+            for (let r = 0; r < 3; r++) {
+                reelStrips[r] = [];
+                tracks[r].innerHTML = '';
+                for (let i = 0; i < STRIP_COUNT; i++) {
+                    const sym = getRandomSymbol();
+                    reelStrips[r].push(sym);
+                    const item = document.createElement('div');
+                    item.className = 'reel-item';
+                    item.textContent = sym.char;
+                    tracks[r].appendChild(item);
+                }
+                // Center item index 1 on the payline
+                tracks[r].style.transform = `translateY(0px)`;
+            }
+        }
+        initReels();
+
+        // --- Bet Controls ---
+        function updateBalance(newBal) {
+            balance = newBal;
+            balanceText.textContent = balance.toLocaleString();
+            if (balance <= 0 && freeSpins <= 0) {
+                reliefBox.style.display = 'flex';
+                if (isAutoSpin) toggleAutoSpin();
+            } else {
+                reliefBox.style.display = 'none';
+            }
+            updateStatsUI();
+        }
+
+        function adjustBet(action) {
+            initAudio();
+            playSound('click');
+            let val = parseInt(betInput.value) || 0;
+            if (action === '100') val += 100;
+            else if (action === '500') val += 500;
+            else if (action === '1000') val += 1000;
+            else if (action === 'half') val = Math.floor(val / 2);
+            else if (action === 'double') val = val * 2;
+            else if (action === 'all') val = Math.max(100, balance);
+
+            val = Math.max(100, Math.min(balance > 0 ? balance : 1000000, val));
+            betInput.value = val;
+        }
+
+        function claimRelief() {
+            initAudio();
+            playSound('win');
+            updateBalance(balance + 5000);
+            winDisplay.textContent = '💸 긴급 구호금 5,000칩이 지급되었습니다!';
+            winDisplay.className = 'win-display';
+        }
+
+        // --- Main Spin Logic ---
+        function handleSpinClick() {
+            initAudio();
+            if (isSpinning) return;
+            startSpin();
+        }
+
+        function toggleAutoSpin() {
+            initAudio();
+            playSound('click');
+            isAutoSpin = !isAutoSpin;
+            if (isAutoSpin) {
+                autoBtn.classList.add('active');
+                autoBtnText.textContent = 'STOP';
+                if (!isSpinning) startSpin();
+            } else {
+                autoBtn.classList.remove('active');
+                autoBtnText.textContent = 'AUTO';
+            }
+        }
+
+        function startSpin() {
+            if (isSpinning) return;
+
+            let bet = parseInt(betInput.value);
+            if (freeSpins > 0) {
+                bet = 0; // Free spin!
+            } else {
+                if (isNaN(bet) || bet < 100) {
+                    alert('최소 베팅 금액은 100칩입니다.');
+                    if (isAutoSpin) toggleAutoSpin();
+                    return;
+                }
+                if (bet > balance) {
+                    alert('보유 칩이 부족합니다!');
+                    if (isAutoSpin) toggleAutoSpin();
+                    return;
+                }
+                updateBalance(balance - bet);
+            }
+
+            isSpinning = true;
+            spinBtn.disabled = true;
+            paylineIndicator.classList.remove('payline-win');
+            document.querySelectorAll('.reel-item').forEach(el => el.classList.remove('win-highlight'));
+            reelElements.forEach(el => el.classList.remove('anticipation'));
+
+            if (freeSpins > 0) {
+                freeSpins--;
+                freeSpinCountText.textContent = freeSpins;
+                winDisplay.textContent = `🔥 FREE SPIN 가동 중! (${freeSpins}회 남음)`;
+                if (freeSpins === 0) {
+                    freeSpinBanner.style.display = 'none';
+                }
+            } else {
+                winDisplay.textContent = '릴이 회전하고 있습니다... 행운을 빕니다!';
+            }
+            winDisplay.className = 'win-display';
+
+            // Determine final outcomes for each reel
+            const results = [getRandomSymbol(), getRandomSymbol(), getRandomSymbol()];
+
+            // Check anticipation: Reel 1 & 2 match 777 or Scatter
+            const hasAnticipation = (results[0].id === '7' && results[1].id === '7') ||
+                                    (results[0].id === 'star' && results[1].id === 'star');
+
+            // Spin animation
+            const spinDurations = [
+                1100,
+                1600,
+                hasAnticipation ? 2800 : 2100
+            ];
+
+            let stoppedReels = 0;
+
+            for (let r = 0; r < 3; r++) {
+                animateReel(r, results[r], spinDurations[r], () => {
+                    stoppedReels++;
+                    if (stoppedReels === 2 && hasAnticipation) {
+                        reelElements[2].classList.add('anticipation');
+                    }
+                    if (stoppedReels === 3) {
+                        reelElements[2].classList.remove('anticipation');
+                        finalizeSpin(results, bet);
+                    }
+                });
+            }
+        }
+
+        function animateReel(reelIdx, targetSymbol, duration, onComplete) {
+            const track = tracks[reelIdx];
+            const startTime = performance.now();
+            let lastTick = 0;
+
+            // Prepare final strip items
+            // We want targetSymbol at the payline (center row, index 1)
+            const topSym = getRandomSymbol();
+            const botSym = getRandomSymbol();
+
+            // Replace top 3 elements for seamless landing
+            track.children[0].textContent = topSym.char;
+            track.children[1].textContent = targetSymbol.char;
+            track.children[2].textContent = botSym.char;
+
+            function frame(now) {
+                const elapsed = now - startTime;
+                if (elapsed < duration) {
+                    // Rapid looping scroll
+                    const speed = 25;
+                    const offset = -((elapsed * speed) % (ITEM_HEIGHT * 6));
+                    track.style.transform = `translateY(${offset}px)`;
+
+                    if (elapsed - lastTick > 70) {
+                        playSound('tick');
+                        lastTick = elapsed;
+                    }
+                    requestAnimationFrame(frame);
+                } else {
+                    // Snap to target with bounce effect
+                    track.style.transition = 'transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+                    track.style.transform = `translateY(0px)`;
+                    playSound('stop');
+
+                    setTimeout(() => {
+                        track.style.transition = 'none';
+                        onComplete();
+                    }, 250);
+                }
+            }
+            requestAnimationFrame(frame);
+        }
+
+        function finalizeSpin(results, bet) {
+            isSpinning = false;
+            spinBtn.disabled = false;
+            totalSpins++;
+
+            // Highlight middle payline items
+            const paylineItems = [
+                tracks[0].children[1],
+                tracks[1].children[1],
+                tracks[2].children[1]
+            ];
+
+            const [s1, s2, s3] = results;
+            let multiplier = 0;
+            let winTitle = '';
+            let isJackpot = false;
+            let isFreeSpinTrigger = false;
+
+            // Payout calculation
+            if (s1.id === '7' && s2.id === '7' && s3.id === '7') {
+                multiplier = 100;
+                winTitle = '👑 MEGA 777 JACKPOT!';
+                isJackpot = true;
+            } else if (s1.id === 'diamond' && s2.id === 'diamond' && s3.id === 'diamond') {
+                multiplier = 50;
+                winTitle = '💎 다이아몬드 3개 당첨!';
+            } else if (s1.id === 'bar' && s2.id === 'bar' && s3.id === 'bar') {
+                multiplier = 25;
+                winTitle = '🎰 BAR 3개 당첨!';
+            } else if (s1.id === 'bell' && s2.id === 'bell' && s3.id === 'bell') {
+                multiplier = 15;
+                winTitle = '🔔 골든 벨 3개 당첨!';
+            } else if (s1.id === 'melon' && s2.id === 'melon' && s3.id === 'melon') {
+                multiplier = 10;
+                winTitle = '🍉 수박 3개 당첨!';
+            } else if (s1.id === 'grape' && s2.id === 'grape' && s3.id === 'grape') {
+                multiplier = 8;
+                winTitle = '🍇 포도 3개 당첨!';
+            } else if (s1.id === 'lemon' && s2.id === 'lemon' && s3.id === 'lemon') {
+                multiplier = 5;
+                winTitle = '🍋 레몬 3개 당첨!';
+            } else if (s1.id === 'cherry' && s2.id === 'cherry' && s3.id === 'cherry') {
+                multiplier = 3;
+                winTitle = '🍒 체리 3개 당첨!';
+            } else if (s1.id === 'star' && s2.id === 'star' && s3.id === 'star') {
+                multiplier = 5;
+                winTitle = '⭐ 스캐터 트리거! 5 프리 스핀 획득!';
+                isFreeSpinTrigger = true;
+            } else if (s1.id === '7' && s2.id === '7') {
+                multiplier = 10;
+                winTitle = '7️⃣7️⃣ 더블 세븐 당첨!';
+            } else if (s1.id === 'diamond' && s2.id === 'diamond') {
+                multiplier = 5;
+                winTitle = '💎💎 더블 다이아 당첨!';
+            } else if (s1.id === 'cherry' && s2.id === 'cherry') {
+                multiplier = 2;
+                winTitle = '🍒🍒 체리 2개 당첨!';
+            } else if (s1.id === 'cherry') {
+                multiplier = 1;
+                winTitle = '🍒 체리 1개 본전 보존!';
+            }
+
+            // Apply free spin bonus multiplier (2X)
+            if (freeSpins > 0) {
+                multiplier *= 2;
+            }
+
+            const winAmount = multiplier * (bet > 0 ? bet : parseInt(betInput.value));
+
+            if (multiplier > 0) {
+                totalWins++;
+                updateBalance(balance + winAmount);
+                if (winAmount > maxWin) maxWin = winAmount;
+                if (isJackpot) totalJackpots++;
+
+                paylineIndicator.classList.add('payline-win');
+                paylineItems.forEach(el => el.classList.add('win-highlight'));
+
+                if (isJackpot) {
+                    playSound('jackpot');
+                    triggerConfetti();
+                    winDisplay.textContent = `${winTitle} +${winAmount.toLocaleString()}칩 (x${multiplier})`;
+                    winDisplay.className = 'win-display big-win';
+                } else if (isFreeSpinTrigger) {
+                    playSound('scatter');
+                    freeSpins += 5;
+                    freeSpinCountText.textContent = freeSpins;
+                    freeSpinBanner.style.display = 'block';
+                    winDisplay.textContent = `${winTitle} +${winAmount.toLocaleString()}칩!`;
+                    winDisplay.className = 'win-display big-win';
+                } else {
+                    playSound('win');
+                    winDisplay.textContent = `${winTitle} +${winAmount.toLocaleString()}칩 (x${multiplier})`;
+                    winDisplay.className = multiplier >= 10 ? 'win-display big-win' : 'win-display';
+                }
+
+                addHistory(`${s1.char}${s2.char}${s3.char}`, `+${winAmount.toLocaleString()}`, true);
+            } else {
+                winDisplay.textContent = `아쉽네요! 다음 스핀에 도전하세요.`;
+                addHistory(`${s1.char}${s2.char}${s3.char}`, '0', false);
+                if (balance <= 0 && freeSpins <= 0) {
+                    playSound('bankrupt');
+                }
+            }
+
+            updateStatsUI();
+
+            // Auto Spin loop
+            if (isAutoSpin) {
+                if (balance >= parseInt(betInput.value) || freeSpins > 0) {
+                    setTimeout(() => {
+                        if (isAutoSpin) startSpin();
+                    }, 800);
+                } else {
+                    toggleAutoSpin();
+                }
+            }
+        }
+
+        // --- History & Stats ---
+        function addHistory(combo, winText, isWin) {
+            const item = document.createElement('div');
+            item.className = `history-item ${isWin ? 'hist-win' : 'hist-loss'}`;
+            item.innerHTML = `<span>${combo}</span> <span>${winText}</span>`;
+            historyTape.insertBefore(item, historyTape.firstChild);
+            if (historyTape.children.length > 10) {
+                historyTape.removeChild(historyTape.lastChild);
+            }
+        }
+
+        function updateStatsUI() {
+            statSpins.textContent = totalSpins;
+            statWins.textContent = totalWins;
+            const rate = totalSpins > 0 ? ((totalWins / totalSpins) * 100).toFixed(1) : 0;
+            statWinRate.textContent = `${rate}%`;
+            const profit = balance - startingBalance;
+            statProfit.textContent = `${profit >= 0 ? '+' : ''}${profit.toLocaleString()}`;
+            statProfit.style.color = profit > 0 ? 'var(--accent-gold)' : (profit < 0 ? '#f87171' : 'var(--text-main)');
+            statMaxWin.textContent = maxWin.toLocaleString();
+            statJackpots.textContent = totalJackpots;
+        }
+
+        // --- Tab Switcher ---
+        function switchTab(tabId) {
+            initAudio();
+            playSound('click');
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+            if (tabId === 'paytable') {
+                document.querySelectorAll('.tab-btn')[0].classList.add('active');
+                document.getElementById('tab-paytable').classList.add('active');
+            } else {
+                document.querySelectorAll('.tab-btn')[1].classList.add('active');
+                document.getElementById('tab-stats').classList.add('active');
+            }
+        }
+
+        // --- Confetti Animation ---
+        const confettiCanvas = document.getElementById('confettiCanvas');
+        const cCtx = confettiCanvas.getContext('2d');
+        let particles = [];
+
+        function resizeConfetti() {
+            confettiCanvas.width = window.innerWidth;
+            confettiCanvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeConfetti);
+        resizeConfetti();
+
+        function triggerConfetti() {
+            particles = [];
+            const colors = ['#ffd700', '#ff3344', '#a855f7', '#10b981', '#38bdf8', '#ffffff'];
+            for (let i = 0; i < 90; i++) {
+                particles.push({
+                    x: window.innerWidth / 2,
+                    y: window.innerHeight / 2,
+                    vx: (Math.random() - 0.5) * 16,
+                    vy: (Math.random() - 0.8) * 18,
+                    size: Math.random() * 8 + 4,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    rot: Math.random() * 360,
+                    vRot: (Math.random() - 0.5) * 10,
+                    life: 1
+                });
+            }
+            animateConfetti();
+        }
+
+        function animateConfetti() {
+            if (particles.length === 0) return;
+            cCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+            particles.forEach((p, idx) => {
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += 0.4; // gravity
+                p.rot += p.vRot;
+                p.life -= 0.012;
+
+                cCtx.save();
+                cCtx.translate(p.x, p.y);
+                cCtx.rotate((p.rot * Math.PI) / 180);
+                cCtx.fillStyle = p.color;
+                cCtx.globalAlpha = Math.max(0, p.life);
+                cCtx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+                cCtx.restore();
+
+                if (p.life <= 0) particles.splice(idx, 1);
+            });
+            if (particles.length > 0) requestAnimationFrame(animateConfetti);
+            else cCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+        }
+    </script>
+</body>
+</html>
