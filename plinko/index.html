@@ -207,6 +207,11 @@
             background: #2d3548;
             color: var(--text-sub);
         }
+        .badge-loss {
+            background: rgba(239, 68, 68, 0.18);
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            color: #f87171;
+        }
 
         /* Canvas Wrapper */
         .canvas-card {
@@ -678,6 +683,28 @@
             } catch (e) {}
         }
 
+        let lastWallHitTime = 0;
+        function playWallHit() {
+            if (isMuted) return;
+            initAudio();
+            const now = audioCtx ? audioCtx.currentTime : 0;
+            if (now - lastWallHitTime < 0.06) return;
+            lastWallHitTime = now;
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(850, now);
+                osc.frequency.exponentialRampToValueAtTime(320, now + 0.035);
+                gain.gain.setValueAtTime(0.08, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.035);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(now);
+                osc.stop(now + 0.035);
+            } catch (e) {}
+        }
+
         function playSlotLand(mult) {
             if (isMuted) return;
             initAudio();
@@ -690,34 +717,34 @@
                     playBigWinFanfare();
                     return;
                 }
-                if (mult >= 1.5) {
+                if (mult >= 1.0) {
                     // Win chime
-                    const notes = [523.25, 659.25, 783.99]; // C5, E5, G5
+                    const notes = mult >= 2.0 ? [523.25, 659.25, 783.99, 1046.50] : [523.25, 659.25, 783.99];
                     notes.forEach((freq, idx) => {
                         const osc = audioCtx.createOscillator();
                         const gain = audioCtx.createGain();
                         osc.type = 'sine';
-                        osc.frequency.setValueAtTime(freq, audioCtx.currentTime + idx * 0.06);
-                        gain.gain.setValueAtTime(0.15, audioCtx.currentTime + idx * 0.06);
-                        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + idx * 0.06 + 0.15);
+                        osc.frequency.setValueAtTime(freq, audioCtx.currentTime + idx * 0.05);
+                        gain.gain.setValueAtTime(0.14, audioCtx.currentTime + idx * 0.05);
+                        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + idx * 0.05 + 0.12);
                         osc.connect(gain);
                         gain.connect(audioCtx.destination);
-                        osc.start(audioCtx.currentTime + idx * 0.06);
-                        osc.stop(audioCtx.currentTime + idx * 0.06 + 0.15);
+                        osc.start(audioCtx.currentTime + idx * 0.05);
+                        osc.stop(audioCtx.currentTime + idx * 0.05 + 0.12);
                     });
                 } else {
-                    // Soft drop
+                    // Loss sound (soft dull thud)
                     const osc = audioCtx.createOscillator();
                     const gain = audioCtx.createGain();
-                    osc.type = 'sine';
-                    osc.frequency.setValueAtTime(220, audioCtx.currentTime);
-                    osc.frequency.exponentialRampToValueAtTime(120, audioCtx.currentTime + 0.06);
-                    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.06);
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(170, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(75, audioCtx.currentTime + 0.09);
+                    gain.gain.setValueAtTime(0.14, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.09);
                     osc.connect(gain);
                     gain.connect(audioCtx.destination);
                     osc.start();
-                    osc.stop(audioCtx.currentTime + 0.06);
+                    osc.stop(audioCtx.currentTime + 0.09);
                 }
             } catch (e) {}
         }
@@ -778,9 +805,9 @@
            2. Multipliers & Risk Settings
            ============================================================ */
         const MULTIPLIERS = {
-            low:  [16, 9, 4.2, 2.1, 1.4, 1.1, 0.8, 1.1, 1.4, 2.1, 4.2, 9, 16],
-            med:  [110, 41, 10, 5, 3, 1.5, 0.4, 1.5, 3, 5, 10, 41, 110],
-            high: [1000, 130, 26, 9, 4, 0.4, 0.2, 0.4, 4, 9, 26, 130, 1000]
+            low:  [16, 7, 3, 1.6, 1.1, 0.8, 0.6, 0.8, 1.1, 1.6, 3, 7, 16],
+            med:  [110, 25, 7, 2.5, 1.2, 0.6, 0.4, 0.6, 1.2, 2.5, 7, 25, 110],
+            high: [1000, 25, 5, 1.5, 0.5, 0.3, 0.2, 0.3, 0.5, 1.5, 5, 25, 1000]
         };
 
         let currentRisk = 'high';
@@ -883,8 +910,8 @@
             if (mult >= 100) badge.classList.add('badge-jackpot');
             else if (mult >= 20) badge.classList.add('badge-huge');
             else if (mult >= 5) badge.classList.add('badge-high');
-            else if (mult >= 1.5) badge.classList.add('badge-med');
-            else badge.classList.add('badge-low');
+            else if (mult >= 1.0) badge.classList.add('badge-med');
+            else badge.classList.add('badge-loss');
 
             // Insert after the label
             if (historyBar.children.length > 1) {
@@ -918,6 +945,40 @@
         let balls = [];
         let floatTexts = [];
 
+        function getLeftWall(y) {
+            if (y < 12) {
+                return { x: 186, nx: 1, ny: 0 };
+            }
+            if (y <= 50) {
+                const t = (y - 12) / 38;
+                const x = 186 + t * (167 - 186);
+                return { x: x, nx: 0.894, ny: 0.447 };
+            }
+            if (y <= 358) {
+                const t = (y - 50) / 308;
+                const x = 167 + t * (32 - 167);
+                return { x: x, nx: 0.916, ny: 0.401 };
+            }
+            return { x: 32, nx: 1, ny: 0 };
+        }
+
+        function getRightWall(y) {
+            if (y < 12) {
+                return { x: 214, nx: -1, ny: 0 };
+            }
+            if (y <= 50) {
+                const t = (y - 12) / 38;
+                const x = 214 + t * (233 - 214);
+                return { x: x, nx: -0.894, ny: 0.447 };
+            }
+            if (y <= 358) {
+                const t = (y - 50) / 308;
+                const x = 233 + t * (368 - 233);
+                return { x: x, nx: -0.916, ny: 0.401 };
+            }
+            return { x: 368, nx: -1, ny: 0 };
+        }
+
         function initPins() {
             pins = [];
             for (let r = 0; r < PINS_ROWS; r++) {
@@ -946,22 +1007,33 @@
                 const mult = multList[i];
                 let color = '#2d3548';
                 let textColor = '#fff';
+                let borderColor = 'transparent';
 
                 if (mult >= 100) {
                     color = '#ff1144';
                     textColor = '#ffd700';
+                    borderColor = '#ffd700';
                 } else if (mult >= 20) {
                     color = '#ff3344';
-                } else if (mult >= 8) {
-                    color = '#f97316';
-                } else if (mult >= 3) {
-                    color = '#eab308';
-                    textColor = '#000';
-                } else if (mult >= 1.5) {
+                    textColor = '#fff';
+                    borderColor = '#ff8899';
+                } else if (mult >= 5) {
+                    color = '#a855f7';
+                    textColor = '#fff';
+                    borderColor = '#c084fc';
+                } else if (mult >= 2) {
+                    color = '#3b82f6';
+                    textColor = '#fff';
+                    borderColor = '#60a5fa';
+                } else if (mult >= 1.0) {
                     color = '#10b981';
+                    textColor = '#fff';
+                    borderColor = '#34d399';
                 } else {
-                    color = '#252c3d';
-                    textColor = '#9ca3af';
+                    // Loss slot (mult < 1.0)
+                    color = '#2d141e';
+                    textColor = '#f87171';
+                    borderColor = 'rgba(239, 68, 68, 0.5)';
                 }
 
                 slots.push({
@@ -972,6 +1044,7 @@
                     mult: mult,
                     color: color,
                     textColor: textColor,
+                    borderColor: borderColor,
                     bounce: 0
                 });
             }
@@ -1047,13 +1120,29 @@
                 b.y += b.vy;
                 b.vx *= 0.995;
 
-                // Wall bounces
-                if (b.x < 12) {
-                    b.x = 12;
-                    b.vx = Math.abs(b.vx) * 0.7;
-                } else if (b.x > canvas.width - 12) {
-                    b.x = canvas.width - 12;
-                    b.vx = -Math.abs(b.vx) * 0.7;
+                // Retaining Side Walls collision (Funnel & Pyramid boundary)
+                const lWall = getLeftWall(b.y);
+                if (b.x - b.r < lWall.x) {
+                    b.x = lWall.x + b.r;
+                    const dot = b.vx * lWall.nx + b.vy * lWall.ny;
+                    if (dot < 0) {
+                        const restitution = 0.65;
+                        b.vx = (b.vx - (1 + restitution) * dot * lWall.nx) + Math.random() * 0.15;
+                        b.vy = (b.vy - (1 + restitution) * dot * lWall.ny) * 0.85;
+                        playWallHit();
+                    }
+                }
+
+                const rWall = getRightWall(b.y);
+                if (b.x + b.r > rWall.x) {
+                    b.x = rWall.x - b.r;
+                    const dot = b.vx * rWall.nx + b.vy * rWall.ny;
+                    if (dot < 0) {
+                        const restitution = 0.65;
+                        b.vx = (b.vx - (1 + restitution) * dot * rWall.nx) - Math.random() * 0.15;
+                        b.vy = (b.vy - (1 + restitution) * dot * rWall.ny) * 0.85;
+                        playWallHit();
+                    }
                 }
 
                 // Pin collisions
@@ -1115,9 +1204,22 @@
                     addHistory(slot.mult);
                     playSlotLand(slot.mult);
 
-                    // Float text
-                    const floatColor = slot.mult >= 10 ? '#ffd700' : (slot.mult >= 1.5 ? '#10b981' : '#9ca3af');
-                    createFloatText(slot.x, slot.y - 12, (slot.mult >= 1 ? '+' : '') + payout.toLocaleString(), floatColor);
+                    // Float text (Net profit/loss & multiplier)
+                    const net = payout - b.bet;
+                    let floatText = '';
+                    let floatColor = '';
+
+                    if (net > 0) {
+                        floatText = `+${net.toLocaleString()}칩 (${slot.mult}X)`;
+                        floatColor = slot.mult >= 10 ? '#ffd700' : '#10b981';
+                    } else if (net < 0) {
+                        floatText = `${net.toLocaleString()}칩 (${slot.mult}X)`;
+                        floatColor = '#ef4444';
+                    } else {
+                        floatText = `±0칩 (${slot.mult}X)`;
+                        floatColor = '#9ca3af';
+                    }
+                    createFloatText(slot.x, slot.y - 12, floatText, floatColor);
 
                     // Confetti on big wins
                     if (slot.mult >= 100) {
@@ -1154,7 +1256,65 @@
         function draw() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // 1. Draw Drop Zone Indicator
+            // 1. Draw Glowing Guide Walls & Funnel
+            ctx.save();
+            ctx.shadowColor = '#00e5ff';
+            ctx.shadowBlur = 10;
+            ctx.strokeStyle = '#00e5ff';
+            ctx.lineWidth = 2.5;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+
+            // Left Wall
+            ctx.beginPath();
+            ctx.moveTo(186, 12);
+            ctx.lineTo(167, 50);
+            ctx.lineTo(32, 358);
+            ctx.lineTo(32, BOTTOM_Y + 24);
+            ctx.stroke();
+
+            // Right Wall
+            ctx.beginPath();
+            ctx.moveTo(214, 12);
+            ctx.lineTo(233, 50);
+            ctx.lineTo(368, 358);
+            ctx.lineTo(368, BOTTOM_Y + 24);
+            ctx.stroke();
+
+            // Inner highlight
+            ctx.shadowBlur = 0;
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(187, 12);
+            ctx.lineTo(168, 50);
+            ctx.lineTo(33, 358);
+            ctx.lineTo(33, BOTTOM_Y + 24);
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(213, 12);
+            ctx.lineTo(232, 50);
+            ctx.lineTo(367, 358);
+            ctx.lineTo(367, BOTTOM_Y + 24);
+            ctx.stroke();
+
+            // Golden corner brackets
+            const brackets = [
+                {x: 186, y: 12}, {x: 167, y: 50}, {x: 32, y: 358}, {x: 32, y: BOTTOM_Y + 24},
+                {x: 214, y: 12}, {x: 233, y: 50}, {x: 368, y: 358}, {x: 368, y: BOTTOM_Y + 24}
+            ];
+            for (let br of brackets) {
+                ctx.fillStyle = '#ffd700';
+                ctx.shadowColor = '#ffd700';
+                ctx.shadowBlur = 6;
+                ctx.beginPath();
+                ctx.arc(br.x, br.y, 2.5, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            ctx.restore();
+
+            // 2. Draw Drop Zone Indicator
             ctx.save();
             ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
             ctx.beginPath();
@@ -1166,7 +1326,7 @@
             ctx.stroke();
             ctx.restore();
 
-            // 2. Draw Pins
+            // 3. Draw Pins
             for (let p of pins) {
                 ctx.save();
                 if (p.glow > 0) {
@@ -1197,6 +1357,12 @@
                 ctx.beginPath();
                 ctx.roundRect(s.x - s.w / 2, slotY, s.w, s.h, 5);
                 ctx.fill();
+
+                if (s.borderColor && s.borderColor !== 'transparent') {
+                    ctx.strokeStyle = s.borderColor;
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                }
 
                 // Slot text
                 ctx.fillStyle = s.textColor;
