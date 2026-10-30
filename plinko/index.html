@@ -1,0 +1,1331 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>⚪ PLINKO 1,000X - 극한의 1,000배 핀볼 도박</title>
+    <style>
+        :root {
+            --bg-color: #0b0e14;
+            --panel-bg: #151922;
+            --panel-sub: #1c2230;
+            --border-color: #2d3548;
+            --accent-gold: #ffd700;
+            --accent-gold-glow: rgba(255, 215, 0, 0.4);
+            --accent-red: #ff3344;
+            --accent-red-glow: rgba(255, 51, 68, 0.4);
+            --accent-purple: #a855f7;
+            --accent-purple-glow: rgba(168, 85, 247, 0.4);
+            --accent-green: #10b981;
+            --accent-green-glow: rgba(16, 185, 129, 0.4);
+            --accent-blue: #3b82f6;
+            --text-main: #f3f4f6;
+            --text-sub: #9ca3af;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 12px;
+            overflow-x: hidden;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 480px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        /* Top Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--panel-bg);
+            padding: 12px 16px;
+            border-radius: 14px;
+            border: 1px solid var(--border-color);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .lobby-btn {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: var(--panel-sub);
+            color: var(--text-sub);
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-decoration: none;
+            border: 1px solid var(--border-color);
+            transition: all 0.2s;
+        }
+
+        .lobby-btn:hover {
+            color: var(--text-main);
+            border-color: var(--text-sub);
+        }
+
+        .title {
+            font-size: 1.1rem;
+            font-weight: 900;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #fff 0%, var(--accent-gold) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .balance-box {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 6px 12px;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            font-weight: 800;
+            font-size: 0.95rem;
+            color: var(--accent-gold);
+        }
+
+        .mute-btn {
+            background: var(--panel-sub);
+            border: 1px solid var(--border-color);
+            color: var(--text-sub);
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        .mute-btn:hover {
+            color: var(--text-main);
+            border-color: var(--text-sub);
+        }
+
+        /* History Multipliers Bar */
+        .history-bar {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--panel-bg);
+            padding: 8px 12px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            overflow-x: auto;
+            white-space: nowrap;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            min-height: 42px;
+        }
+        .history-bar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .history-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-sub);
+            margin-right: 4px;
+            flex-shrink: 0;
+        }
+
+        .history-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            letter-spacing: -0.3px;
+            flex-shrink: 0;
+            animation: popIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.6); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .badge-jackpot {
+            background: linear-gradient(135deg, #ffd700, #ff8800);
+            color: #000;
+            box-shadow: 0 0 10px var(--accent-gold-glow);
+        }
+        .badge-huge {
+            background: #ff3344;
+            color: #fff;
+            box-shadow: 0 0 8px var(--accent-red-glow);
+        }
+        .badge-high {
+            background: #a855f7;
+            color: #fff;
+        }
+        .badge-med {
+            background: #3b82f6;
+            color: #fff;
+        }
+        .badge-low {
+            background: #2d3548;
+            color: var(--text-sub);
+        }
+
+        /* Canvas Wrapper */
+        .canvas-card {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 8px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+        }
+
+        #plinkoCanvas {
+            width: 100%;
+            height: auto;
+            max-width: 440px;
+            border-radius: 12px;
+            background: radial-gradient(circle at 50% 15%, #182030 0%, #0d111a 75%);
+            display: block;
+        }
+
+        /* Risk Selector Tabs */
+        .risk-selector {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            background: var(--panel-bg);
+            padding: 8px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .risk-btn {
+            padding: 8px 4px;
+            background: var(--panel-sub);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-sub);
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .risk-btn:hover {
+            color: var(--text-main);
+            border-color: var(--text-sub);
+        }
+
+        .risk-btn.active.low {
+            background: rgba(16, 185, 129, 0.15);
+            border-color: var(--accent-green);
+            color: var(--accent-green);
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.2);
+        }
+
+        .risk-btn.active.med {
+            background: rgba(59, 130, 246, 0.15);
+            border-color: var(--accent-blue);
+            color: var(--accent-blue);
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.2);
+        }
+
+        .risk-btn.active.high {
+            background: rgba(255, 51, 68, 0.15);
+            border-color: var(--accent-red);
+            color: var(--accent-red);
+            box-shadow: 0 0 12px rgba(255, 51, 68, 0.3);
+        }
+
+        /* Controls Panel */
+        .controls-card {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .bet-input-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .bet-input-box {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            background: var(--panel-sub);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 8px 12px;
+            gap: 8px;
+        }
+
+        .bet-input-box span {
+            color: var(--text-sub);
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+
+        .bet-input-box input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: var(--accent-gold);
+            font-size: 1.1rem;
+            font-weight: 800;
+            outline: none;
+        }
+
+        .bet-quick-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+        }
+
+        .quick-btn {
+            background: var(--panel-sub);
+            border: 1px solid var(--border-color);
+            color: var(--text-sub);
+            padding: 8px 4px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .quick-btn:hover {
+            color: var(--text-main);
+            border-color: var(--text-sub);
+            background: #252c3d;
+        }
+
+        .quick-btn:active {
+            transform: scale(0.96);
+        }
+
+        .quick-btn.all-in {
+            color: #f87171;
+            border-color: rgba(248, 113, 113, 0.4);
+        }
+
+        /* Drop Buttons Group */
+        .drop-group {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 8px;
+        }
+
+        .drop-btn {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            padding: 14px 10px;
+            font-size: 1.05rem;
+            font-weight: 900;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+            transition: all 0.15s;
+        }
+
+        .drop-btn:hover {
+            filter: brightness(1.1);
+            transform: translateY(-1px);
+        }
+
+        .drop-btn:active {
+            transform: scale(0.98);
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4);
+        }
+
+        .multi-drop-btn {
+            background: var(--panel-sub);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            border-radius: 12px;
+            padding: 12px 6px;
+            font-size: 0.9rem;
+            font-weight: 800;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            transition: all 0.15s;
+        }
+
+        .multi-drop-btn span {
+            font-size: 0.7rem;
+            color: var(--text-sub);
+            font-weight: 600;
+        }
+
+        .multi-drop-btn:hover {
+            border-color: var(--accent-blue);
+            background: #252c3d;
+        }
+
+        .multi-drop-btn:active {
+            transform: scale(0.96);
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+
+        .stat-card {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 8px;
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            color: var(--text-sub);
+            margin-bottom: 2px;
+            font-weight: 600;
+        }
+
+        .stat-value {
+            font-size: 0.9rem;
+            font-weight: 800;
+            color: var(--text-main);
+        }
+
+        .stat-value.profit-pos { color: var(--accent-green); }
+        .stat-value.profit-neg { color: var(--accent-red); }
+        .stat-value.jackpot { color: var(--accent-gold); }
+
+        /* Relief Banner */
+        .relief-banner {
+            display: none;
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(245, 158, 11, 0.15));
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            border-radius: 12px;
+            padding: 12px 16px;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .relief-banner.show {
+            display: flex;
+        }
+
+        .relief-info h4 {
+            font-size: 0.95rem;
+            color: #f87171;
+            margin-bottom: 2px;
+        }
+
+        .relief-info p {
+            font-size: 0.75rem;
+            color: var(--text-sub);
+        }
+
+        .relief-btn {
+            background: linear-gradient(135deg, #f59e0b, #ef4444);
+            border: none;
+            color: #fff;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
+            transition: all 0.2s;
+        }
+
+        .relief-btn:active {
+            transform: scale(0.96);
+        }
+
+        /* Confetti Canvas */
+        #confettiCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 9999;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="confettiCanvas"></canvas>
+
+    <div class="container">
+        <!-- Top Header -->
+        <div class="header">
+            <div class="header-left">
+                <a href="../index.html" class="lobby-btn">🏠 로비</a>
+                <div class="title">⚪ PLINKO 1,000X</div>
+            </div>
+            <div class="header-right">
+                <div class="balance-box">
+                    <span>🪙</span>
+                    <span id="balanceText">10,000</span>
+                </div>
+                <button class="mute-btn" id="muteBtn" title="효과음 켜기/끄기">🔊</button>
+            </div>
+        </div>
+
+        <!-- History Multipliers Bar -->
+        <div class="history-bar" id="historyBar">
+            <span class="history-label">최근 당첨:</span>
+            <!-- Badges injected by JS -->
+        </div>
+
+        <!-- Canvas Area -->
+        <div class="canvas-card">
+            <canvas id="plinkoCanvas" width="400" height="480"></canvas>
+        </div>
+
+        <!-- Risk Selector -->
+        <div class="risk-selector">
+            <button class="risk-btn low" onclick="setRisk('low')">🟢 낮음 (최대 16X)</button>
+            <button class="risk-btn med" onclick="setRisk('med')">🟡 보통 (최대 110X)</button>
+            <button class="risk-btn high active" onclick="setRisk('high')">🔴 고위험 (1,000X)</button>
+        </div>
+
+        <!-- Relief Banner -->
+        <div class="relief-banner" id="reliefBanner">
+            <div class="relief-info">
+                <h4>💸 파산 경보!</h4>
+                <p>구호금 5,000칩을 긴급 충전받으세요.</p>
+            </div>
+            <button class="relief-btn" onclick="claimRelief()">긴급 충전 받기</button>
+        </div>
+
+        <!-- Controls Card -->
+        <div class="controls-card">
+            <div class="bet-input-row">
+                <div class="bet-input-box">
+                    <span>베팅금</span>
+                    <input type="number" id="betInput" value="500" min="100" step="100">
+                </div>
+            </div>
+
+            <div class="bet-quick-row">
+                <button class="quick-btn" onclick="adjustBet(100)">+100</button>
+                <button class="quick-btn" onclick="adjustBet(500)">+500</button>
+                <button class="quick-btn" onclick="adjustBet(1000)">+1,000</button>
+                <button class="quick-btn" onclick="adjustBet(5000)">+5,000</button>
+                <button class="quick-btn" onclick="multiplyBet(0.5)">1/2</button>
+                <button class="quick-btn" onclick="multiplyBet(2)">2X</button>
+                <button class="quick-btn" onclick="setBet(100)">최소(100)</button>
+                <button class="quick-btn all-in" onclick="allIn()">ALL IN</button>
+            </div>
+
+            <div class="drop-group">
+                <button class="drop-btn" id="dropBtn" onclick="dropBall(1)">
+                    <span>⚪</span>
+                    <span>구슬 투하</span>
+                </button>
+                <button class="multi-drop-btn" onclick="dropBall(5)">
+                    <span>⚡ x5</span>
+                    <span>연타 투하</span>
+                </button>
+                <button class="multi-drop-btn" onclick="dropBall(10)">
+                    <span>🔥 x10</span>
+                    <span>폭풍 투하</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">총 낙하수</div>
+                <div class="stat-value" id="statDrops">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">최고 배수</div>
+                <div class="stat-value jackpot" id="statMaxMult">0X</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">총 베팅</div>
+                <div class="stat-value" id="statTotalBet">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">순수익</div>
+                <div class="stat-value" id="statProfit">0</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* ============================================================
+           1. Audio Synthesizer (Web Audio API)
+           ============================================================ */
+        let audioCtx = null;
+        let isMuted = false;
+
+        function initAudio() {
+            if (!audioCtx) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioContext();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        const muteBtn = document.getElementById('muteBtn');
+        muteBtn.addEventListener('click', () => {
+            isMuted = !isMuted;
+            muteBtn.textContent = isMuted ? '🔇' : '🔊';
+        });
+
+        function playPinHit(row) {
+            if (isMuted) return;
+            initAudio();
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                const freq = 450 + (row * 35) + (Math.random() * 20 - 10);
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(freq * 0.7, audioCtx.currentTime + 0.05);
+
+                gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.05);
+            } catch (e) {}
+        }
+
+        function playDropSound() {
+            if (isMuted) return;
+            initAudio();
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(320, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(180, audioCtx.currentTime + 0.08);
+
+                gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.08);
+            } catch (e) {}
+        }
+
+        function playSlotLand(mult) {
+            if (isMuted) return;
+            initAudio();
+            try {
+                if (mult >= 100) {
+                    playJackpotFanfare();
+                    return;
+                }
+                if (mult >= 10) {
+                    playBigWinFanfare();
+                    return;
+                }
+                if (mult >= 1.5) {
+                    // Win chime
+                    const notes = [523.25, 659.25, 783.99]; // C5, E5, G5
+                    notes.forEach((freq, idx) => {
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(freq, audioCtx.currentTime + idx * 0.06);
+                        gain.gain.setValueAtTime(0.15, audioCtx.currentTime + idx * 0.06);
+                        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + idx * 0.06 + 0.15);
+                        osc.connect(gain);
+                        gain.connect(audioCtx.destination);
+                        osc.start(audioCtx.currentTime + idx * 0.06);
+                        osc.stop(audioCtx.currentTime + idx * 0.06 + 0.15);
+                    });
+                } else {
+                    // Soft drop
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(220, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(120, audioCtx.currentTime + 0.06);
+                    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.06);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.06);
+                }
+            } catch (e) {}
+        }
+
+        function playBigWinFanfare() {
+            const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+            notes.forEach((freq, idx) => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime + idx * 0.08);
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime + idx * 0.08);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + idx * 0.08 + 0.3);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(audioCtx.currentTime + idx * 0.08);
+                osc.stop(audioCtx.currentTime + idx * 0.08 + 0.3);
+            });
+        }
+
+        function playJackpotFanfare() {
+            const notes = [523.25, 659.25, 783.99, 1046.50, 1318.51, 1567.98];
+            notes.forEach((freq, idx) => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime + idx * 0.09);
+                gain.gain.setValueAtTime(0.22, audioCtx.currentTime + idx * 0.09);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + idx * 0.09 + 0.4);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(audioCtx.currentTime + idx * 0.09);
+                osc.stop(audioCtx.currentTime + idx * 0.09 + 0.4);
+            });
+        }
+
+        function playReliefSound() {
+            if (isMuted) return;
+            initAudio();
+            try {
+                const notes = [392.00, 523.25, 659.25, 783.99]; // G4, C5, E5, G5
+                notes.forEach((freq, idx) => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(freq, audioCtx.currentTime + idx * 0.07);
+                    gain.gain.setValueAtTime(0.18, audioCtx.currentTime + idx * 0.07);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + idx * 0.07 + 0.25);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(audioCtx.currentTime + idx * 0.07);
+                    osc.stop(audioCtx.currentTime + idx * 0.07 + 0.25);
+                });
+            } catch (e) {}
+        }
+
+        /* ============================================================
+           2. Multipliers & Risk Settings
+           ============================================================ */
+        const MULTIPLIERS = {
+            low:  [16, 9, 4.2, 2.1, 1.4, 1.1, 0.8, 1.1, 1.4, 2.1, 4.2, 9, 16],
+            med:  [110, 41, 10, 5, 3, 1.5, 0.4, 1.5, 3, 5, 10, 41, 110],
+            high: [1000, 130, 26, 9, 4, 0.4, 0.2, 0.4, 4, 9, 26, 130, 1000]
+        };
+
+        let currentRisk = 'high';
+
+        function setRisk(risk) {
+            currentRisk = risk;
+            document.querySelectorAll('.risk-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.classList.contains(risk)) btn.classList.add('active');
+            });
+            updateSlotsData();
+        }
+
+        /* ============================================================
+           3. Game State & Balance
+           ============================================================ */
+        let balance = parseInt(localStorage.getItem('plinko_balance') || '10000', 10);
+        if (isNaN(balance) || balance < 0) balance = 10000;
+
+        let totalDrops = parseInt(localStorage.getItem('plinko_total_drops') || '0', 10);
+        let totalBet = parseInt(localStorage.getItem('plinko_total_bet') || '0', 10);
+        let totalWin = parseInt(localStorage.getItem('plinko_total_win') || '0', 10);
+        let maxMult = parseFloat(localStorage.getItem('plinko_max_mult') || '0');
+
+        function updateBalanceUI() {
+            document.getElementById('balanceText').textContent = balance.toLocaleString();
+            localStorage.setItem('plinko_balance', balance.toString());
+
+            const reliefBanner = document.getElementById('reliefBanner');
+            if (balance < 100) {
+                reliefBanner.classList.add('show');
+            } else {
+                reliefBanner.classList.remove('show');
+            }
+        }
+
+        function updateStatsUI() {
+            document.getElementById('statDrops').textContent = totalDrops.toLocaleString();
+            document.getElementById('statTotalBet').textContent = totalBet.toLocaleString();
+            document.getElementById('statMaxMult').textContent = maxMult > 0 ? maxMult + 'X' : '0X';
+
+            const profit = totalWin - totalBet;
+            const profitElem = document.getElementById('statProfit');
+            if (profit > 0) {
+                profitElem.textContent = '+' + profit.toLocaleString();
+                profitElem.className = 'stat-value profit-pos';
+            } else if (profit < 0) {
+                profitElem.textContent = profit.toLocaleString();
+                profitElem.className = 'stat-value profit-neg';
+            } else {
+                profitElem.textContent = '0';
+                profitElem.className = 'stat-value';
+            }
+
+            localStorage.setItem('plinko_total_drops', totalDrops.toString());
+            localStorage.setItem('plinko_total_bet', totalBet.toString());
+            localStorage.setItem('plinko_total_win', totalWin.toString());
+            localStorage.setItem('plinko_max_mult', maxMult.toString());
+        }
+
+        function claimRelief() {
+            balance += 5000;
+            updateBalanceUI();
+            playReliefSound();
+            createFloatText(canvas.width / 2, canvas.height / 2, '+5,000 긴급 충전!', '#ffd700');
+        }
+
+        function adjustBet(delta) {
+            const input = document.getElementById('betInput');
+            let val = parseInt(input.value || '100', 10) + delta;
+            if (val < 100) val = 100;
+            if (val > balance && balance >= 100) val = balance;
+            input.value = val;
+        }
+
+        function multiplyBet(factor) {
+            const input = document.getElementById('betInput');
+            let val = Math.floor(parseInt(input.value || '100', 10) * factor);
+            if (val < 100) val = 100;
+            if (val > balance && balance >= 100) val = balance;
+            input.value = val;
+        }
+
+        function setBet(val) {
+            document.getElementById('betInput').value = val;
+        }
+
+        function allIn() {
+            if (balance >= 100) {
+                document.getElementById('betInput').value = balance;
+            }
+        }
+
+        function addHistory(mult) {
+            const historyBar = document.getElementById('historyBar');
+            const badge = document.createElement('div');
+            badge.className = 'history-badge';
+            badge.textContent = mult + 'X';
+
+            if (mult >= 100) badge.classList.add('badge-jackpot');
+            else if (mult >= 20) badge.classList.add('badge-huge');
+            else if (mult >= 5) badge.classList.add('badge-high');
+            else if (mult >= 1.5) badge.classList.add('badge-med');
+            else badge.classList.add('badge-low');
+
+            // Insert after the label
+            if (historyBar.children.length > 1) {
+                historyBar.insertBefore(badge, historyBar.children[1]);
+            } else {
+                historyBar.appendChild(badge);
+            }
+
+            // Keep max 15 badges
+            while (historyBar.children.length > 16) {
+                historyBar.removeChild(historyBar.lastChild);
+            }
+        }
+
+        /* ============================================================
+           4. Canvas Physics Engine
+           ============================================================ */
+        const canvas = document.getElementById('plinkoCanvas');
+        const ctx = canvas.getContext('2d');
+
+        const PINS_ROWS = 12;
+        const PINS_DX = 24.5;
+        const PINS_DY = 28;
+        const PINS_START_Y = 50;
+        const PIN_RADIUS = 3.2;
+        const BALL_RADIUS = 5.2;
+        const BOTTOM_Y = PINS_START_Y + PINS_ROWS * PINS_DY + 18;
+
+        let pins = [];
+        let slots = [];
+        let balls = [];
+        let floatTexts = [];
+
+        function initPins() {
+            pins = [];
+            for (let r = 0; r < PINS_ROWS; r++) {
+                const count = r + 3;
+                const startX = (canvas.width / 2) - ((count - 1) * PINS_DX) / 2;
+                for (let i = 0; i < count; i++) {
+                    pins.push({
+                        x: startX + i * PINS_DX,
+                        y: PINS_START_Y + r * PINS_DY,
+                        r: PIN_RADIUS,
+                        row: r,
+                        glow: 0
+                    });
+                }
+            }
+        }
+
+        function updateSlotsData() {
+            const multList = MULTIPLIERS[currentRisk];
+            const slotCount = multList.length; // 13 slots
+            const slotWidth = PINS_DX;
+            const startX = (canvas.width / 2) - ((slotCount - 1) * slotWidth) / 2;
+
+            slots = [];
+            for (let i = 0; i < slotCount; i++) {
+                const mult = multList[i];
+                let color = '#2d3548';
+                let textColor = '#fff';
+
+                if (mult >= 100) {
+                    color = '#ff1144';
+                    textColor = '#ffd700';
+                } else if (mult >= 20) {
+                    color = '#ff3344';
+                } else if (mult >= 8) {
+                    color = '#f97316';
+                } else if (mult >= 3) {
+                    color = '#eab308';
+                    textColor = '#000';
+                } else if (mult >= 1.5) {
+                    color = '#10b981';
+                } else {
+                    color = '#252c3d';
+                    textColor = '#9ca3af';
+                }
+
+                slots.push({
+                    x: startX + i * slotWidth,
+                    y: BOTTOM_Y,
+                    w: slotWidth - 3,
+                    h: 24,
+                    mult: mult,
+                    color: color,
+                    textColor: textColor,
+                    bounce: 0
+                });
+            }
+        }
+
+        function createFloatText(x, y, text, color) {
+            floatTexts.push({
+                x: x,
+                y: y,
+                text: text,
+                color: color || '#ffd700',
+                alpha: 1.0,
+                vy: -1.2
+            });
+        }
+
+        function dropBall(count = 1) {
+            const input = document.getElementById('betInput');
+            const betAmount = parseInt(input.value || '100', 10);
+
+            if (isNaN(betAmount) || betAmount < 100) {
+                alert('최소 베팅금은 100칩입니다.');
+                return;
+            }
+
+            for (let i = 0; i < count; i++) {
+                setTimeout(() => {
+                    if (balance < betAmount) {
+                        updateBalanceUI();
+                        return;
+                    }
+
+                    balance -= betAmount;
+                    totalBet += betAmount;
+                    totalDrops++;
+                    updateBalanceUI();
+                    updateStatsUI();
+                    playDropSound();
+
+                    // Neon ball colors
+                    const ballColors = ['#ffd700', '#ff3344', '#10b981', '#3b82f6', '#a855f7', '#06b6d4'];
+                    const color = ballColors[Math.floor(Math.random() * ballColors.length)];
+
+                    balls.push({
+                        x: (canvas.width / 2) + (Math.random() - 0.5) * 6,
+                        y: 18,
+                        vx: (Math.random() - 0.5) * 0.8,
+                        vy: 0.8 + Math.random() * 0.4,
+                        r: BALL_RADIUS,
+                        bet: betAmount,
+                        color: color,
+                        trail: []
+                    });
+                }, i * 140);
+            }
+        }
+
+        /* ============================================================
+           5. Physics Update & Render Loop
+           ============================================================ */
+        function updatePhysics() {
+            // Update balls
+            for (let i = balls.length - 1; i >= 0; i--) {
+                const b = balls[i];
+
+                // Trail
+                b.trail.push({ x: b.x, y: b.y });
+                if (b.trail.length > 5) b.trail.shift();
+
+                // Gravity & velocity
+                b.vy += 0.28;
+                b.x += b.vx;
+                b.y += b.vy;
+                b.vx *= 0.995;
+
+                // Wall bounces
+                if (b.x < 12) {
+                    b.x = 12;
+                    b.vx = Math.abs(b.vx) * 0.7;
+                } else if (b.x > canvas.width - 12) {
+                    b.x = canvas.width - 12;
+                    b.vx = -Math.abs(b.vx) * 0.7;
+                }
+
+                // Pin collisions
+                for (let p of pins) {
+                    const dx = b.x - p.x;
+                    const dy = b.y - p.y;
+                    const distSq = dx * dx + dy * dy;
+                    const minDist = b.r + p.r;
+
+                    if (distSq < minDist * minDist) {
+                        const dist = Math.sqrt(distSq) || 0.001;
+                        const nx = dx / dist;
+                        const ny = dy / dist;
+
+                        // Push out
+                        b.x = p.x + nx * minDist;
+                        b.y = p.y + ny * minDist;
+
+                        // Reflect velocity with restitution
+                        const dot = b.vx * nx + b.vy * ny;
+                        if (dot < 0) {
+                            const restitution = 0.62;
+                            b.vx = (b.vx - (1 + restitution) * dot * nx) + (Math.random() - 0.5) * 0.45;
+                            b.vy = (b.vy - (1 + restitution) * dot * ny) * 0.75;
+
+                            // Velocity bounds
+                            b.vx = Math.max(-4.2, Math.min(4.2, b.vx));
+                            b.vy = Math.max(-2.5, Math.min(6.5, b.vy));
+
+                            p.glow = 15;
+                            playPinHit(p.row);
+                        }
+                    }
+                }
+
+                // Landed in bottom slots
+                if (b.y >= BOTTOM_Y - 4) {
+                    // Determine slot index
+                    let bestIdx = 0;
+                    let bestDist = 9999;
+                    for (let sIdx = 0; sIdx < slots.length; sIdx++) {
+                        const dist = Math.abs(b.x - slots[sIdx].x);
+                        if (dist < bestDist) {
+                            bestDist = dist;
+                            bestIdx = sIdx;
+                        }
+                    }
+
+                    const slot = slots[bestIdx];
+                    slot.bounce = 18;
+
+                    const payout = Math.floor(b.bet * slot.mult);
+                    balance += payout;
+                    totalWin += payout;
+                    if (slot.mult > maxMult) maxMult = slot.mult;
+
+                    updateBalanceUI();
+                    updateStatsUI();
+                    addHistory(slot.mult);
+                    playSlotLand(slot.mult);
+
+                    // Float text
+                    const floatColor = slot.mult >= 10 ? '#ffd700' : (slot.mult >= 1.5 ? '#10b981' : '#9ca3af');
+                    createFloatText(slot.x, slot.y - 12, (slot.mult >= 1 ? '+' : '') + payout.toLocaleString(), floatColor);
+
+                    // Confetti on big wins
+                    if (slot.mult >= 100) {
+                        fireConfetti(80);
+                    } else if (slot.mult >= 10) {
+                        fireConfetti(35);
+                    }
+
+                    balls.splice(i, 1);
+                }
+            }
+
+            // Update pin glows
+            for (let p of pins) {
+                if (p.glow > 0) p.glow--;
+            }
+
+            // Update slot bounces
+            for (let s of slots) {
+                if (s.bounce > 0) s.bounce--;
+            }
+
+            // Update float texts
+            for (let i = floatTexts.length - 1; i >= 0; i--) {
+                const ft = floatTexts[i];
+                ft.y += ft.vy;
+                ft.alpha -= 0.02;
+                if (ft.alpha <= 0) {
+                    floatTexts.splice(i, 1);
+                }
+            }
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // 1. Draw Drop Zone Indicator
+            ctx.save();
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
+            ctx.beginPath();
+            ctx.arc(canvas.width / 2, 16, 10, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = 'rgba(255, 215, 0, 0.4)';
+            ctx.lineWidth = 1.5;
+            ctx.setLineDash([3, 3]);
+            ctx.stroke();
+            ctx.restore();
+
+            // 2. Draw Pins
+            for (let p of pins) {
+                ctx.save();
+                if (p.glow > 0) {
+                    ctx.shadowColor = '#ffd700';
+                    ctx.shadowBlur = 12;
+                    ctx.fillStyle = '#fff';
+                } else {
+                    ctx.fillStyle = '#8b949e';
+                }
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.r + (p.glow > 0 ? 1 : 0), 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+
+            // 3. Draw Bottom Multiplier Slots
+            for (let s of slots) {
+                ctx.save();
+                const bounceY = s.bounce > 0 ? Math.sin((s.bounce / 18) * Math.PI) * 4 : 0;
+                const slotY = s.y - bounceY;
+
+                // Slot box
+                if (s.bounce > 0) {
+                    ctx.shadowColor = s.color;
+                    ctx.shadowBlur = 14;
+                }
+                ctx.fillStyle = s.color;
+                ctx.beginPath();
+                ctx.roundRect(s.x - s.w / 2, slotY, s.w, s.h, 5);
+                ctx.fill();
+
+                // Slot text
+                ctx.fillStyle = s.textColor;
+                ctx.font = 'bold 8.5px -apple-system, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                const label = s.mult >= 1000 ? '1000x' : (s.mult + 'x');
+                ctx.fillText(label, s.x, slotY + s.h / 2);
+
+                ctx.restore();
+            }
+
+            // 4. Draw Balls with Neon Trails
+            for (let b of balls) {
+                ctx.save();
+                // Trail
+                for (let t = 0; t < b.trail.length; t++) {
+                    const tr = b.trail[t];
+                    const alpha = (t + 1) / b.trail.length * 0.35;
+                    ctx.fillStyle = b.color;
+                    ctx.globalAlpha = alpha;
+                    ctx.beginPath();
+                    ctx.arc(tr.x, tr.y, b.r * 0.7, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                // Main ball
+                ctx.globalAlpha = 1.0;
+                ctx.shadowColor = b.color;
+                ctx.shadowBlur = 10;
+                ctx.fillStyle = '#fff';
+                ctx.beginPath();
+                ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Outer neon rim
+                ctx.strokeStyle = b.color;
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+
+                ctx.restore();
+            }
+
+            // 5. Draw Floating Texts
+            for (let ft of floatTexts) {
+                ctx.save();
+                ctx.globalAlpha = Math.max(0, ft.alpha);
+                ctx.fillStyle = ft.color;
+                ctx.font = 'bold 12px -apple-system, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.shadowColor = 'rgba(0,0,0,0.8)';
+                ctx.shadowBlur = 4;
+                ctx.fillText(ft.text, ft.x, ft.y);
+                ctx.restore();
+            }
+        }
+
+        function gameLoop() {
+            updatePhysics();
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+
+        /* ============================================================
+           6. Confetti Particle System
+           ============================================================ */
+        const confettiCanvas = document.getElementById('confettiCanvas');
+        const cCtx = confettiCanvas.getContext('2d');
+        let confettiParticles = [];
+
+        function resizeConfetti() {
+            confettiCanvas.width = window.innerWidth;
+            confettiCanvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeConfetti);
+        resizeConfetti();
+
+        function fireConfetti(count = 50) {
+            const colors = ['#ffd700', '#ff3344', '#10b981', '#3b82f6', '#a855f7', '#f97316'];
+            for (let i = 0; i < count; i++) {
+                confettiParticles.push({
+                    x: window.innerWidth / 2 + (Math.random() - 0.5) * 100,
+                    y: window.innerHeight / 2,
+                    vx: (Math.random() - 0.5) * 12,
+                    vy: -Math.random() * 14 - 3,
+                    size: Math.random() * 8 + 4,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    rot: Math.random() * Math.PI * 2,
+                    rotSpeed: (Math.random() - 0.5) * 0.2,
+                    alpha: 1.0
+                });
+            }
+        }
+
+        function updateConfetti() {
+            cCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+            for (let i = confettiParticles.length - 1; i >= 0; i--) {
+                const p = confettiParticles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += 0.35; // gravity
+                p.rot += p.rotSpeed;
+                p.alpha -= 0.012;
+
+                if (p.alpha <= 0 || p.y > confettiCanvas.height) {
+                    confettiParticles.splice(i, 1);
+                    continue;
+                }
+
+                cCtx.save();
+                cCtx.globalAlpha = p.alpha;
+                cCtx.translate(p.x, p.y);
+                cCtx.rotate(p.rot);
+                cCtx.fillStyle = p.color;
+                cCtx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+                cCtx.restore();
+            }
+            requestAnimationFrame(updateConfetti);
+        }
+        updateConfetti();
+
+        /* ============================================================
+           7. Initialization
+           ============================================================ */
+        initPins();
+        updateSlotsData();
+        updateBalanceUI();
+        updateStatsUI();
+        gameLoop();
+    </script>
+</body>
+</html>
