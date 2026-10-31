@@ -1,0 +1,1628 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🎲 MACAU SIC BO - 마카오 주사위 식보 카지노</title>
+    <style>
+        :root {
+            --bg-color: #080c14;
+            --panel-bg: #101726;
+            --panel-sub: #172136;
+            --table-felt: #0b2e21;
+            --table-felt-border: #144e39;
+            --border-color: #26354f;
+            --gold: #f5c518;
+            --gold-glow: rgba(245, 197, 24, 0.4);
+            --gold-dark: #b8860b;
+            --red: #e63946;
+            --red-glow: rgba(230, 57, 70, 0.4);
+            --blue: #38bdf8;
+            --green: #10b981;
+            --purple: #c084fc;
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+            --chip-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 12px 10px 40px 10px;
+            overflow-x: hidden;
+            background-image: radial-gradient(circle at 50% 0%, #172540 0%, #080c14 80%);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 480px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        /* Top Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--panel-bg);
+            padding: 10px 14px;
+            border-radius: 14px;
+            border: 1px solid var(--border-color);
+        }
+
+        .lobby-btn {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: var(--panel-sub);
+            color: var(--text-sub);
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-decoration: none;
+            border: 1px solid var(--border-color);
+            transition: all 0.2s;
+        }
+
+        .lobby-btn:hover {
+            color: var(--text-main);
+            border-color: var(--gold);
+        }
+
+        .title-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 1.1rem;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #fff 0%, var(--gold) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .audio-toggle {
+            background: var(--panel-sub);
+            border: 1px solid var(--border-color);
+            color: var(--text-sub);
+            font-size: 1rem;
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Balance & Stats Bar */
+        .balance-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 10px 14px;
+        }
+
+        .balance-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .balance-label {
+            font-size: 0.75rem;
+            color: var(--text-sub);
+            font-weight: 600;
+        }
+
+        .balance-val {
+            font-size: 1.25rem;
+            font-weight: 900;
+            color: var(--gold);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .relief-btn {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            border: 1px solid #3b82f6;
+            color: #fff;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 6px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: none;
+            animation: pulse-glow 1.5s infinite;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 0 rgba(37, 99, 235, 0.4); }
+            50% { transform: scale(1.03); box-shadow: 0 0 12px rgba(59, 130, 246, 0.8); }
+        }
+
+        .bet-info {
+            text-align: right;
+        }
+
+        .bet-label {
+            font-size: 0.75rem;
+            color: var(--text-sub);
+            font-weight: 600;
+        }
+
+        .bet-val {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: var(--text-main);
+        }
+
+        /* Shaker & Dice Display */
+        .shaker-container {
+            background: radial-gradient(circle at 50% 40%, #1a2d24 0%, #0d1b15 100%);
+            border: 2px solid var(--gold-dark);
+            border-radius: 20px;
+            padding: 18px 14px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(245, 197, 24, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .shaker-dome {
+            width: 220px;
+            height: 120px;
+            background: linear-gradient(180deg, rgba(245, 197, 24, 0.15) 0%, rgba(13, 27, 21, 0.8) 100%);
+            border: 2px solid rgba(245, 197, 24, 0.4);
+            border-radius: 110px 110px 20px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            padding: 10px 16px;
+            position: relative;
+            box-shadow: inset 0 8px 16px rgba(255, 255, 255, 0.1);
+            transition: transform 0.2s ease;
+        }
+
+        .shaker-dome.shaking {
+            animation: cup-shake 0.12s infinite;
+        }
+
+        @keyframes cup-shake {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(-4px, 2px) rotate(-3deg); }
+            50% { transform: translate(3px, -2px) rotate(2deg); }
+            75% { transform: translate(-2px, -3px) rotate(-1deg); }
+            100% { transform: translate(4px, 1px) rotate(3deg); }
+        }
+
+        /* 3D Real Asian Casino Dice */
+        .dice {
+            width: 48px;
+            height: 48px;
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.4), inset -2px -2px 4px rgba(0, 0, 0, 0.15), inset 2px 2px 4px rgba(255, 255, 255, 0.9);
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            padding: 6px;
+            align-items: center;
+            justify-items: center;
+            transform: scale(1);
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .dice.rolling {
+            animation: dice-spin 0.2s infinite ease-in-out;
+            filter: blur(1px);
+        }
+
+        @keyframes dice-spin {
+            0% { transform: rotate(0deg) scale(0.9); }
+            50% { transform: rotate(180deg) scale(1.05); }
+            100% { transform: rotate(360deg) scale(0.9); }
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #111;
+        }
+
+        /* Asian Macau Style Dice: 1 and 4 have Red Dots! */
+        .dot.red {
+            background: #d90429;
+            box-shadow: inset 0 0 2px rgba(0,0,0,0.3);
+        }
+
+        .dot.large-red {
+            width: 14px;
+            height: 14px;
+            background: #d90429;
+            box-shadow: inset 0 0 3px rgba(0,0,0,0.3);
+        }
+
+        /* Result Display Bar */
+        .result-bar {
+            margin-top: 14px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            width: 100%;
+        }
+
+        .result-badge-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .res-badge {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 800;
+            letter-spacing: -0.3px;
+        }
+
+        .badge-sum {
+            background: rgba(245, 197, 24, 0.15);
+            color: var(--gold);
+            border: 1px solid var(--gold);
+            font-size: 0.95rem;
+        }
+
+        .badge-big {
+            background: rgba(230, 57, 70, 0.2);
+            color: #ff6b6b;
+            border: 1px solid #e63946;
+        }
+
+        .badge-small {
+            background: rgba(56, 189, 248, 0.2);
+            color: #38bdf8;
+            border: 1px solid #0284c7;
+        }
+
+        .badge-triple {
+            background: linear-gradient(135deg, rgba(245, 197, 24, 0.3), rgba(192, 132, 252, 0.3));
+            color: #fff;
+            border: 1px solid #ffd700;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+            animation: bounce-badge 0.6s infinite alternate;
+        }
+
+        @keyframes bounce-badge {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-3px); }
+        }
+
+        .badge-odd {
+            background: rgba(168, 85, 247, 0.2);
+            color: #c084fc;
+            border: 1px solid #9333ea;
+        }
+
+        .badge-even {
+            background: rgba(16, 185, 129, 0.2);
+            color: #34d399;
+            border: 1px solid #059669;
+        }
+
+        .payout-announcement {
+            font-size: 1.15rem;
+            font-weight: 900;
+            min-height: 24px;
+            text-align: center;
+        }
+
+        .payout-win {
+            color: var(--gold);
+            text-shadow: 0 0 12px var(--gold-glow);
+            animation: win-pop 0.3s ease;
+        }
+
+        .payout-loss {
+            color: var(--text-sub);
+            font-size: 0.9rem;
+        }
+
+        @keyframes win-pop {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Macau History Bead Plate */
+        .history-section {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            overflow-x: auto;
+            white-space: nowrap;
+            scrollbar-width: none;
+        }
+        .history-section::-webkit-scrollbar { display: none; }
+
+        .hist-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-sub);
+            flex-shrink: 0;
+        }
+
+        .hist-list {
+            display: flex;
+            gap: 6px;
+        }
+
+        .hist-item {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 800;
+            line-height: 1;
+            flex-shrink: 0;
+            border: 1px solid transparent;
+        }
+
+        .hist-big { background: rgba(230, 57, 70, 0.25); color: #ff858d; border-color: rgba(230, 57, 70, 0.4); }
+        .hist-small { background: rgba(56, 189, 248, 0.25); color: #7dd3fc; border-color: rgba(56, 189, 248, 0.4); }
+        .hist-triple { background: rgba(245, 197, 24, 0.3); color: #ffd700; border-color: #ffd700; }
+
+        /* Casino Betting Felt Board */
+        .betting-board {
+            background: var(--table-felt);
+            border: 2px solid var(--table-felt-border);
+            border-radius: 16px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+
+        /* Board Navigation Tabs */
+        .board-tabs {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+        }
+
+        .tab-btn {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-sub);
+            padding: 8px 4px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(180deg, #1e4a36, #143827);
+            color: var(--gold);
+            border-color: var(--gold);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .tab-content {
+            display: none;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .tab-content.active {
+            display: flex;
+        }
+
+        /* Betting Cell Styles */
+        .bet-cell {
+            background: rgba(10, 30, 22, 0.85);
+            border: 1px solid rgba(245, 197, 24, 0.25);
+            border-radius: 10px;
+            padding: 10px 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: relative;
+            user-select: none;
+            transition: all 0.15s ease;
+        }
+
+        .bet-cell:hover {
+            border-color: var(--gold);
+            background: rgba(20, 50, 38, 0.95);
+        }
+
+        .bet-cell:active {
+            transform: scale(0.96);
+        }
+
+        .bet-cell.has-bet {
+            border-color: var(--gold);
+            background: rgba(245, 197, 24, 0.12);
+            box-shadow: inset 0 0 10px rgba(245, 197, 24, 0.2);
+        }
+
+        .bet-cell.winner {
+            animation: cell-win-glow 0.8s infinite alternate;
+        }
+
+        @keyframes cell-win-glow {
+            0% { border-color: var(--gold); box-shadow: 0 0 8px var(--gold-glow); }
+            100% { border-color: #ffffff; box-shadow: 0 0 16px rgba(255, 255, 255, 0.8); }
+        }
+
+        .cell-name {
+            font-size: 0.95rem;
+            font-weight: 900;
+            color: var(--text-main);
+            margin-bottom: 2px;
+        }
+
+        .cell-sub {
+            font-size: 0.7rem;
+            color: var(--text-sub);
+            margin-bottom: 4px;
+        }
+
+        .cell-payout {
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: var(--gold);
+        }
+
+        /* Chip on cell badge */
+        .cell-chip-badge {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: #fff;
+            font-size: 0.7rem;
+            font-weight: 900;
+            padding: 2px 6px;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+            border: 1px solid #fff;
+            display: none;
+            z-index: 5;
+        }
+
+        .bet-cell.has-bet .cell-chip-badge {
+            display: block;
+        }
+
+        /* Tab 1: Big/Small Grid */
+        .big-small-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .big-cell { border-color: rgba(230, 57, 70, 0.4); }
+        .big-cell .cell-name { color: #ff6b6b; font-size: 1.15rem; }
+        .small-cell { border-color: rgba(56, 189, 248, 0.4); }
+        .small-cell .cell-name { color: #38bdf8; font-size: 1.15rem; }
+
+        .odd-even-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .any-triple-banner {
+            background: linear-gradient(135deg, rgba(245, 197, 24, 0.2), rgba(192, 132, 252, 0.2));
+            border: 1px solid var(--gold);
+        }
+        .any-triple-banner .cell-name { color: var(--gold); font-size: 1.05rem; }
+
+        /* Tab 2: Triples & Doubles */
+        .triple-180-notice {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--gold-dark);
+            border-radius: 8px;
+            padding: 6px 10px;
+            font-size: 0.75rem;
+            color: var(--gold);
+            text-align: center;
+            font-weight: 700;
+        }
+
+        .triples-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+        }
+
+        .doubles-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+        }
+
+        /* Tab 3: Totals 4~17 */
+        .totals-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+        }
+
+        /* Tab 4: Singles & Combos */
+        .singles-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 5px;
+        }
+        .singles-grid .bet-cell { padding: 8px 4px; }
+
+        .combos-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 5px;
+        }
+        .combos-grid .bet-cell { padding: 8px 2px; }
+
+        /* Chips Tray Section */
+        .chips-section {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 10px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .chips-label-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.75rem;
+            color: var(--text-sub);
+            font-weight: 700;
+        }
+
+        .chips-tray {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .chip-btn {
+            flex: 1;
+            aspect-ratio: 1;
+            max-width: 68px;
+            border-radius: 50%;
+            border: 3px dashed rgba(255, 255, 255, 0.4);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: var(--chip-shadow);
+            transition: all 0.2s ease;
+            position: relative;
+            user-select: none;
+        }
+
+        .chip-btn.selected {
+            transform: translateY(-4px) scale(1.08);
+            border-style: solid;
+            border-color: #ffffff;
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.8), 0 0 12px var(--gold-glow);
+        }
+
+        .chip-btn:active { transform: scale(0.95); }
+
+        .chip-val {
+            font-size: 0.85rem;
+            font-weight: 900;
+            color: #ffffff;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+        }
+
+        .chip-100 { background: radial-gradient(circle, #3b82f6 0%, #1d4ed8 100%); }
+        .chip-500 { background: radial-gradient(circle, #ef4444 0%, #b91c1c 100%); }
+        .chip-1000 { background: radial-gradient(circle, #10b981 0%, #047857 100%); }
+        .chip-5000 { background: radial-gradient(circle, #8b5cf6 0%, #6d28d9 100%); }
+        .chip-10000 { background: radial-gradient(circle, #f59e0b 0%, #b45309 100%); }
+
+        /* Quick Bet Action Controls */
+        .quick-actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .btn-action {
+            flex: 1;
+            padding: 8px 4px;
+            background: var(--panel-sub);
+            border: 1px solid var(--border-color);
+            color: var(--text-sub);
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-action:hover {
+            color: var(--text-main);
+            border-color: var(--text-sub);
+        }
+
+        .btn-action:active { transform: scale(0.96); }
+
+        /* Roll Button */
+        .roll-btn {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            border: 2px solid #fef3c7;
+            color: #000;
+            padding: 16px;
+            border-radius: 14px;
+            font-size: 1.25rem;
+            font-weight: 900;
+            letter-spacing: -0.3px;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .roll-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 26px rgba(245, 158, 11, 0.6);
+        }
+
+        .roll-btn:active { transform: scale(0.98); }
+
+        .roll-btn:disabled {
+            background: #334155;
+            border-color: #475569;
+            color: #94a3b8;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Stats Summary Modal/Panel */
+        .stats-panel {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 10px 14px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+            text-align: center;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .stat-title {
+            font-size: 0.65rem;
+            color: var(--text-sub);
+            font-weight: 600;
+        }
+
+        .stat-val {
+            font-size: 0.85rem;
+            font-weight: 800;
+            color: var(--text-main);
+        }
+
+        /* Confetti Canvas */
+        #confettiCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        /* Rules Guide Modal / Toast */
+        .rules-bar {
+            text-align: center;
+            font-size: 0.7rem;
+            color: var(--text-sub);
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="confettiCanvas"></canvas>
+
+    <div class="container">
+        <!-- Top Header -->
+        <div class="header">
+            <a href="../index.html" class="lobby-btn">🏠 로비</a>
+            <div class="title-badge">🎲 MACAU SIC BO</div>
+            <button class="audio-toggle" id="audioToggle" title="사운드 온/오프">🔊</button>
+        </div>
+
+        <!-- Balance Bar -->
+        <div class="balance-bar">
+            <div class="balance-info">
+                <span class="balance-label">보유 칩 (CHIPS)</span>
+                <div class="balance-val">
+                    🪙 <span id="balanceDisplay">10,000</span>
+                </div>
+            </div>
+            <button class="relief-btn" id="reliefBtn">파산 구호금 +5,000</button>
+            <div class="bet-info">
+                <span class="bet-label">총 베팅액</span>
+                <div class="bet-val">🪙 <span id="totalBetDisplay">0</span></div>
+            </div>
+        </div>
+
+        <!-- Shaker & Dice Display -->
+        <div class="shaker-container">
+            <div class="shaker-dome" id="shakerDome">
+                <!-- 3 Realistic Macau Dice -->
+                <div class="dice" id="dice1"></div>
+                <div class="dice" id="dice2"></div>
+                <div class="dice" id="dice3"></div>
+            </div>
+
+            <!-- Result Bar -->
+            <div class="result-bar">
+                <div class="result-badge-row" id="resultBadges">
+                    <span class="res-badge badge-sum" id="resSum">합계 --</span>
+                    <span class="res-badge badge-big" id="resBigSmall">대/소 --</span>
+                    <span class="res-badge badge-odd" id="resOddEven">홀/짝 --</span>
+                </div>
+                <div class="payout-announcement" id="payoutNotice">베팅할 구역을 선택하고 주사위를 굴리세요!</div>
+            </div>
+        </div>
+
+        <!-- History Bead Plate -->
+        <div class="history-section">
+            <span class="hist-label">기록 판</span>
+            <div class="hist-list" id="histList">
+                <div class="hist-item hist-big"><span>大</span><span>13</span></div>
+                <div class="hist-item hist-small"><span>小</span><span>8</span></div>
+                <div class="hist-item hist-big"><span>大</span><span>11</span></div>
+                <div class="hist-item hist-small"><span>小</span><span>9</span></div>
+            </div>
+        </div>
+
+        <!-- Casino Betting Felt Board -->
+        <div class="betting-board">
+            <!-- Tabs -->
+            <div class="board-tabs">
+                <button class="tab-btn active" data-tab="tab-main">🔥 대/소·홀/짝</button>
+                <button class="tab-btn" data-tab="tab-triples">🎰 트리플·더블</button>
+                <button class="tab-btn" data-tab="tab-totals">🎯 총합 (4~17)</button>
+                <button class="tab-btn" data-tab="tab-singles">🎲 싱글·조합</button>
+            </div>
+
+            <!-- Tab 1: 대/소 & 홀/짝 & 애니 트리플 -->
+            <div class="tab-content active" id="tab-main">
+                <div class="big-small-grid">
+                    <div class="bet-cell small-cell" data-bet="small">
+                        <span class="cell-name">小 (소)</span>
+                        <span class="cell-sub">합계 4 ~ 10</span>
+                        <span class="cell-payout">1 : 1 배당</span>
+                        <span class="cell-chip-badge" id="badge-small">0</span>
+                    </div>
+                    <div class="bet-cell big-cell" data-bet="big">
+                        <span class="cell-name">大 (대)</span>
+                        <span class="cell-sub">합계 11 ~ 17</span>
+                        <span class="cell-payout">1 : 1 배당</span>
+                        <span class="cell-chip-badge" id="badge-big">0</span>
+                    </div>
+                </div>
+
+                <div class="odd-even-grid">
+                    <div class="bet-cell" data-bet="odd">
+                        <span class="cell-name">홀 (ODD)</span>
+                        <span class="cell-sub">주사위 합 홀수</span>
+                        <span class="cell-payout">1 : 1 배당</span>
+                        <span class="cell-chip-badge" id="badge-odd">0</span>
+                    </div>
+                    <div class="bet-cell" data-bet="even">
+                        <span class="cell-name">짝 (EVEN)</span>
+                        <span class="cell-sub">주사위 합 짝수</span>
+                        <span class="cell-payout">1 : 1 배당</span>
+                        <span class="cell-chip-badge" id="badge-even">0</span>
+                    </div>
+                </div>
+
+                <div class="bet-cell any-triple-banner" data-bet="any_triple">
+                    <span class="cell-name">👑 애니 트리플 (ANY TRIPLE)</span>
+                    <span class="cell-sub">아무 숫자나 동일 3개 (111 ~ 666)</span>
+                    <span class="cell-payout">⭐ 31 배당 (30 : 1)</span>
+                    <span class="cell-chip-badge" id="badge-any_triple">0</span>
+                </div>
+            </div>
+
+            <!-- Tab 2: 특정 트리플 180배 & 더블 11배 -->
+            <div class="tab-content" id="tab-triples">
+                <div class="triple-180-notice">💥 특정 트리플 잭팟: 180배 (180 : 1) / 더블: 11배 (10 : 1)</div>
+                <div class="triples-grid">
+                    <div class="bet-cell" data-bet="triple_1"><span class="cell-name">1-1-1</span><span class="cell-payout">180배</span><span class="cell-chip-badge" id="badge-triple_1">0</span></div>
+                    <div class="bet-cell" data-bet="triple_2"><span class="cell-name">2-2-2</span><span class="cell-payout">180배</span><span class="cell-chip-badge" id="badge-triple_2">0</span></div>
+                    <div class="bet-cell" data-bet="triple_3"><span class="cell-name">3-3-3</span><span class="cell-payout">180배</span><span class="cell-chip-badge" id="badge-triple_3">0</span></div>
+                    <div class="bet-cell" data-bet="triple_4"><span class="cell-name">4-4-4</span><span class="cell-payout">180배</span><span class="cell-chip-badge" id="badge-triple_4">0</span></div>
+                    <div class="bet-cell" data-bet="triple_5"><span class="cell-name">5-5-5</span><span class="cell-payout">180배</span><span class="cell-chip-badge" id="badge-triple_5">0</span></div>
+                    <div class="bet-cell" data-bet="triple_6"><span class="cell-name">6-6-6</span><span class="cell-payout">180배</span><span class="cell-chip-badge" id="badge-triple_6">0</span></div>
+                </div>
+
+                <div class="doubles-grid">
+                    <div class="bet-cell" data-bet="double_1"><span class="cell-name">1-1 더블</span><span class="cell-payout">11배</span><span class="cell-chip-badge" id="badge-double_1">0</span></div>
+                    <div class="bet-cell" data-bet="double_2"><span class="cell-name">2-2 더블</span><span class="cell-payout">11배</span><span class="cell-chip-badge" id="badge-double_2">0</span></div>
+                    <div class="bet-cell" data-bet="double_3"><span class="cell-name">3-3 더블</span><span class="cell-payout">11배</span><span class="cell-chip-badge" id="badge-double_3">0</span></div>
+                    <div class="bet-cell" data-bet="double_4"><span class="cell-name">4-4 더블</span><span class="cell-payout">11배</span><span class="cell-chip-badge" id="badge-double_4">0</span></div>
+                    <div class="bet-cell" data-bet="double_5"><span class="cell-name">5-5 더블</span><span class="cell-payout">11배</span><span class="cell-chip-badge" id="badge-double_5">0</span></div>
+                    <div class="bet-cell" data-bet="double_6"><span class="cell-name">6-6 더블</span><span class="cell-payout">11배</span><span class="cell-chip-badge" id="badge-double_6">0</span></div>
+                </div>
+            </div>
+
+            <!-- Tab 3: 총합 4 ~ 17 베팅 -->
+            <div class="tab-content" id="tab-totals">
+                <div class="totals-grid">
+                    <div class="bet-cell" data-bet="total_4"><span class="cell-name">4</span><span class="cell-payout">60배</span><span class="cell-chip-badge" id="badge-total_4">0</span></div>
+                    <div class="bet-cell" data-bet="total_5"><span class="cell-name">5</span><span class="cell-payout">30배</span><span class="cell-chip-badge" id="badge-total_5">0</span></div>
+                    <div class="bet-cell" data-bet="total_6"><span class="cell-name">6</span><span class="cell-payout">18배</span><span class="cell-chip-badge" id="badge-total_6">0</span></div>
+                    <div class="bet-cell" data-bet="total_7"><span class="cell-name">7</span><span class="cell-payout">12배</span><span class="cell-chip-badge" id="badge-total_7">0</span></div>
+                    <div class="bet-cell" data-bet="total_8"><span class="cell-name">8</span><span class="cell-payout">8배</span><span class="cell-chip-badge" id="badge-total_8">0</span></div>
+                    <div class="bet-cell" data-bet="total_9"><span class="cell-name">9</span><span class="cell-payout">6배</span><span class="cell-chip-badge" id="badge-total_9">0</span></div>
+                    <div class="bet-cell" data-bet="total_10"><span class="cell-name">10</span><span class="cell-payout">6배</span><span class="cell-chip-badge" id="badge-total_10">0</span></div>
+                    <div class="bet-cell" data-bet="total_11"><span class="cell-name">11</span><span class="cell-payout">6배</span><span class="cell-chip-badge" id="badge-total_11">0</span></div>
+                    <div class="bet-cell" data-bet="total_12"><span class="cell-name">12</span><span class="cell-payout">6배</span><span class="cell-chip-badge" id="badge-total_12">0</span></div>
+                    <div class="bet-cell" data-bet="total_13"><span class="cell-name">13</span><span class="cell-payout">8배</span><span class="cell-chip-badge" id="badge-total_13">0</span></div>
+                    <div class="bet-cell" data-bet="total_14"><span class="cell-name">14</span><span class="cell-payout">12배</span><span class="cell-chip-badge" id="badge-total_14">0</span></div>
+                    <div class="bet-cell" data-bet="total_15"><span class="cell-name">15</span><span class="cell-payout">18배</span><span class="cell-chip-badge" id="badge-total_15">0</span></div>
+                    <div class="bet-cell" data-bet="total_16"><span class="cell-name">16</span><span class="cell-payout">30배</span><span class="cell-chip-badge" id="badge-total_16">0</span></div>
+                    <div class="bet-cell" data-bet="total_17"><span class="cell-name">17</span><span class="cell-payout">60배</span><span class="cell-chip-badge" id="badge-total_17">0</span></div>
+                </div>
+            </div>
+
+            <!-- Tab 4: 싱글 다이스 & 2주사위 조합 -->
+            <div class="tab-content" id="tab-singles">
+                <div class="triple-180-notice">싱글 (1개=1배, 2개=2배, 3개=3배) / 조합 6배</div>
+                <div class="singles-grid">
+                    <div class="bet-cell" data-bet="single_1"><span class="cell-name">⚀ 1</span><span class="cell-payout">1~3배</span><span class="cell-chip-badge" id="badge-single_1">0</span></div>
+                    <div class="bet-cell" data-bet="single_2"><span class="cell-name">⚁ 2</span><span class="cell-payout">1~3배</span><span class="cell-chip-badge" id="badge-single_2">0</span></div>
+                    <div class="bet-cell" data-bet="single_3"><span class="cell-name">⚂ 3</span><span class="cell-payout">1~3배</span><span class="cell-chip-badge" id="badge-single_3">0</span></div>
+                    <div class="bet-cell" data-bet="single_4"><span class="cell-name">⚃ 4</span><span class="cell-payout">1~3배</span><span class="cell-chip-badge" id="badge-single_4">0</span></div>
+                    <div class="bet-cell" data-bet="single_5"><span class="cell-name">⚄ 5</span><span class="cell-payout">1~3배</span><span class="cell-chip-badge" id="badge-single_5">0</span></div>
+                    <div class="bet-cell" data-bet="single_6"><span class="cell-name">⚅ 6</span><span class="cell-payout">1~3배</span><span class="cell-chip-badge" id="badge-single_6">0</span></div>
+                </div>
+
+                <div class="combos-grid">
+                    <div class="bet-cell" data-bet="combo_1_2"><span class="cell-name">1-2</span><span class="cell-payout">6배</span><span class="cell-chip-badge" id="badge-combo_1_2">0</span></div>
+                    <div class="bet-cell" data-bet="combo_1_3"><span class="cell-name">1-3</span><span class="cell-payout">6배</span><span class="cell-chip-badge" id="badge-combo_1_3">0</span></div>
+                    <div class="bet-cell" data-bet="combo_1_4"><span class="cell-name">1-4</span><span class="cell-payout">6배</span><span class="cell-chip-badge" id="badge-combo_1_4">0</span></div>
+                    <div class="bet-cell" data-bet="combo_1_5"><span class="cell-name">1-5</span><span class="cell-payout">6배</span><span class="cell-chip-badge" id="badge-combo_1_5">0</span></div>
+                    <div class="bet-cell" data-bet="combo_1_6"><span class="cell-name">1-6</span><span class="cell-payout">6배</span><span class="cell-chip-badge" id="badge-combo_1_6">0</span></div>
+                    <div class="bet-cell" data-bet="combo_2_3"><span class="cell-name">2-3</span><span class="cell-payout">6배</span><span class="cell-chip-badge" id="badge-combo_2_3">0</span></div>
+                    <div class="bet-cell" data-bet="combo_2_4"><span class="cell-name">2-4</span><span class="cell-payout">6배</span><span class="cell-chip-badge" id="badge-combo_2_4">0</span></div>
+                    <div class="bet-cell" data-bet="combo_2_5"><span class="cell-name">2-5</span><span class="cell-payout">6배</span><span class="cell-chip-badge" id="badge-combo_2_5">0</span></div>
+                    <div class="bet-cell" data-bet="combo_2_6"><span class="cell-name">2-6</span><span class="cell-payout">6배</span><span class="cell-chip-badge" id="badge-combo_2_6">0</span></div>
+                    <div class="bet-cell" data-bet="combo_3_4"><span class="cell-name">3-4</span><span class="cell-payout">6배</span><span class="cell-chip-badge" id="badge-combo_3_4">0</span></div>
+                    <div class="bet-cell" data-bet="combo_3_5"><span class="cell-name">3-5</span><span class="cell-payout">6배</span><span class="cell-chip-badge" id="badge-combo_3_5">0</span></div>
+                    <div class="bet-cell" data-bet="combo_3_6"><span class="cell-name">3-6</span><span class="cell-payout">6배</span><span class="cell-chip-badge" id="badge-combo_3_6">0</span></div>
+                    <div class="bet-cell" data-bet="combo_4_5"><span class="cell-name">4-5</span><span class="cell-payout">6배</span><span class="cell-chip-badge" id="badge-combo_4_5">0</span></div>
+                    <div class="bet-cell" data-bet="combo_4_6"><span class="cell-name">4-6</span><span class="cell-payout">6배</span><span class="cell-chip-badge" id="badge-combo_4_6">0</span></div>
+                    <div class="bet-cell" data-bet="combo_5_6"><span class="cell-name">5-6</span><span class="cell-payout">6배</span><span class="cell-chip-badge" id="badge-combo_5_6">0</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chips Tray & Actions -->
+        <div class="chips-section">
+            <div class="chips-label-row">
+                <span>베팅 칩 선택</span>
+                <span id="selectedChipLabel">선택: 1,000</span>
+            </div>
+            <div class="chips-tray">
+                <div class="chip-btn chip-100" data-value="100"><span class="chip-val">100</span></div>
+                <div class="chip-btn chip-500" data-value="500"><span class="chip-val">500</span></div>
+                <div class="chip-btn chip-1000 selected" data-value="1000"><span class="chip-val">1K</span></div>
+                <div class="chip-btn chip-5000" data-value="5000"><span class="chip-val">5K</span></div>
+                <div class="chip-btn chip-10000" data-value="10000"><span class="chip-val">10K</span></div>
+            </div>
+
+            <div class="quick-actions">
+                <button class="btn-action" id="btnClear">초기화</button>
+                <button class="btn-action" id="btnRebet">이전 베팅</button>
+                <button class="btn-action" id="btnDouble">2배</button>
+            </div>
+        </div>
+
+        <!-- Roll Button -->
+        <button class="roll-btn" id="rollBtn">
+            <span>🎲</span> <span>주사위 굴리기 (SHAKE & ROLL)</span>
+        </button>
+
+        <!-- Stats Panel -->
+        <div class="stats-panel">
+            <div class="stat-item">
+                <span class="stat-title">총 판수</span>
+                <span class="stat-val" id="statRolls">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-title">총 베팅</span>
+                <span class="stat-val" id="statTotalBet">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-title">순 손익</span>
+                <span class="stat-val" id="statNetProfit">+0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-title">최대 배수</span>
+                <span class="stat-val" id="statMaxMult">0X</span>
+            </div>
+        </div>
+
+        <div class="rules-bar">
+            마카오 정통 식보 규칙 · 대/소/홀/짝 시 트리플 발생 시 하우스 승리 · 특정 트리플 180배 잭팟
+        </div>
+    </div>
+
+    <script>
+        /* ============================================================
+           Audio Engine (Web Audio API Synthesizer)
+           ============================================================ */
+        class AudioEngine {
+            constructor() {
+                this.ctx = null;
+                this.enabled = true;
+            }
+
+            init() {
+                if (!this.ctx) {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    this.ctx = new AudioContext();
+                }
+                if (this.ctx.state === 'suspended') {
+                    this.ctx.resume();
+                }
+            }
+
+            playChip() {
+                if (!this.enabled || !this.ctx) return;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(1200 + Math.random() * 400, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(300, this.ctx.currentTime + 0.06);
+
+                gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.06);
+
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.06);
+            }
+
+            playShake() {
+                if (!this.enabled || !this.ctx) return;
+                // Multiple rapid dice rattling clicks
+                for (let i = 0; i < 8; i++) {
+                    const time = this.ctx.currentTime + i * 0.08 + Math.random() * 0.03;
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(400 + Math.random() * 300, time);
+                    gain.gain.setValueAtTime(0.15, time);
+                    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.04);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start(time);
+                    osc.stop(time + 0.04);
+                }
+            }
+
+            playDiceSlam() {
+                if (!this.enabled || !this.ctx) return;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(120, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(40, this.ctx.currentTime + 0.15);
+
+                gain.gain.setValueAtTime(0.4, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.15);
+
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.15);
+            }
+
+            playWin(isJackpot = false) {
+                if (!this.enabled || !this.ctx) return;
+                const notes = isJackpot ? [523.25, 659.25, 783.99, 1046.50, 1318.51, 1567.98] : [523.25, 659.25, 783.99, 1046.50];
+                notes.forEach((freq, idx) => {
+                    const time = this.ctx.currentTime + idx * 0.09;
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = isJackpot ? 'sawtooth' : 'sine';
+                    osc.frequency.setValueAtTime(freq, time);
+                    gain.gain.setValueAtTime(0.2, time);
+                    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.25);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start(time);
+                    osc.stop(time + 0.25);
+                });
+            }
+
+            playLoss() {
+                if (!this.enabled || !this.ctx) return;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(220, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(110, this.ctx.currentTime + 0.2);
+
+                gain.gain.setValueAtTime(0.15, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.2);
+
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.2);
+            }
+        }
+
+        const audio = new AudioEngine();
+
+        /* ============================================================
+           Confetti Canvas Engine
+           ============================================================ */
+        const canvas = document.getElementById('confettiCanvas');
+        const ctx = canvas.getContext('2d');
+        let confetti = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        function spawnConfetti(count = 70) {
+            const colors = ['#f59e0b', '#ef4444', '#10b981', '#3b82f6', '#ec4899', '#ffd700'];
+            for (let i = 0; i < count; i++) {
+                confetti.push({
+                    x: canvas.width / 2 + (Math.random() - 0.5) * 100,
+                    y: canvas.height * 0.3,
+                    vx: (Math.random() - 0.5) * 12,
+                    vy: (Math.random() - 1.2) * 10,
+                    size: Math.random() * 8 + 4,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    rot: Math.random() * Math.PI * 2,
+                    vrot: (Math.random() - 0.5) * 0.2,
+                    life: 1
+                });
+            }
+        }
+
+        function updateConfetti() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = confetti.length - 1; i >= 0; i--) {
+                const p = confetti[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += 0.25; // gravity
+                p.rot += p.vrot;
+                p.life -= 0.012;
+
+                if (p.life <= 0 || p.y > canvas.height) {
+                    confetti.splice(i, 1);
+                    continue;
+                }
+
+                ctx.save();
+                ctx.translate(p.x, p.y);
+                ctx.rotate(p.rot);
+                ctx.fillStyle = p.color;
+                ctx.globalAlpha = p.life;
+                ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+                ctx.restore();
+            }
+            requestAnimationFrame(updateConfetti);
+        }
+        updateConfetti();
+
+        /* ============================================================
+           Game State & Logic
+           ============================================================ */
+        let balance = parseInt(localStorage.getItem('sicbo_balance') || '10000', 10);
+        let selectedChip = 1000;
+        let currentBets = {}; // betKey -> amount
+        let previousBets = {};
+        let isRolling = false;
+
+        let totalRolls = parseInt(localStorage.getItem('sicbo_total_rolls') || '0', 10);
+        let totalBet = parseInt(localStorage.getItem('sicbo_total_bet') || '0', 10);
+        let totalWin = parseInt(localStorage.getItem('sicbo_total_win') || '0', 10);
+        let maxMult = parseFloat(localStorage.getItem('sicbo_max_mult') || '0');
+
+        let history = JSON.parse(localStorage.getItem('sicbo_history') || '[]');
+        if (history.length === 0) {
+            history = [
+                { sum: 13, type: 'big' },
+                { sum: 8, type: 'small' },
+                { sum: 11, type: 'big' },
+                { sum: 9, type: 'small' }
+            ];
+        }
+
+        // DOM elements
+        const balanceDisplay = document.getElementById('balanceDisplay');
+        const totalBetDisplay = document.getElementById('totalBetDisplay');
+        const reliefBtn = document.getElementById('reliefBtn');
+        const rollBtn = document.getElementById('rollBtn');
+        const shakerDome = document.getElementById('shakerDome');
+        const diceEls = [document.getElementById('dice1'), document.getElementById('dice2'), document.getElementById('dice3')];
+        const resSum = document.getElementById('resSum');
+        const resBigSmall = document.getElementById('resBigSmall');
+        const resOddEven = document.getElementById('resOddEven');
+        const payoutNotice = document.getElementById('payoutNotice');
+        const histList = document.getElementById('histList');
+        const audioToggle = document.getElementById('audioToggle');
+
+        const statRolls = document.getElementById('statRolls');
+        const statTotalBet = document.getElementById('statTotalBet');
+        const statNetProfit = document.getElementById('statNetProfit');
+        const statMaxMult = document.getElementById('statMaxMult');
+
+        function saveState() {
+            localStorage.setItem('sicbo_balance', balance.toString());
+            localStorage.setItem('sicbo_total_rolls', totalRolls.toString());
+            localStorage.setItem('sicbo_total_bet', totalBet.toString());
+            localStorage.setItem('sicbo_total_win', totalWin.toString());
+            localStorage.setItem('sicbo_max_mult', maxMult.toString());
+            localStorage.setItem('sicbo_history', JSON.stringify(history.slice(-20)));
+        }
+
+        function updateUI() {
+            balanceDisplay.textContent = balance.toLocaleString();
+            const totalCurrBet = Object.values(currentBets).reduce((a, b) => a + b, 0);
+            totalBetDisplay.textContent = totalCurrBet.toLocaleString();
+
+            reliefBtn.style.display = (balance < 100 && totalCurrBet === 0) ? 'block' : 'none';
+            rollBtn.disabled = isRolling || totalCurrBet === 0;
+
+            statRolls.textContent = totalRolls.toLocaleString();
+            statTotalBet.textContent = totalBet.toLocaleString();
+            const net = totalWin - totalBet;
+            statNetProfit.textContent = (net >= 0 ? '+' : '') + net.toLocaleString();
+            statNetProfit.style.color = net >= 0 ? '#10b981' : '#ef4444';
+            statMaxMult.textContent = maxMult > 0 ? `${maxMult}X` : '0X';
+
+            // Update badge displays on cells
+            document.querySelectorAll('.bet-cell').forEach(cell => {
+                const betKey = cell.getAttribute('data-bet');
+                const badge = cell.querySelector('.cell-chip-badge');
+                if (currentBets[betKey] && currentBets[betKey] > 0) {
+                    cell.classList.add('has-bet');
+                    if (badge) badge.textContent = currentBets[betKey] >= 1000 ? `${(currentBets[betKey]/1000)}k` : currentBets[betKey];
+                } else {
+                    cell.classList.remove('has-bet');
+                    if (badge) badge.textContent = '0';
+                }
+            });
+
+            renderHistory();
+        }
+
+        function renderHistory() {
+            histList.innerHTML = '';
+            history.slice(-12).reverse().forEach(h => {
+                const div = document.createElement('div');
+                div.className = `hist-item hist-${h.type}`;
+                const label = h.type === 'triple' ? '全' : (h.type === 'big' ? '大' : '小');
+                div.innerHTML = `<span>${label}</span><span>${h.sum}</span>`;
+                histList.appendChild(div);
+            });
+        }
+
+        // Draw Asian Macau Dice Face (with Red dot on 1 and Red dots on 4)
+        function renderDiceFace(el, val) {
+            el.innerHTML = '';
+            // 3x3 grid dots: [row, col]
+            const dotConfigs = {
+                1: [{ r: 2, c: 2, red: true, large: true }],
+                2: [{ r: 1, c: 1 }, { r: 3, c: 3 }],
+                3: [{ r: 1, c: 1 }, { r: 2, c: 2 }, { r: 3, c: 3 }],
+                4: [{ r: 1, c: 1, red: true }, { r: 1, c: 3, red: true }, { r: 3, c: 1, red: true }, { r: 3, c: 3, red: true }],
+                5: [{ r: 1, c: 1 }, { r: 1, c: 3 }, { r: 2, c: 2, red: true }, { r: 3, c: 1 }, { r: 3, c: 3 }],
+                6: [{ r: 1, c: 1 }, { r: 1, c: 3 }, { r: 2, c: 1 }, { r: 2, c: 3 }, { r: 3, c: 1 }, { r: 3, c: 3 }]
+            };
+
+            const dots = dotConfigs[val] || dotConfigs[1];
+            dots.forEach(d => {
+                const dot = document.createElement('div');
+                dot.className = 'dot' + (d.large ? ' large-red' : (d.red ? ' red' : ''));
+                dot.style.gridRow = d.r;
+                dot.style.gridColumn = d.c;
+                el.appendChild(dot);
+            });
+        }
+
+        // Initialize with default dice [4, 5, 6]
+        renderDiceFace(diceEls[0], 4);
+        renderDiceFace(diceEls[1], 5);
+        renderDiceFace(diceEls[2], 6);
+
+        /* ============================================================
+           Tab Navigation
+           ============================================================ */
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                audio.init();
+                audio.playChip();
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+                btn.classList.add('active');
+                const targetId = btn.getAttribute('data-tab');
+                document.getElementById(targetId).classList.add('active');
+            });
+        });
+
+        /* ============================================================
+           Chip Selection
+           ============================================================ */
+        document.querySelectorAll('.chip-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                audio.init();
+                audio.playChip();
+                document.querySelectorAll('.chip-btn').forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                selectedChip = parseInt(btn.getAttribute('data-value'), 10);
+                document.getElementById('selectedChipLabel').textContent = `선택: ${selectedChip.toLocaleString()}`;
+            });
+        });
+
+        /* ============================================================
+           Betting Cell Click
+           ============================================================ */
+        document.querySelectorAll('.bet-cell').forEach(cell => {
+            cell.addEventListener('click', () => {
+                if (isRolling) return;
+                audio.init();
+
+                const betKey = cell.getAttribute('data-bet');
+                if (!betKey) return;
+
+                if (balance < selectedChip) {
+                    payoutNotice.textContent = "보유 칩이 부족합니다!";
+                    payoutNotice.className = 'payout-announcement payout-loss';
+                    return;
+                }
+
+                balance -= selectedChip;
+                currentBets[betKey] = (currentBets[betKey] || 0) + selectedChip;
+                audio.playChip();
+                updateUI();
+            });
+        });
+
+        /* ============================================================
+           Quick Action Buttons
+           ============================================================ */
+        document.getElementById('btnClear').addEventListener('click', () => {
+            if (isRolling) return;
+            audio.init();
+            audio.playChip();
+            // Refund current bets back to balance
+            for (const key in currentBets) {
+                balance += currentBets[key];
+            }
+            currentBets = {};
+            updateUI();
+        });
+
+        document.getElementById('btnDouble').addEventListener('click', () => {
+            if (isRolling) return;
+            audio.init();
+            const totalCurr = Object.values(currentBets).reduce((a, b) => a + b, 0);
+            if (totalCurr === 0) return;
+
+            if (balance < totalCurr) {
+                payoutNotice.textContent = "2배 베팅할 칩이 부족합니다!";
+                payoutNotice.className = 'payout-announcement payout-loss';
+                return;
+            }
+
+            balance -= totalCurr;
+            for (const key in currentBets) {
+                currentBets[key] *= 2;
+            }
+            audio.playChip();
+            updateUI();
+        });
+
+        document.getElementById('btnRebet').addEventListener('click', () => {
+            if (isRolling) return;
+            audio.init();
+            const prevTotal = Object.values(previousBets).reduce((a, b) => a + b, 0);
+            if (prevTotal === 0) {
+                payoutNotice.textContent = "이전 베팅 기록이 없습니다.";
+                return;
+            }
+
+            if (balance < prevTotal) {
+                payoutNotice.textContent = "이전 베팅을 복원할 칩이 부족합니다!";
+                payoutNotice.className = 'payout-announcement payout-loss';
+                return;
+            }
+
+            // Refund current bets first
+            for (const key in currentBets) {
+                balance += currentBets[key];
+            }
+            currentBets = { ...previousBets };
+            balance -= prevTotal;
+            audio.playChip();
+            updateUI();
+        });
+
+        reliefBtn.addEventListener('click', () => {
+            audio.init();
+            audio.playWin(false);
+            balance += 5000;
+            saveState();
+            updateUI();
+            payoutNotice.textContent = "구호금 +5,000칩이 지급되었습니다!";
+            payoutNotice.className = 'payout-announcement payout-win';
+        });
+
+        audioToggle.addEventListener('click', () => {
+            audio.init();
+            audio.enabled = !audio.enabled;
+            audioToggle.textContent = audio.enabled ? '🔊' : '🔇';
+        });
+
+        /* ============================================================
+           Roll & Payout Resolution
+           ============================================================ */
+        rollBtn.addEventListener('click', rollDice);
+
+        function rollDice() {
+            const totalCurrBet = Object.values(currentBets).reduce((a, b) => a + b, 0);
+            if (totalCurrBet === 0 || isRolling) return;
+
+            audio.init();
+            isRolling = true;
+            rollBtn.disabled = true;
+            previousBets = { ...currentBets };
+
+            // Reset win cell highlights
+            document.querySelectorAll('.bet-cell').forEach(c => c.classList.remove('winner'));
+
+            // Start Shaking Animation & Sound
+            shakerDome.classList.add('shaking');
+            diceEls.forEach(d => d.classList.add('rolling'));
+            audio.playShake();
+            payoutNotice.textContent = "주사위를 흔드는 중...";
+            payoutNotice.className = 'payout-announcement';
+
+            // Rapid dice face flicker
+            const flickerInterval = setInterval(() => {
+                diceEls.forEach(d => renderDiceFace(d, Math.floor(Math.random() * 6) + 1));
+            }, 80);
+
+            setTimeout(() => {
+                clearInterval(flickerInterval);
+                shakerDome.classList.remove('shaking');
+                diceEls.forEach(d => d.classList.remove('rolling'));
+                audio.playDiceSlam();
+
+                // Generate 3 random dice
+                const d1 = Math.floor(Math.random() * 6) + 1;
+                const d2 = Math.floor(Math.random() * 6) + 1;
+                const d3 = Math.floor(Math.random() * 6) + 1;
+
+                renderDiceFace(diceEls[0], d1);
+                renderDiceFace(diceEls[1], d2);
+                renderDiceFace(diceEls[2], d3);
+
+                resolveOutcome(d1, d2, d3, totalCurrBet);
+            }, 1200);
+        }
+
+        function resolveOutcome(d1, d2, d3, totalCurrBet) {
+            const dice = [d1, d2, d3].sort((a, b) => a - b);
+            const sum = d1 + d2 + d3;
+            const isTriple = (d1 === d2 && d2 === d3);
+            const isOdd = (sum % 2 === 1);
+
+            // Badges
+            resSum.textContent = `합계 ${sum}`;
+
+            let histType = 'small';
+            if (isTriple) {
+                resBigSmall.textContent = '트리플 (TRIPLE)';
+                resBigSmall.className = 'res-badge badge-triple';
+                histType = 'triple';
+            } else if (sum >= 11 && sum <= 17) {
+                resBigSmall.textContent = '大 (대)';
+                resBigSmall.className = 'res-badge badge-big';
+                histType = 'big';
+            } else {
+                resBigSmall.textContent = '小 (소)';
+                resBigSmall.className = 'res-badge badge-small';
+                histType = 'small';
+            }
+
+            resOddEven.textContent = isOdd ? '홀 (ODD)' : '짝 (EVEN)';
+            resOddEven.className = `res-badge badge-${isOdd ? 'odd' : 'even'}`;
+
+            history.push({ sum, type: histType });
+
+            // Determine Winning Bet Keys & Payout Multipliers (Return Multiplier: e.g. 1:1 -> 2.0x return)
+            const winningMultipliers = {}; // betKey -> return multiplier
+
+            // 1. Big / Small (House wins on Triple)
+            if (!isTriple) {
+                if (sum >= 11 && sum <= 17) winningMultipliers['big'] = 2.0;
+                if (sum >= 4 && sum <= 10) winningMultipliers['small'] = 2.0;
+                if (isOdd) winningMultipliers['odd'] = 2.0;
+                if (!isOdd) winningMultipliers['even'] = 2.0;
+            }
+
+            // 2. Any Triple (31x return, i.e., 30:1 payout)
+            if (isTriple) {
+                winningMultipliers['any_triple'] = 31.0;
+                winningMultipliers[`triple_${d1}`] = 181.0; // Specific Triple: 180:1 payout -> 181x return
+            }
+
+            // 3. Specific Doubles (11x return, i.e. 10:1 payout)
+            for (let num = 1; num <= 6; num++) {
+                const count = dice.filter(x => x === num).length;
+                if (count >= 2) {
+                    winningMultipliers[`double_${num}`] = 11.0;
+                }
+            }
+
+            // 4. Totals (4~17)
+            const totalPayouts = {
+                4: 61.0, 17: 61.0,
+                5: 31.0, 16: 31.0,
+                6: 19.0, 15: 19.0,
+                7: 13.0, 14: 13.0,
+                8: 9.0, 13: 9.0,
+                9: 7.0, 10: 7.0, 11: 7.0, 12: 7.0
+            };
+            if (totalPayouts[sum]) {
+                winningMultipliers[`total_${sum}`] = totalPayouts[sum];
+            }
+
+            // 5. Singles (1 match -> 2x, 2 matches -> 3x, 3 matches -> 4x)
+            for (let num = 1; num <= 6; num++) {
+                const count = dice.filter(x => x === num).length;
+                if (count > 0) {
+                    winningMultipliers[`single_${num}`] = (count + 1); // 1:1, 2:1, 3:1
+                }
+            }
+
+            // 6. Two Dice Combos (6x return)
+            const pairs = [
+                '1_2', '1_3', '1_4', '1_5', '1_6',
+                '2_3', '2_4', '2_5', '2_6',
+                '3_4', '3_5', '3_6',
+                '4_5', '4_6', '5_6'
+            ];
+            pairs.forEach(p => {
+                const [n1, n2] = p.split('_').map(Number);
+                if (dice.includes(n1) && dice.includes(n2)) {
+                    winningMultipliers[`combo_${p}`] = 6.0;
+                }
+            });
+
+            // Calculate total win return
+            let totalReturn = 0;
+            let highestMult = 0;
+
+            for (const betKey in currentBets) {
+                const betAmt = currentBets[betKey];
+                if (winningMultipliers[betKey]) {
+                    const mult = winningMultipliers[betKey];
+                    totalReturn += Math.round(betAmt * mult);
+                    if (mult > highestMult) highestMult = mult;
+
+                    // Highlight winning cell
+                    const cell = document.querySelector(`.bet-cell[data-bet="${betKey}"]`);
+                    if (cell) cell.classList.add('winner');
+                }
+            }
+
+            // Stats update
+            totalRolls++;
+            totalBet += totalCurrBet;
+            totalWin += totalReturn;
+            balance += totalReturn;
+
+            const roundProfit = totalReturn - totalCurrBet;
+            if (highestMult > maxMult) maxMult = highestMult;
+
+            saveState();
+
+            // Payout announcements
+            if (roundProfit > 0) {
+                const isMega = highestMult >= 30;
+                audio.playWin(isMega);
+                if (isMega) spawnConfetti(120);
+
+                payoutNotice.textContent = `🎉 축하합니다! +${roundProfit.toLocaleString()}칩 획득! (${highestMult}X 당첨)`;
+                payoutNotice.className = 'payout-announcement payout-win';
+            } else if (roundProfit === 0 && totalReturn > 0) {
+                audio.playWin(false);
+                payoutNotice.textContent = `본전 회수! (환급: ${totalReturn.toLocaleString()}칩)`;
+                payoutNotice.className = 'payout-announcement payout-win';
+            } else {
+                audio.playLoss();
+                payoutNotice.textContent = `아쉽습니다! -${totalCurrBet.toLocaleString()}칩 손실`;
+                payoutNotice.className = 'payout-announcement payout-loss';
+            }
+
+            currentBets = {};
+            isRolling = false;
+            updateUI();
+        }
+
+        // Initial UI Render
+        updateUI();
+    </script>
+</body>
+</html>
