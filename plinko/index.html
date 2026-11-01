@@ -504,6 +504,177 @@
             transform: scale(0.96);
         }
 
+        /* Rewarded Ad Button & Modal */
+        .ad-reward-btn {
+            background: linear-gradient(135deg, #10b981, #059669);
+            border: none;
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+            transition: all 0.2s;
+        }
+        .ad-reward-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+        }
+        .ad-reward-btn:active {
+            transform: scale(0.96);
+        }
+
+        .ad-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(6px);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+        }
+        .ad-modal-overlay.active {
+            display: flex;
+        }
+        .ad-modal-box {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 400px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+            animation: adModalPop 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes adModalPop {
+            from { transform: scale(0.85); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .ad-modal-header {
+            background: #0d1117;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #30363d;
+        }
+        .ad-badge {
+            background: rgba(88, 166, 255, 0.15);
+            color: #58a6ff;
+            border: 1px solid rgba(88, 166, 255, 0.3);
+            font-size: 0.7rem;
+            font-weight: 800;
+            padding: 2px 8px;
+            border-radius: 4px;
+            letter-spacing: 0.5px;
+        }
+        .ad-timer {
+            font-size: 0.85rem;
+            color: #c9d1d9;
+            font-weight: 600;
+        }
+        .ad-screen {
+            padding: 24px 20px;
+            text-align: center;
+            background: linear-gradient(180deg, rgba(22, 27, 34, 0.9) 0%, rgba(13, 17, 23, 0.95) 100%);
+        }
+        .ad-brand-icon {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            filter: drop-shadow(0 4px 10px rgba(241, 224, 90, 0.3));
+            animation: adIconBounce 2s infinite ease-in-out;
+        }
+        @keyframes adIconBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
+        .ad-brand-title {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: #f0f6fc;
+            margin-bottom: 6px;
+        }
+        .ad-brand-desc {
+            font-size: 0.85rem;
+            color: #8b949e;
+            line-height: 1.45;
+            margin-bottom: 16px;
+        }
+        .ad-progress-track {
+            width: 100%;
+            height: 8px;
+            background: #21262d;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+        .ad-progress-bar {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #10b981, #58a6ff);
+            border-radius: 4px;
+        }
+        .ad-notice {
+            font-size: 0.75rem;
+            color: #6e7681;
+            background: rgba(110, 118, 129, 0.1);
+            padding: 6px 10px;
+            border-radius: 6px;
+        }
+        .ad-modal-footer {
+            background: #0d1117;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            border-top: 1px solid #30363d;
+        }
+        .ad-skip-btn {
+            background: transparent;
+            border: 1px solid #30363d;
+            color: #8b949e;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .ad-skip-btn:hover {
+            color: #f85149;
+            border-color: #f85149;
+        }
+        .ad-claim-btn {
+            background: #21262d;
+            border: none;
+            color: #8b949e;
+            padding: 8px 18px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: not-allowed;
+            transition: all 0.2s;
+        }
+        .ad-claim-btn.ready {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #fff;
+            cursor: pointer;
+            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);
+            animation: claimPulse 1.5s infinite;
+        }
+        @keyframes claimPulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4); }
+            50% { transform: scale(1.03); box-shadow: 0 6px 20px rgba(16, 185, 129, 0.6); }
+        }
+
         /* Confetti Canvas */
         #confettiCanvas {
             position: fixed;
@@ -527,6 +698,7 @@
                 <div class="title">⚪ PLINKO 1,000X</div>
             </div>
             <div class="header-right">
+                <button class="ad-reward-btn" id="adRewardBtn" onclick="openRewardedAd('header')">📺 무료 칩</button>
                 <div class="balance-box">
                     <span>🪙</span>
                     <span id="balanceText">10,000</span>
@@ -556,10 +728,10 @@
         <!-- Relief Banner -->
         <div class="relief-banner" id="reliefBanner">
             <div class="relief-info">
-                <h4>💸 파산 경보!</h4>
-                <p>구호금 5,000칩을 긴급 충전받으세요.</p>
+                <h4>💸 칩이 모두 소진되었나요?</h4>
+                <p>5초 보상형 광고 보고 5,000칩을 무료 충전하세요!</p>
             </div>
-            <button class="relief-btn" onclick="claimRelief()">긴급 충전 받기</button>
+            <button class="relief-btn" onclick="openRewardedAd('relief')">📺 광고 보고 +5,000</button>
         </div>
 
         <!-- Controls Card -->
@@ -615,6 +787,29 @@
             <div class="stat-card">
                 <div class="stat-label">순수익</div>
                 <div class="stat-value" id="statProfit">0</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rewarded Ad Modal -->
+    <div id="rewardedAdModal" class="ad-modal-overlay">
+        <div class="ad-modal-box">
+            <div class="ad-modal-header">
+                <div class="ad-badge">SPONSORED AD</div>
+                <div class="ad-timer" id="adTimerText">⏳ 보상까지 <span id="adCountdown">5</span>초</div>
+            </div>
+            <div class="ad-screen">
+                <div class="ad-brand-icon">🎰</div>
+                <div class="ad-brand-title">미니게임 아케이드 VIP 스폰서</div>
+                <div class="ad-brand-desc">매일 새로운 확률 게임과 실시간 잭팟 이벤트!<br>5초 시청 완료 시 즉시 5,000칩이 무료 충전됩니다.</div>
+                <div class="ad-progress-track">
+                    <div class="ad-progress-bar" id="adProgressBar"></div>
+                </div>
+                <div class="ad-notice">💡 실제 배포 시 Google AdSense / AdinPlay 보상형 비디오가 연동됩니다.</div>
+            </div>
+            <div class="ad-modal-footer">
+                <button class="ad-skip-btn" id="adSkipBtn" onclick="skipAd()">건너뛰기 (보상 미지급)</button>
+                <button class="ad-claim-btn" id="adClaimBtn" onclick="claimAdReward()" disabled>광고 시청 중...</button>
             </div>
         </div>
     </div>
@@ -869,10 +1064,7 @@
         }
 
         function claimRelief() {
-            balance += 5000;
-            updateBalanceUI();
-            playReliefSound();
-            createFloatText(canvas.width / 2, canvas.height / 2, '+5,000 긴급 충전!', '#ffd700');
+            openRewardedAd('relief');
         }
 
         function adjustBet(delta) {
@@ -1483,6 +1675,135 @@
             requestAnimationFrame(updateConfetti);
         }
         updateConfetti();
+
+        /* ============================================================
+           Rewarded Ad Monetization System (AdSense / AdinPlay Ready)
+           ============================================================ */
+        const RewardedAdManager = {
+            rewardAmount: 5000,
+            countdownSeconds: 5,
+            timerId: null,
+            isWatching: false,
+            canClaim: false,
+
+            open(source = 'button') {
+                const modal = document.getElementById('rewardedAdModal');
+                if (!modal) return;
+                modal.classList.add('active');
+                this.startAd();
+            },
+
+            startAd() {
+                this.isWatching = true;
+                this.canClaim = false;
+                let remaining = this.countdownSeconds;
+
+                const countdownEl = document.getElementById('adCountdown');
+                const timerText = document.getElementById('adTimerText');
+                const progressBar = document.getElementById('adProgressBar');
+                const claimBtn = document.getElementById('adClaimBtn');
+                const skipBtn = document.getElementById('adSkipBtn');
+
+                if (countdownEl) countdownEl.textContent = remaining;
+                if (timerText) timerText.innerHTML = `⏳ 보상까지 <span id="adCountdown">${remaining}</span>초`;
+                if (progressBar) {
+                    progressBar.style.transition = 'none';
+                    progressBar.style.width = '0%';
+                }
+                if (claimBtn) {
+                    claimBtn.disabled = true;
+                    claimBtn.textContent = '광고 시청 중...';
+                    claimBtn.classList.remove('ready');
+                }
+                if (skipBtn) skipBtn.style.display = 'inline-block';
+
+                setTimeout(() => {
+                    if (progressBar) {
+                        progressBar.style.transition = `width ${this.countdownSeconds}s linear`;
+                        progressBar.style.width = '100%';
+                    }
+                }, 50);
+
+                clearInterval(this.timerId);
+                this.timerId = setInterval(() => {
+                    remaining--;
+                    if (remaining > 0) {
+                        const el = document.getElementById('adCountdown');
+                        if (el) el.textContent = remaining;
+                    } else {
+                        clearInterval(this.timerId);
+                        this.completeAd();
+                    }
+                }, 1000);
+            },
+
+            completeAd() {
+                this.isWatching = false;
+                this.canClaim = true;
+                const timerText = document.getElementById('adTimerText');
+                const claimBtn = document.getElementById('adClaimBtn');
+                const skipBtn = document.getElementById('adSkipBtn');
+
+                if (timerText) timerText.innerHTML = '🎉 <span style="color:#10b981;font-weight:bold;">시청 완료!</span> 보상 수령 가능';
+                if (claimBtn) {
+                    claimBtn.disabled = false;
+                    claimBtn.textContent = `🎁 +${this.rewardAmount.toLocaleString()}칩 받기!`;
+                    claimBtn.classList.add('ready');
+                }
+                if (skipBtn) skipBtn.style.display = 'none';
+
+                playReliefSound();
+            },
+
+            claim() {
+                if (!this.canClaim) return;
+                this.close();
+                onAdRewardGranted(this.rewardAmount);
+            },
+
+            skip() {
+                if (this.isWatching) {
+                    if (!confirm('광고를 건너뛰면 무료 칩 보상이 지급되지 않습니다. 정말 건너뛸까요?')) {
+                        return;
+                    }
+                }
+                clearInterval(this.timerId);
+                this.close();
+            },
+
+            close() {
+                clearInterval(this.timerId);
+                this.isWatching = false;
+                this.canClaim = false;
+                const modal = document.getElementById('rewardedAdModal');
+                if (modal) modal.classList.remove('active');
+                const progressBar = document.getElementById('adProgressBar');
+                if (progressBar) {
+                    progressBar.style.transition = 'none';
+                    progressBar.style.width = '0%';
+                }
+            }
+        };
+
+        function openRewardedAd(source) {
+            RewardedAdManager.open(source);
+        }
+
+        function skipAd() {
+            RewardedAdManager.skip();
+        }
+
+        function claimAdReward() {
+            RewardedAdManager.claim();
+        }
+
+        function onAdRewardGranted(amount) {
+            balance += amount;
+            updateBalanceUI();
+            playReliefSound();
+            createFloatText(canvas.width / 2, canvas.height / 2, `+${amount.toLocaleString()} 무료 칩 충전!`, '#10b981');
+            spawnConfetti();
+        }
 
         /* ============================================================
            7. Initialization
