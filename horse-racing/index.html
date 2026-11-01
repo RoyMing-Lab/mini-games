@@ -1,0 +1,1770 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🏇 PIXEL DERBY - 픽셀 경마 베팅 배틀</title>
+    <style>
+        :root {
+            --bg-color: #0a0e17;
+            --panel-bg: #121826;
+            --panel-sub: #1a2234;
+            --border-color: #26334d;
+            --gold: #f5c518;
+            --gold-glow: rgba(245, 197, 24, 0.4);
+            --red: #ef4444;
+            --blue: #3b82f6;
+            --green: #10b981;
+            --purple: #a855f7;
+            --yellow: #eab308;
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+            --track-green: #154726;
+            --track-dirt: #8b5a2b;
+            --track-rail: #e2e8f0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 12px 10px 40px 10px;
+            overflow-x: hidden;
+            background-image: radial-gradient(circle at 50% 0%, #172642 0%, #0a0e17 80%);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 480px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        /* Top Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 8px 14px;
+        }
+
+        .lobby-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: var(--panel-sub);
+            color: var(--text-sub);
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 700;
+            padding: 6px 10px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            transition: all 0.2s;
+        }
+        .lobby-btn:hover {
+            color: var(--text-main);
+            border-color: var(--blue);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 900;
+            font-size: 1rem;
+            letter-spacing: -0.5px;
+            color: var(--gold);
+        }
+
+        .sound-btn {
+            background: var(--panel-sub);
+            border: 1px solid var(--border-color);
+            color: var(--text-sub);
+            border-radius: 8px;
+            padding: 6px 10px;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+
+        /* Chips Bar */
+        .chips-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, rgba(245, 197, 24, 0.12) 0%, rgba(18, 24, 38, 0.9) 100%);
+            border: 1px solid rgba(245, 197, 24, 0.35);
+            border-radius: 14px;
+            padding: 10px 16px;
+        }
+
+        .chip-info {
+            display: flex;
+            flex-direction: column;
+        }
+        .chip-label {
+            font-size: 0.75rem;
+            color: var(--text-sub);
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .chip-val-box {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 1.45rem;
+            font-weight: 900;
+            color: var(--gold);
+        }
+
+        .relief-btn {
+            display: none;
+            background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 0.8rem;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 0 12px rgba(239, 68, 68, 0.5);
+            animation: pulse-relief 1s infinite alternate;
+        }
+        @keyframes pulse-relief {
+            from { transform: scale(1); }
+            to { transform: scale(1.05); }
+        }
+
+        .bet-summary {
+            font-size: 0.85rem;
+            color: var(--text-sub);
+            text-align: right;
+        }
+        .bet-summary b {
+            color: #38bdf8;
+            font-size: 1rem;
+        }
+
+        /* Broadcast Live Banner */
+        .live-banner {
+            background: #0d1424;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            color: #e2e8f0;
+            overflow: hidden;
+            position: relative;
+        }
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #ef4444;
+            box-shadow: 0 0 8px #ef4444;
+            flex-shrink: 0;
+            animation: blink 1s infinite;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        .live-text {
+            font-weight: 700;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: #f1f5f9;
+        }
+
+        /* Canvas Track Area */
+        .track-wrapper {
+            position: relative;
+            width: 100%;
+            background: #0f172a;
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8);
+        }
+
+        canvas#derbyCanvas {
+            display: block;
+            width: 100%;
+            height: 230px;
+            background: #11361b;
+        }
+
+        /* Race Overlay Status */
+        .race-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 8px 12px;
+        }
+        .race-meter-bar {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: rgba(255, 255, 255, 0.8);
+            background: rgba(0, 0, 0, 0.45);
+            padding: 3px 8px;
+            border-radius: 6px;
+            backdrop-filter: blur(2px);
+        }
+
+        .rank-badges {
+            display: flex;
+            gap: 6px;
+            align-self: flex-start;
+        }
+        .rank-chip {
+            font-size: 0.75rem;
+            font-weight: 900;
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        /* Winner Modal / Toast */
+        .finish-banner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.8);
+            background: rgba(10, 14, 23, 0.95);
+            border: 2px solid var(--gold);
+            border-radius: 14px;
+            padding: 16px 24px;
+            text-align: center;
+            box-shadow: 0 0 30px rgba(245, 197, 24, 0.6);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 20;
+            min-width: 260px;
+        }
+        .finish-banner.show {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+            pointer-events: auto;
+        }
+        .finish-banner h2 {
+            font-size: 1.4rem;
+            font-weight: 900;
+            color: var(--gold);
+            margin-bottom: 4px;
+        }
+        .finish-banner .win-horse {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+        .finish-banner .payout-text {
+            font-size: 1.2rem;
+            font-weight: 900;
+            color: #38bdf8;
+            margin-bottom: 12px;
+        }
+        .close-banner-btn {
+            background: var(--gold);
+            color: #000;
+            border: none;
+            padding: 6px 16px;
+            border-radius: 8px;
+            font-weight: 900;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+
+        /* Horse Betting Board */
+        .betting-section-title {
+            font-size: 0.85rem;
+            font-weight: 800;
+            color: var(--text-sub);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 4px;
+        }
+        .betting-section-title span:last-child {
+            color: #38bdf8;
+            font-size: 0.75rem;
+        }
+
+        .horses-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .horse-card {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 10px 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            user-select: none;
+        }
+        .horse-card:hover {
+            border-color: rgba(245, 197, 24, 0.5);
+            background: var(--panel-sub);
+        }
+        .horse-card:active {
+            transform: scale(0.98);
+        }
+        .horse-card.has-bet {
+            border-color: var(--gold);
+            background: linear-gradient(90deg, rgba(245, 197, 24, 0.12) 0%, var(--panel-bg) 100%);
+            box-shadow: 0 0 12px rgba(245, 197, 24, 0.15);
+        }
+
+        .horse-num-badge {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            font-weight: 900;
+            color: white;
+            flex-shrink: 0;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+        }
+        .bg-h1 { background: #ef4444; }
+        .bg-h2 { background: #3b82f6; }
+        .bg-h3 { background: #10b981; }
+        .bg-h4 { background: #a855f7; }
+        .bg-h5 { background: #eab308; color: #1e1b4b; }
+
+        .horse-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .horse-name-line {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .horse-name {
+            font-size: 0.95rem;
+            font-weight: 800;
+            color: var(--text-main);
+        }
+        .horse-cond {
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 1px 5px;
+            border-radius: 4px;
+            background: rgba(255,255,255,0.08);
+            color: var(--text-sub);
+        }
+        .cond-up { color: #f87171; background: rgba(239, 68, 68, 0.15); }
+        .cond-best { color: #fbbf24; background: rgba(245, 197, 24, 0.15); }
+        .cond-fire { color: #c084fc; background: rgba(168, 85, 247, 0.15); }
+
+        .horse-trait {
+            font-size: 0.72rem;
+            color: var(--text-sub);
+        }
+
+        .horse-odds-box {
+            text-align: right;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 2px;
+        }
+        .horse-odds {
+            font-size: 1.15rem;
+            font-weight: 900;
+            color: var(--gold);
+        }
+        .horse-bet-val {
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: #38bdf8;
+            background: rgba(56, 189, 248, 0.12);
+            padding: 2px 6px;
+            border-radius: 4px;
+            border: 1px solid rgba(56, 189, 248, 0.25);
+            display: none;
+        }
+        .horse-bet-val.show {
+            display: block;
+        }
+
+        /* Controls Section */
+        .control-panel {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        /* Chip Selection */
+        .chip-selector-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 6px;
+        }
+        .chip-pick-btn {
+            flex: 1;
+            padding: 8px 4px;
+            background: var(--panel-sub);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-main);
+            font-size: 0.8rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.15s;
+            text-align: center;
+        }
+        .chip-pick-btn:hover {
+            border-color: var(--gold);
+        }
+        .chip-pick-btn.active {
+            background: linear-gradient(135deg, rgba(245, 197, 24, 0.25) 0%, rgba(245, 197, 24, 0.05) 100%);
+            border-color: var(--gold);
+            color: var(--gold);
+            box-shadow: 0 0 10px rgba(245, 197, 24, 0.3);
+        }
+
+        /* Quick Action Row */
+        .quick-action-row {
+            display: flex;
+            gap: 6px;
+        }
+        .quick-btn {
+            flex: 1;
+            background: var(--panel-sub);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-sub);
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 6px 0;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .quick-btn:hover {
+            color: var(--text-main);
+            border-color: var(--blue);
+        }
+        .quick-btn.clear {
+            color: #f87171;
+        }
+        .quick-btn.allin {
+            color: var(--gold);
+            font-weight: 800;
+        }
+
+        /* Start Race Button */
+        .start-race-btn {
+            background: linear-gradient(135deg, #f5c518 0%, #d97706 100%);
+            color: #0b0f19;
+            border: none;
+            border-radius: 12px;
+            padding: 14px;
+            font-size: 1.15rem;
+            font-weight: 900;
+            letter-spacing: -0.3px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 6px 20px rgba(245, 197, 24, 0.35);
+            transition: all 0.15s;
+        }
+        .start-race-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(245, 197, 24, 0.45);
+        }
+        .start-race-btn:active {
+            transform: scale(0.98);
+        }
+        .start-race-btn:disabled {
+            background: #334155;
+            color: #64748b;
+            box-shadow: none;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Statistics Bar */
+        .stats-bar {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 10px 14px;
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+        }
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .stat-label {
+            font-size: 0.68rem;
+            color: var(--text-sub);
+            font-weight: 600;
+        }
+        .stat-val {
+            font-size: 0.95rem;
+            font-weight: 800;
+            color: var(--text-main);
+        }
+
+        /* History Roll */
+        .history-box {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 10px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .history-title {
+            font-size: 0.72rem;
+            color: var(--text-sub);
+            font-weight: 700;
+            display: flex;
+            justify-content: space-between;
+        }
+        .history-pills {
+            display: flex;
+            gap: 6px;
+            overflow-x: auto;
+            padding-bottom: 2px;
+        }
+        .history-pills::-webkit-scrollbar {
+            display: none;
+        }
+        .hist-pill {
+            font-size: 0.7rem;
+            font-weight: 800;
+            padding: 4px 8px;
+            border-radius: 6px;
+            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        /* Confetti */
+        #confettiCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 100;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="confettiCanvas"></canvas>
+
+    <div class="container">
+        <!-- Top Header -->
+        <header class="header">
+            <a href="../index.html" class="lobby-btn">🏠 로비</a>
+            <div class="brand">🏇 PIXEL DERBY</div>
+            <button id="soundToggle" class="sound-btn">🔊 소리 켜짐</button>
+        </header>
+
+        <!-- Chips Balance Bar -->
+        <div class="chips-bar">
+            <div class="chip-info">
+                <span class="chip-label">보유 칩 (Chips)</span>
+                <div class="chip-val-box">
+                    <span>🪙</span>
+                    <span id="chipsDisplay">10,000</span>
+                </div>
+            </div>
+            <button id="reliefBtn" class="relief-btn">🚨 긴급 구호금 +5,000</button>
+            <div class="bet-summary">
+                총 베팅액<br>
+                <b id="totalBetDisplay">0</b> 칩
+            </div>
+        </div>
+
+        <!-- Live Commentary Banner -->
+        <div class="live-banner">
+            <div class="live-dot"></div>
+            <div id="liveText" class="live-text">원하는 경주마를 클릭하여 베팅한 후 레이스를 시작하세요!</div>
+        </div>
+
+        <!-- Canvas Race Track Area -->
+        <div class="track-wrapper">
+            <canvas id="derbyCanvas" width="480" height="230"></canvas>
+            <div class="race-overlay">
+                <div class="race-meter-bar">
+                    <span id="raceDistLabel">🏁 거리: 300m 직선주로</span>
+                    <span id="raceSpeedLabel">상태: 대기 중</span>
+                </div>
+                <div class="rank-badges" id="liveRankBadges">
+                    <!-- Live Order Badges inserted dynamically -->
+                </div>
+            </div>
+
+            <!-- Finish Banner -->
+            <div id="finishBanner" class="finish-banner">
+                <h2 id="bannerTitle">🏆 레이스 종료!</h2>
+                <div id="bannerWinner" class="win-horse">1등: 1번 썬더볼트 (2.2X)</div>
+                <div id="bannerPayout" class="payout-text">+2,200 칩 획득!</div>
+                <button id="closeBannerBtn" class="close-banner-btn">확인 (다음 레이스)</button>
+            </div>
+        </div>
+
+        <!-- Horse Betting Board -->
+        <div class="betting-section-title">
+            <span>출전마 명단 & 베팅판</span>
+            <span>마우스/터치로 칩 추가 베팅</span>
+        </div>
+
+        <div class="horses-grid" id="horsesGrid">
+            <!-- 5 Horses injected by JS -->
+        </div>
+
+        <!-- Betting Controls -->
+        <div class="control-panel">
+            <div class="chip-selector-row">
+                <button class="chip-pick-btn active" data-amt="100">+100</button>
+                <button class="chip-pick-btn" data-amt="500">+500</button>
+                <button class="chip-pick-btn" data-amt="1000">+1,000</button>
+                <button class="chip-pick-btn" data-amt="5000">+5,000</button>
+                <button class="chip-pick-btn" data-amt="10000">+1만</button>
+            </div>
+
+            <div class="quick-action-row">
+                <button class="quick-btn" id="btnHalf">1/2 베팅</button>
+                <button class="quick-btn" id="btnDouble">2X 베팅</button>
+                <button class="quick-btn allin" id="btnAllIn">🔥 균등 올인</button>
+                <button class="quick-btn clear" id="btnClear">초기화</button>
+            </div>
+
+            <button id="startRaceBtn" class="start-race-btn">
+                <span>🏇</span>
+                <span id="startBtnText">게이트 오픈! 레이스 출발</span>
+            </button>
+        </div>
+
+        <!-- Statistics -->
+        <div class="stats-bar">
+            <div class="stat-item">
+                <span class="stat-label">총 전적</span>
+                <span class="stat-val" id="statRaces">0전 0승</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">승률</span>
+                <span class="stat-val" id="statWinRate">0%</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">순손익</span>
+                <span class="stat-val" id="statProfit">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">최대 배당 당첨</span>
+                <span class="stat-val" id="statMaxOdds">-</span>
+            </div>
+        </div>
+
+        <!-- Recent Results History -->
+        <div class="history-box">
+            <div class="history-title">
+                <span>최근 레이스 우승 기록</span>
+                <span id="historyCount">최근 0회</span>
+            </div>
+            <div class="history-pills" id="historyPills">
+                <span style="font-size: 0.7rem; color: var(--text-sub);">레이스를 진행하면 우승마가 기록됩니다.</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* ============================================================
+           Audio Synthesizer (Web Audio API)
+           ============================================================ */
+        class SoundFX {
+            constructor() {
+                this.ctx = null;
+                this.enabled = true;
+            }
+
+            init() {
+                if (!this.ctx) {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    this.ctx = new AudioContext();
+                }
+                if (this.ctx.state === 'suspended') {
+                    this.ctx.resume();
+                }
+            }
+
+            playChip() {
+                if (!this.enabled || !this.ctx) return;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(1200 + Math.random() * 400, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(300, this.ctx.currentTime + 0.05);
+
+                gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.05);
+
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.05);
+            }
+
+            playGateOpen() {
+                if (!this.enabled || !this.ctx) return;
+                // Starting horn fanfare
+                const now = this.ctx.currentTime;
+                const notes = [440, 554.37, 659.25, 880];
+                notes.forEach((freq, idx) => {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(freq, now + idx * 0.08);
+                    
+                    gain.gain.setValueAtTime(0, now + idx * 0.08);
+                    gain.gain.linearRampToValueAtTime(0.25, now + idx * 0.08 + 0.02);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.08 + 0.25);
+
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start(now + idx * 0.08);
+                    osc.stop(now + idx * 0.08 + 0.25);
+                });
+            }
+
+            playGallop() {
+                if (!this.enabled || !this.ctx) return;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(140 + Math.random() * 60, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(40, this.ctx.currentTime + 0.04);
+
+                gain.gain.setValueAtTime(0.12, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.04);
+
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.04);
+            }
+
+            playWin() {
+                if (!this.enabled || !this.ctx) return;
+                const now = this.ctx.currentTime;
+                const chord = [523.25, 659.25, 783.99, 1046.50]; // C Major
+                chord.forEach((freq, i) => {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(freq, now + i * 0.06);
+
+                    gain.gain.setValueAtTime(0.3, now + i * 0.06);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.06 + 0.6);
+
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start(now + i * 0.06);
+                    osc.stop(now + i * 0.06 + 0.6);
+                });
+            }
+
+            playLose() {
+                if (!this.enabled || !this.ctx) return;
+                const now = this.ctx.currentTime;
+                const notes = [350, 310, 270, 220];
+                notes.forEach((freq, idx) => {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(freq, now + idx * 0.1);
+
+                    gain.gain.setValueAtTime(0.2, now + idx * 0.1);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.1 + 0.2);
+
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start(now + idx * 0.1);
+                    osc.stop(now + idx * 0.1 + 0.2);
+                });
+            }
+
+            playBankrupt() {
+                if (!this.enabled || !this.ctx) return;
+                const now = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(450, now);
+                osc.frequency.linearRampToValueAtTime(150, now + 0.4);
+
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(now);
+                osc.stop(now + 0.4);
+            }
+        }
+
+        const sound = new SoundFX();
+
+        /* ============================================================
+           Game Configuration & State
+           ============================================================ */
+        const HORSES_DATA = [
+            {
+                id: 1,
+                name: "썬더볼트",
+                odds: 2.2,
+                color: "#ef4444",
+                badgeClass: "bg-h1",
+                cond: "최상 🔥",
+                condClass: "cond-best",
+                trait: "인기 1위 · 압도적 스피드 & 안정형",
+                baseSpeed: 4.8,
+                variance: 0.6,
+                burstChance: 0.15
+            },
+            {
+                id: 2,
+                name: "섀도우 대시",
+                odds: 3.6,
+                color: "#3b82f6",
+                badgeClass: "bg-h2",
+                cond: "상승 📈",
+                condClass: "cond-up",
+                trait: "인기 2위 · 직선주로 강력 추월형",
+                baseSpeed: 4.5,
+                variance: 0.9,
+                burstChance: 0.25
+            },
+            {
+                id: 3,
+                name: "윈드 체이서",
+                odds: 5.2,
+                color: "#10b981",
+                badgeClass: "bg-h3",
+                cond: "보통 ⚡",
+                condClass: "",
+                trait: "초반 선행 도주마 · 복병",
+                baseSpeed: 4.3,
+                variance: 1.1,
+                burstChance: 0.22
+            },
+            {
+                id: 4,
+                name: "아이언 불릿",
+                odds: 9.5,
+                color: "#a855f7",
+                badgeClass: "bg-h4",
+                cond: "도전 🎯",
+                condClass: "",
+                trait: "중배당 다크호스 · 막판 스퍼트",
+                baseSpeed: 4.1,
+                variance: 1.4,
+                burstChance: 0.35
+            },
+            {
+                id: 5,
+                name: "미라클 잭팟",
+                odds: 25.0,
+                color: "#eab308",
+                badgeClass: "bg-h5",
+                cond: "로또 💥",
+                condClass: "cond-fire",
+                trait: "초고배당 복병 · 기적의 25배 대박!",
+                baseSpeed: 3.8,
+                variance: 2.0,
+                burstChance: 0.45
+            }
+        ];
+
+        // State variables
+        let chips = 10000;
+        let selectedChipAmt = 100;
+        let horseBets = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+        let isRacing = false;
+        let raceHorses = [];
+        let raceDistance = 1800; // Total track units
+        let cameraX = 0;
+        let animFrameId = null;
+        let gallopSoundTimer = 0;
+
+        // Statistics
+        let stats = {
+            races: 0,
+            wins: 0,
+            netProfit: 0,
+            maxOddsWon: 0,
+            history: []
+        };
+
+        // Load storage
+        function loadStorage() {
+            const savedChips = localStorage.getItem("pixel_derby_chips");
+            if (savedChips !== null) {
+                chips = parseInt(savedChips, 10);
+                if (isNaN(chips) || chips < 0) chips = 10000;
+            }
+
+            const savedStats = localStorage.getItem("pixel_derby_stats");
+            if (savedStats) {
+                try {
+                    stats = JSON.parse(savedStats);
+                } catch (e) {
+                    console.error(e);
+                }
+            }
+        }
+
+        function saveStorage() {
+            localStorage.setItem("pixel_derby_chips", chips);
+            localStorage.setItem("pixel_derby_stats", JSON.stringify(stats));
+        }
+
+        /* ============================================================
+           UI Initialization & Event Handlers
+           ============================================================ */
+        const chipsDisplay = document.getElementById("chipsDisplay");
+        const totalBetDisplay = document.getElementById("totalBetDisplay");
+        const reliefBtn = document.getElementById("reliefBtn");
+        const liveText = document.getElementById("liveText");
+        const horsesGrid = document.getElementById("horsesGrid");
+        const startRaceBtn = document.getElementById("startRaceBtn");
+        const startBtnText = document.getElementById("startBtnText");
+        const finishBanner = document.getElementById("finishBanner");
+        const bannerTitle = document.getElementById("bannerTitle");
+        const bannerWinner = document.getElementById("bannerWinner");
+        const bannerPayout = document.getElementById("bannerPayout");
+        const closeBannerBtn = document.getElementById("closeBannerBtn");
+        const soundToggle = document.getElementById("soundToggle");
+        const raceDistLabel = document.getElementById("raceDistLabel");
+        const raceSpeedLabel = document.getElementById("raceSpeedLabel");
+        const liveRankBadges = document.getElementById("liveRankBadges");
+
+        // Stat elements
+        const statRaces = document.getElementById("statRaces");
+        const statWinRate = document.getElementById("statWinRate");
+        const statProfit = document.getElementById("statProfit");
+        const statMaxOdds = document.getElementById("statMaxOdds");
+        const historyPills = document.getElementById("historyPills");
+        const historyCount = document.getElementById("historyCount");
+
+        // Canvas
+        const canvas = document.getElementById("derbyCanvas");
+        const ctx = canvas.getContext("2d");
+
+        function updateUI() {
+            chipsDisplay.textContent = chips.toLocaleString();
+            
+            const totalBet = Object.values(horseBets).reduce((a, b) => a + b, 0);
+            totalBetDisplay.textContent = totalBet.toLocaleString();
+
+            if (chips <= 0 && totalBet <= 0) {
+                reliefBtn.style.display = "block";
+            } else {
+                reliefBtn.style.display = "none";
+            }
+
+            // Update horse bet displays
+            HORSES_DATA.forEach(h => {
+                const card = document.getElementById(`horse-card-${h.id}`);
+                const betValElem = document.getElementById(`horse-bet-${h.id}`);
+                const betAmt = horseBets[h.id];
+
+                if (card && betValElem) {
+                    if (betAmt > 0) {
+                        card.classList.add("has-bet");
+                        betValElem.textContent = `${betAmt.toLocaleString()} 칩`;
+                        betValElem.classList.add("show");
+                    } else {
+                        card.classList.remove("has-bet");
+                        betValElem.classList.remove("show");
+                    }
+                }
+            });
+
+            // Start button state
+            if (isRacing) {
+                startRaceBtn.disabled = true;
+                startBtnText.textContent = "레이스 진행 중...";
+            } else {
+                startRaceBtn.disabled = totalBet <= 0;
+                startBtnText.textContent = totalBet > 0 
+                    ? `🏇 ${totalBet.toLocaleString()}칩 베팅 완료! 출발하기` 
+                    : "경주마를 선택하여 베팅하세요";
+            }
+
+            // Stats update
+            statRaces.textContent = `${stats.races}전 ${stats.wins}승`;
+            const winRate = stats.races > 0 ? Math.round((stats.wins / stats.races) * 100) : 0;
+            statWinRate.textContent = `${winRate}%`;
+
+            if (stats.netProfit > 0) {
+                statProfit.textContent = `+${stats.netProfit.toLocaleString()}`;
+                statProfit.style.color = "#4ade80";
+            } else if (stats.netProfit < 0) {
+                statProfit.textContent = `${stats.netProfit.toLocaleString()}`;
+                statProfit.style.color = "#f87171";
+            } else {
+                statProfit.textContent = "0";
+                statProfit.style.color = "var(--text-main)";
+            }
+
+            statMaxOdds.textContent = stats.maxOddsWon > 0 ? `${stats.maxOddsWon.toFixed(1)}X` : "-";
+
+            // History render
+            renderHistory();
+        }
+
+        function renderHistory() {
+            if (!stats.history || stats.history.length === 0) {
+                historyPills.innerHTML = '<span style="font-size: 0.7rem; color: var(--text-sub);">레이스를 진행하면 우승마가 기록됩니다.</span>';
+                historyCount.textContent = "최근 0회";
+                return;
+            }
+
+            historyCount.textContent = `최근 ${stats.history.length}회`;
+            historyPills.innerHTML = stats.history.map(item => {
+                const horse = HORSES_DATA.find(h => h.id === item.winnerId);
+                const bg = horse ? horse.color : "#475569";
+                return `
+                    <div class="hist-pill" style="background: ${bg};">
+                        <span>[${item.winnerId}]</span>
+                        <span>${item.odds.toFixed(1)}X</span>
+                        ${item.isWin ? '<span>🏆</span>' : ''}
+                    </div>
+                `;
+            }).join("");
+        }
+
+        function buildHorsesGrid() {
+            horsesGrid.innerHTML = HORSES_DATA.map(h => `
+                <div class="horse-card" id="horse-card-${h.id}" data-id="${h.id}">
+                    <div class="horse-num-badge ${h.badgeClass}">${h.id}</div>
+                    <div class="horse-info">
+                        <div class="horse-name-line">
+                            <span class="horse-name">${h.name}</span>
+                            <span class="horse-cond ${h.condClass}">${h.cond}</span>
+                        </div>
+                        <div class="horse-trait">${h.trait}</div>
+                    </div>
+                    <div class="horse-odds-box">
+                        <div class="horse-odds">${h.odds.toFixed(1)}X</div>
+                        <div class="horse-bet-val" id="horse-bet-${h.id}">0 칩</div>
+                    </div>
+                </div>
+            `).join("");
+
+            // Click event on horse card
+            document.querySelectorAll(".horse-card").forEach(card => {
+                card.addEventListener("click", () => {
+                    if (isRacing) return;
+                    sound.init();
+                    const horseId = parseInt(card.dataset.id, 10);
+                    addBet(horseId, selectedChipAmt);
+                });
+            });
+        }
+
+        function addBet(horseId, amount) {
+            if (chips < amount) {
+                amount = chips; // Bet all remaining chips
+            }
+            if (amount <= 0) {
+                sound.playBankrupt();
+                liveText.textContent = "⚠️ 보유 칩이 부족합니다! 긴급 구호금을 충전하세요.";
+                return;
+            }
+
+            chips -= amount;
+            horseBets[horseId] += amount;
+            sound.playChip();
+            saveStorage();
+            updateUI();
+
+            const horse = HORSES_DATA.find(h => h.id === horseId);
+            liveText.textContent = `[${horseId}] ${horse.name}에 +${amount.toLocaleString()}칩 베팅 (총 ${horseBets[horseId].toLocaleString()}칩)`;
+        }
+
+        /* ============================================================
+           Quick Buttons Listeners
+           ============================================================ */
+        document.querySelectorAll(".chip-pick-btn").forEach(btn => {
+            btn.addEventListener("click", () => {
+                sound.init();
+                sound.playChip();
+                document.querySelectorAll(".chip-pick-btn").forEach(b => b.classList.remove("active"));
+                btn.classList.add("active");
+                selectedChipAmt = parseInt(btn.dataset.amt, 10);
+            });
+        });
+
+        document.getElementById("btnClear").addEventListener("click", () => {
+            if (isRacing) return;
+            sound.init();
+            sound.playChip();
+            const totalBet = Object.values(horseBets).reduce((a, b) => a + b, 0);
+            chips += totalBet;
+            horseBets = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+            saveStorage();
+            updateUI();
+            liveText.textContent = "베팅이 모두 초기화되었습니다.";
+        });
+
+        document.getElementById("btnHalf").addEventListener("click", () => {
+            if (isRacing) return;
+            sound.init();
+            sound.playChip();
+            let refunded = 0;
+            for (let id in horseBets) {
+                const current = horseBets[id];
+                const half = Math.floor(current / 2);
+                refunded += (current - half);
+                horseBets[id] = half;
+            }
+            chips += refunded;
+            saveStorage();
+            updateUI();
+            liveText.textContent = "베팅액을 1/2로 줄였습니다.";
+        });
+
+        document.getElementById("btnDouble").addEventListener("click", () => {
+            if (isRacing) return;
+            sound.init();
+            const totalBet = Object.values(horseBets).reduce((a, b) => a + b, 0);
+            if (totalBet <= 0) return;
+
+            if (chips < totalBet) {
+                liveText.textContent = "⚠️ 2배 베팅할 칩이 부족합니다!";
+                sound.playBankrupt();
+                return;
+            }
+
+            for (let id in horseBets) {
+                chips -= horseBets[id];
+                horseBets[id] *= 2;
+            }
+            sound.playChip();
+            saveStorage();
+            updateUI();
+            liveText.textContent = "베팅액을 2배로 올렸습니다!";
+        });
+
+        document.getElementById("btnAllIn").addEventListener("click", () => {
+            if (isRacing) return;
+            sound.init();
+            sound.playChip();
+            if (chips <= 0) return;
+
+            // Check if any horses already selected
+            const selectedIds = Object.keys(horseBets).filter(id => horseBets[id] > 0);
+            if (selectedIds.length > 0) {
+                // Split chips equally among selected horses
+                const splitAmt = Math.floor(chips / selectedIds.length);
+                const remainder = chips % selectedIds.length;
+                selectedIds.forEach((id, idx) => {
+                    horseBets[id] += splitAmt + (idx === 0 ? remainder : 0);
+                });
+                chips = 0;
+            } else {
+                // Put all in on Favorite (1번) and Miracle (5번) 7:3 split
+                const amt1 = Math.floor(chips * 0.7);
+                const amt5 = chips - amt1;
+                horseBets[1] += amt1;
+                horseBets[5] += amt5;
+                chips = 0;
+            }
+
+            saveStorage();
+            updateUI();
+            liveText.textContent = "🔥 올인 베팅 완료! 기적의 역전을 기대해 보세요!";
+        });
+
+        reliefBtn.addEventListener("click", () => {
+            sound.init();
+            sound.playWin();
+            chips += 5000;
+            saveStorage();
+            updateUI();
+            liveText.textContent = "🚨 파산 구호금 5,000칩이 지급되었습니다! 힘내세요!";
+        });
+
+        soundToggle.addEventListener("click", () => {
+            sound.init();
+            sound.enabled = !sound.enabled;
+            soundToggle.textContent = sound.enabled ? "🔊 소리 켜짐" : "🔇 소리 꺼짐";
+        });
+
+        closeBannerBtn.addEventListener("click", () => {
+            finishBanner.classList.remove("show");
+            resetTrackForNewRace();
+        });
+
+        /* ============================================================
+           Race Simulation & Canvas Rendering Engine
+           ============================================================ */
+        function initRaceHorses() {
+            raceHorses = HORSES_DATA.map((h, index) => {
+                return {
+                    id: h.id,
+                    name: h.name,
+                    color: h.color,
+                    odds: h.odds,
+                    lane: index,
+                    x: 20, // Start line offset
+                    baseY: 28 + index * 38,
+                    speed: h.baseSpeed,
+                    targetSpeed: h.baseSpeed,
+                    variance: h.variance,
+                    burstChance: h.burstChance,
+                    hasSpurted: false,
+                    isSpurting: false,
+                    finishRank: 0,
+                    finishTime: 0,
+                    legFrame: 0,
+                    particles: []
+                };
+            });
+        }
+
+        function drawTrack() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const laneHeight = 38;
+            const startX = 60 - cameraX;
+            const finishX = (raceDistance) - cameraX;
+
+            // Draw Turf Background
+            ctx.fillStyle = "#11381b";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Draw Lanes & Rails
+            for (let i = 0; i < 5; i++) {
+                const y = 20 + i * laneHeight;
+
+                // Alternate turf shades
+                ctx.fillStyle = (i % 2 === 0) ? "#144220" : "#11381b";
+                ctx.fillRect(0, y, canvas.width, laneHeight);
+
+                // Lane separator dashed lines
+                ctx.strokeStyle = "rgba(255, 255, 255, 0.25)";
+                ctx.lineWidth = 1;
+                ctx.setLineDash([8, 8]);
+                ctx.beginPath();
+                ctx.moveTo(0, y + laneHeight);
+                ctx.lineTo(canvas.width, y + laneHeight);
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                // Lane number marker on the left
+                ctx.fillStyle = "rgba(255, 255, 255, 0.35)";
+                ctx.font = "bold 11px monospace";
+                ctx.fillText(`L${i + 1}`, 10, y + 22);
+            }
+
+            // Draw Start Gate Line
+            if (startX > -40 && startX < canvas.width + 40) {
+                ctx.strokeStyle = "#e2e8f0";
+                ctx.lineWidth = 4;
+                ctx.beginPath();
+                ctx.moveTo(startX, 18);
+                ctx.lineTo(startX, 18 + 5 * laneHeight);
+                ctx.stroke();
+
+                ctx.fillStyle = "#e2e8f0";
+                ctx.font = "bold 10px sans-serif";
+                ctx.fillText("START", startX - 16, 14);
+            }
+
+            // Distance Markers along the track
+            const markers = [300, 600, 900, 1200, 1500];
+            markers.forEach(dist => {
+                const mx = dist - cameraX;
+                if (mx > -40 && mx < canvas.width + 40) {
+                    ctx.strokeStyle = "rgba(255, 255, 255, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.setLineDash([4, 4]);
+                    ctx.beginPath();
+                    ctx.moveTo(mx, 20);
+                    ctx.lineTo(mx, 20 + 5 * laneHeight);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+
+                    ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
+                    ctx.font = "bold 9px sans-serif";
+                    ctx.fillText(`${Math.round(dist / 6)}m`, mx - 10, 14);
+                }
+            });
+
+            // Draw Finish Line (Checkerboard)
+            if (finishX > -50 && finishX < canvas.width + 60) {
+                const checkerSize = 8;
+                for (let r = 0; r < (5 * laneHeight) / checkerSize; r++) {
+                    for (let c = 0; c < 2; c++) {
+                        ctx.fillStyle = ((r + c) % 2 === 0) ? "#ffffff" : "#000000";
+                        ctx.fillRect(finishX + c * checkerSize, 20 + r * checkerSize, checkerSize, checkerSize);
+                    }
+                }
+
+                ctx.fillStyle = "#f5c518";
+                ctx.font = "900 11px sans-serif";
+                ctx.fillText("GOAL 🏁", finishX - 14, 14);
+            }
+
+            // Draw Horses & Particles
+            raceHorses.forEach(h => {
+                drawHorse(h);
+            });
+        }
+
+        function drawHorse(h) {
+            const screenX = h.x - cameraX;
+            const screenY = h.baseY;
+
+            // Draw kicked dirt particles
+            h.particles.forEach(p => {
+                ctx.fillStyle = `rgba(139, 90, 43, ${p.alpha})`;
+                ctx.fillRect(p.x - cameraX, p.y, p.size, p.size);
+            });
+
+            // Spurt fire effect behind horse
+            if (h.isSpurting) {
+                ctx.fillStyle = "rgba(239, 68, 68, 0.6)";
+                ctx.beginPath();
+                ctx.arc(screenX - 12, screenY + 4, 6 + Math.random() * 4, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // Horse Sprite (Pixel Art Geometry)
+            ctx.save();
+            ctx.translate(screenX, screenY);
+
+            // Shadow under horse
+            ctx.fillStyle = "rgba(0, 0, 0, 0.35)";
+            ctx.beginPath();
+            ctx.ellipse(0, 14, 18, 5, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Horse Body (Dark brown / chestnut)
+            ctx.fillStyle = "#6b3e1b";
+            ctx.fillRect(-12, -4, 24, 12); // main torso
+
+            // Neck & Head
+            ctx.fillRect(8, -12, 8, 12); // neck
+            ctx.fillRect(12, -16, 10, 8); // head
+
+            // Ears
+            ctx.fillRect(13, -19, 3, 4);
+
+            // Mane & Tail
+            ctx.fillStyle = "#331808";
+            ctx.fillRect(6, -14, 4, 10); // mane
+            // Tail fluttering
+            const tailWiggle = Math.sin(h.legFrame * 2) * 3;
+            ctx.fillRect(-16, -6 + tailWiggle, 6, 4);
+
+            // Saddle & Jockey Silk (Horse's specific color)
+            ctx.fillStyle = h.color;
+            ctx.fillRect(-4, -6, 12, 6); // saddle cloth
+            ctx.fillRect(0, -14, 8, 9); // jockey body
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(2, -18, 6, 5); // helmet
+            ctx.fillStyle = h.color;
+            ctx.fillRect(5, -18, 4, 3); // helmet visor
+
+            // Jockey whip / arm
+            ctx.fillStyle = "#fbcfe8";
+            ctx.fillRect(6, -11, 4, 3);
+
+            // Horse Legs (Gallop Animation Frames)
+            ctx.fillStyle = "#522e12";
+            const f = Math.floor(h.legFrame) % 4;
+
+            if (f === 0) {
+                // Front extended, back extended
+                ctx.fillRect(10, 6, 3, 9);
+                ctx.fillRect(13, 12, 4, 3);
+                ctx.fillRect(-12, 6, 3, 8);
+                ctx.fillRect(-15, 11, 4, 3);
+            } else if (f === 1) {
+                // Gathered under body
+                ctx.fillRect(6, 6, 3, 8);
+                ctx.fillRect(4, 11, 4, 3);
+                ctx.fillRect(-4, 6, 3, 8);
+                ctx.fillRect(-6, 11, 4, 3);
+            } else if (f === 2) {
+                // Pushing off
+                ctx.fillRect(4, 6, 3, 9);
+                ctx.fillRect(6, 12, 4, 3);
+                ctx.fillRect(-14, 6, 3, 7);
+                ctx.fillRect(-17, 10, 4, 3);
+            } else {
+                // High stride
+                ctx.fillRect(12, 6, 3, 7);
+                ctx.fillRect(14, 9, 4, 3);
+                ctx.fillRect(-8, 6, 3, 9);
+                ctx.fillRect(-10, 12, 4, 3);
+            }
+
+            // Horse Number Badge on body
+            ctx.fillStyle = "#ffffff";
+            ctx.font = "bold 8px monospace";
+            ctx.fillText(h.id, -1, 1);
+
+            ctx.restore();
+
+            // Name floating tag above horse
+            ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
+            ctx.fillRect(screenX - 18, screenY - 26, 38, 12);
+            ctx.fillStyle = h.color;
+            ctx.font = "bold 8px sans-serif";
+            ctx.fillText(`[${h.id}] ${h.name.substring(0, 3)}`, screenX - 16, screenY - 17);
+        }
+
+        /* ============================================================
+           Race Loop Logic
+           ============================================================ */
+        function startRace() {
+            sound.init();
+            sound.playGateOpen();
+
+            isRacing = true;
+            finishBanner.classList.remove("show");
+            updateUI();
+
+            initRaceHorses();
+            cameraX = 0;
+
+            liveText.textContent = "🏁 게이트 오픈! 모든 경주마가 힘차게 출발합니다!";
+            raceSpeedLabel.textContent = "상태: 레이스 진행 중 🔥";
+
+            let stepCount = 0;
+            let raceFinished = false;
+            let finishOrder = [];
+
+            function raceStep() {
+                stepCount++;
+
+                // Gallop sound periodically
+                if (sound.enabled && stepCount % 12 === 0) {
+                    sound.playGallop();
+                }
+
+                // Update horse positions & physics
+                raceHorses.forEach(h => {
+                    // Leg animation
+                    h.legFrame += 0.35 + (h.speed * 0.05);
+
+                    // Add dirt particles
+                    if (Math.random() < 0.4) {
+                        h.particles.push({
+                            x: h.x - 12,
+                            y: h.baseY + 12,
+                            size: 2 + Math.random() * 2,
+                            alpha: 0.8,
+                            vx: -1 - Math.random() * 2,
+                            vy: -Math.random() * 1.5
+                        });
+                    }
+
+                    // Update particles
+                    h.particles.forEach(p => {
+                        p.x += p.vx;
+                        p.y += p.vy;
+                        p.alpha -= 0.05;
+                    });
+                    h.particles = h.particles.filter(p => p.alpha > 0);
+
+                    // Dynamic Speed calculation
+                    // Mid-race adjustments
+                    const progress = h.x / raceDistance;
+
+                    if (progress > 0.4 && progress < 0.75) {
+                        // Mid-pack jostle
+                        h.speed += (Math.random() - 0.48) * (h.variance * 0.4);
+                    }
+
+                    // Spurt logic at final 35% distance
+                    if (progress > 0.65 && !h.hasSpurted) {
+                        if (Math.random() < h.burstChance) {
+                            h.isSpurting = true;
+                            h.hasSpurted = true;
+                            h.speed += 1.8 + Math.random() * 1.2;
+                            liveText.textContent = `🚨 [${h.id}] ${h.name}의 폭발적인 막판 스퍼트 추격!!`;
+                        } else {
+                            h.hasSpurted = true;
+                        }
+                    }
+
+                    // Speed clamping
+                    h.speed = Math.max(2.5, Math.min(8.5, h.speed + (Math.random() - 0.5) * 0.2));
+
+                    // Advance position
+                    h.x += h.speed;
+
+                    // Check finish
+                    if (h.x >= raceDistance && h.finishRank === 0) {
+                        finishOrder.push(h);
+                        h.finishRank = finishOrder.length;
+                        h.finishTime = stepCount;
+                    }
+                });
+
+                // Sort horses by X position for live ranking
+                const sorted = [...raceHorses].sort((a, b) => b.x - a.x);
+                updateLiveRanking(sorted);
+
+                // Commentary triggers
+                const leader = sorted[0];
+                const leadDistM = Math.round(leader.x / 6);
+                raceDistLabel.textContent = `🏁 리더: ${leadDistM}m / 300m`;
+
+                if (stepCount === 40) {
+                    liveText.textContent = `⚡ [${leader.id}] ${leader.name}이(가) 초반 빠른 템포로 선두를 이끕니다!`;
+                } else if (stepCount === 100) {
+                    const second = sorted[1];
+                    liveText.textContent = `🔥 [${leader.id}]와 [${second.id}]의 치열한 1위 다툼! 팽팽한 긴장감!`;
+                } else if (stepCount === 160) {
+                    liveText.textContent = `📢 마지막 결승선 직선주로 진입! 승부는 지금부터입니다!`;
+                }
+
+                // Smooth camera follow lead horse
+                const targetCamX = Math.max(0, leader.x - 180);
+                cameraX += (targetCamX - cameraX) * 0.12;
+
+                drawTrack();
+
+                // Check if all finished
+                if (finishOrder.length === raceHorses.length || (finishOrder.length > 0 && finishOrder[0].x > raceDistance + 250)) {
+                    raceFinished = true;
+                }
+
+                if (!raceFinished) {
+                    animFrameId = requestAnimationFrame(raceStep);
+                } else {
+                    finishRace(finishOrder[0]);
+                }
+            }
+
+            animFrameId = requestAnimationFrame(raceStep);
+        }
+
+        function updateLiveRanking(sorted) {
+            liveRankBadges.innerHTML = sorted.map((h, idx) => {
+                const rankText = idx === 0 ? "1위" : idx === 1 ? "2위" : idx === 2 ? "3위" : `${idx + 1}위`;
+                return `
+                    <div class="rank-chip" style="background: ${h.color};">
+                        <span>${rankText}</span>
+                        <span>[${h.id}]</span>
+                    </div>
+                `;
+            }).join("");
+        }
+
+        function finishRace(winner) {
+            isRacing = false;
+            raceSpeedLabel.textContent = "상태: 레이스 종료";
+
+            const winningHorse = HORSES_DATA.find(h => h.id === winner.id);
+            const userBet = horseBets[winner.id] || 0;
+            const totalBet = Object.values(horseBets).reduce((a, b) => a + b, 0);
+
+            let payout = 0;
+            let isUserWin = false;
+
+            if (userBet > 0) {
+                payout = Math.floor(userBet * winningHorse.odds);
+                chips += payout;
+                isUserWin = true;
+                sound.playWin();
+                triggerConfetti();
+            } else {
+                sound.playLose();
+            }
+
+            const netDiff = payout - totalBet;
+
+            // Stats Update
+            stats.races++;
+            if (isUserWin) stats.wins++;
+            stats.netProfit += netDiff;
+            if (isUserWin && winningHorse.odds > stats.maxOddsWon) {
+                stats.maxOddsWon = winningHorse.odds;
+            }
+
+            stats.history.unshift({
+                winnerId: winner.id,
+                odds: winningHorse.odds,
+                isWin: isUserWin
+            });
+            if (stats.history.length > 10) stats.history.pop();
+
+            saveStorage();
+
+            // Show Finish Modal
+            bannerTitle.textContent = isUserWin ? "🎉 잭팟 적중! 승리!" : "아쉬운 패배...";
+            bannerTitle.style.color = isUserWin ? "var(--gold)" : "#f87171";
+            bannerWinner.innerHTML = `우승: <b>[${winner.id}번] ${winner.name}</b> (배당 ${winningHorse.odds.toFixed(1)}X)`;
+            
+            if (isUserWin) {
+                bannerPayout.innerHTML = `<span style="color:#4ade80;">+${payout.toLocaleString()} 칩 획득!</span> (순수익: +${netDiff.toLocaleString()})`;
+            } else {
+                bannerPayout.innerHTML = `<span style="color:#f87171;">-${totalBet.toLocaleString()} 칩 손실</span>`;
+            }
+
+            finishBanner.classList.add("show");
+
+            liveText.textContent = `🏆 [${winner.id}] ${winner.name} 1등 결승선 통과! (배당 ${winningHorse.odds.toFixed(1)}X) ` +
+                (isUserWin ? `🎉 +${payout.toLocaleString()}칩 획득!` : "다음 레이스에 도전하세요!");
+
+            updateUI();
+        }
+
+        function resetTrackForNewRace() {
+            horseBets = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+            cameraX = 0;
+            initRaceHorses();
+            drawTrack();
+            updateUI();
+            liveText.textContent = "새 레이스 준비 완료! 원하는 경주마에 베팅하세요.";
+        }
+
+        startRaceBtn.addEventListener("click", () => {
+            if (isRacing) return;
+            const totalBet = Object.values(horseBets).reduce((a, b) => a + b, 0);
+            if (totalBet <= 0) return;
+            startRace();
+        });
+
+        /* ============================================================
+           Confetti Animation for Big Wins
+           ============================================================ */
+        const confettiCanvas = document.getElementById("confettiCanvas");
+        const cCtx = confettiCanvas.getContext("2d");
+        let confettiPieces = [];
+
+        function resizeConfetti() {
+            confettiCanvas.width = window.innerWidth;
+            confettiCanvas.height = window.innerHeight;
+        }
+        window.addEventListener("resize", resizeConfetti);
+        resizeConfetti();
+
+        function triggerConfetti() {
+            confettiPieces = [];
+            const colors = ["#f5c518", "#ef4444", "#3b82f6", "#10b981", "#a855f7", "#ec4899", "#ffffff"];
+            for (let i = 0; i < 90; i++) {
+                confettiPieces.push({
+                    x: confettiCanvas.width / 2 + (Math.random() - 0.5) * 150,
+                    y: confettiCanvas.height / 2 - 50,
+                    w: 8 + Math.random() * 6,
+                    h: 4 + Math.random() * 6,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    vx: (Math.random() - 0.5) * 14,
+                    vy: -8 - Math.random() * 10,
+                    rot: Math.random() * 360,
+                    rotSpeed: (Math.random() - 0.5) * 12,
+                    alpha: 1
+                });
+            }
+
+            function updateConfetti() {
+                cCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+                confettiPieces.forEach(p => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vy += 0.35; // gravity
+                    p.rot += p.rotSpeed;
+                    p.alpha -= 0.012;
+
+                    cCtx.save();
+                    cCtx.translate(p.x, p.y);
+                    cCtx.rotate((p.rot * Math.PI) / 180);
+                    cCtx.fillStyle = p.color;
+                    cCtx.globalAlpha = Math.max(0, p.alpha);
+                    cCtx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+                    cCtx.restore();
+                });
+
+                confettiPieces = confettiPieces.filter(p => p.alpha > 0);
+                if (confettiPieces.length > 0) {
+                    requestAnimationFrame(updateConfetti);
+                } else {
+                    cCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+                }
+            }
+            requestAnimationFrame(updateConfetti);
+        }
+
+        /* ============================================================
+           Initial Startup
+           ============================================================ */
+        loadStorage();
+        buildHorsesGrid();
+        initRaceHorses();
+        drawTrack();
+        updateUI();
+    </script>
+</body>
+</html>
