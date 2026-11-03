@@ -1,0 +1,1480 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🪙 COIN FLIP - 코인 토스 올인 스트릭</title>
+    <style>
+        :root {
+            --bg-color: #0b1118;
+            --panel-bg: #131c28;
+            --panel-sub: #1b2636;
+            --border-color: #27374d;
+            --gold: #f5c518;
+            --gold-glow: rgba(245, 197, 24, 0.4);
+            --gold-dark: #b8860b;
+            --silver: #e2e8f0;
+            --silver-dark: #64748b;
+            --red: #ef4444;
+            --blue: #3b82f6;
+            --green: #10b981;
+            --purple: #8b5cf6;
+            --orange: #f97316;
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 12px 10px 40px 10px;
+            overflow-x: hidden;
+            background-image: radial-gradient(circle at 50% 0%, #1c2e48 0%, #0b1118 80%);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 480px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        /* Top Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 8px 14px;
+        }
+
+        .header-left, .header-right {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .lobby-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: var(--panel-sub);
+            color: var(--text-sub);
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 700;
+            padding: 6px 10px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            transition: all 0.2s;
+        }
+        .lobby-btn:hover {
+            color: var(--text-main);
+            border-color: var(--blue);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 900;
+            font-size: 1rem;
+            letter-spacing: -0.5px;
+            color: var(--gold);
+        }
+
+        .icon-btn {
+            background: var(--panel-sub);
+            border: 1px solid var(--border-color);
+            color: var(--text-sub);
+            border-radius: 8px;
+            padding: 6px 10px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .icon-btn:hover {
+            color: var(--text-main);
+            border-color: var(--gold);
+        }
+
+        .free-chip-badge {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: #000;
+            font-weight: 900;
+            font-size: 0.72rem;
+            padding: 2px 6px;
+            border-radius: 6px;
+            animation: pulseChip 1.8s infinite;
+        }
+        @keyframes pulseChip {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.08); box-shadow: 0 0 10px rgba(245, 158, 11, 0.6); }
+        }
+
+        /* Balance & Stats Bar */
+        .status-bar {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .stat-card {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 10px 14px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .stat-label {
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--text-sub);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .stat-val {
+            font-size: 1.25rem;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: baseline;
+            gap: 4px;
+        }
+        .val-gold { color: var(--gold); text-shadow: 0 0 12px rgba(245, 197, 24, 0.3); }
+        .val-streak { color: #38bdf8; text-shadow: 0 0 12px rgba(56, 189, 248, 0.4); }
+
+        /* Streak Multiplier Ladder */
+        .ladder-wrapper {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 10px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .ladder-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: var(--text-sub);
+        }
+
+        .ladder-track {
+            display: flex;
+            gap: 5px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+            scrollbar-width: none;
+        }
+        .ladder-track::-webkit-scrollbar { display: none; }
+
+        .ladder-step {
+            flex: 0 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: var(--panel-sub);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 6px 8px;
+            min-width: 52px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .step-num {
+            font-size: 0.65rem;
+            color: var(--text-sub);
+            font-weight: 700;
+        }
+
+        .step-mult {
+            font-size: 0.85rem;
+            font-weight: 900;
+            color: var(--text-main);
+            margin-top: 2px;
+        }
+
+        .ladder-step.active {
+            background: linear-gradient(180deg, rgba(56, 189, 248, 0.25) 0%, rgba(14, 165, 233, 0.1) 100%);
+            border-color: #38bdf8;
+            box-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
+            transform: translateY(-2px);
+        }
+        .ladder-step.active .step-mult {
+            color: #38bdf8;
+            text-shadow: 0 0 8px rgba(56, 189, 248, 0.6);
+        }
+
+        .ladder-step.jackpot {
+            border-color: var(--gold);
+            background: linear-gradient(180deg, rgba(245, 197, 24, 0.2) 0%, rgba(184, 134, 11, 0.1) 100%);
+        }
+        .ladder-step.jackpot .step-mult {
+            color: var(--gold);
+        }
+
+        /* 3D Coin Arena */
+        .arena {
+            background: radial-gradient(circle at 50% 50%, #1a273b 0%, #0f1724 100%);
+            border: 2px solid var(--border-color);
+            border-radius: 18px;
+            height: 270px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            perspective: 1200px;
+            overflow: hidden;
+            box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.6);
+        }
+
+        .arena-spotlight {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(56, 189, 248, 0.12) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            transition: all 0.4s;
+        }
+
+        .arena.won .arena-spotlight {
+            background: radial-gradient(circle, rgba(245, 197, 24, 0.25) 0%, transparent 70%);
+        }
+        .arena.lost .arena-spotlight {
+            background: radial-gradient(circle, rgba(239, 68, 68, 0.2) 0%, transparent 70%);
+        }
+
+        /* Coin 3D Object */
+        .coin-box {
+            width: 140px;
+            height: 140px;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.1s;
+            cursor: pointer;
+        }
+
+        .coin-side {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), inset 0 0 0 5px rgba(255, 255, 255, 0.2);
+            user-select: none;
+        }
+
+        /* Heads: Gold Crown */
+        .coin-heads {
+            background: radial-gradient(circle at 35% 30%, #fff2a3 0%, #f5c518 45%, #b8860b 85%, #7a5802 100%);
+            border: 4px solid #fef08a;
+            color: #533801;
+            transform: rotateY(0deg);
+        }
+        .coin-heads .coin-symbol {
+            font-size: 3.2rem;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+        }
+        .coin-heads .coin-text {
+            font-size: 0.85rem;
+            font-weight: 900;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            text-shadow: 0 1px 1px rgba(255, 255, 255, 0.4);
+        }
+
+        /* Tails: Silver / Sapphire Star */
+        .coin-tails {
+            background: radial-gradient(circle at 35% 30%, #e0f2fe 0%, #38bdf8 45%, #0284c7 85%, #075985 100%);
+            border: 4px solid #bae6fd;
+            color: #082f49;
+            transform: rotateY(180deg);
+        }
+        .coin-tails .coin-symbol {
+            font-size: 3.2rem;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+        }
+        .coin-tails .coin-text {
+            font-size: 0.85rem;
+            font-weight: 900;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            text-shadow: 0 1px 1px rgba(255, 255, 255, 0.4);
+        }
+
+        /* Coin Shadow */
+        .coin-shadow {
+            position: absolute;
+            bottom: 24px;
+            width: 100px;
+            height: 18px;
+            background: rgba(0, 0, 0, 0.45);
+            border-radius: 50%;
+            filter: blur(4px);
+            transition: all 0.3s;
+        }
+
+        /* Flipping Keyframes */
+        @keyframes flipHeads {
+            0% {
+                transform: translateY(0) rotateX(0deg) rotateY(0deg) scale(1);
+            }
+            30% {
+                transform: translateY(-90px) rotateX(720deg) rotateY(540deg) scale(1.18);
+            }
+            70% {
+                transform: translateY(-40px) rotateX(1440deg) rotateY(1080deg) scale(1.08);
+            }
+            100% {
+                transform: translateY(0) rotateX(2160deg) rotateY(1440deg) scale(1);
+            }
+        }
+
+        @keyframes flipTails {
+            0% {
+                transform: translateY(0) rotateX(0deg) rotateY(0deg) scale(1);
+            }
+            30% {
+                transform: translateY(-90px) rotateX(720deg) rotateY(720deg) scale(1.18);
+            }
+            70% {
+                transform: translateY(-40px) rotateX(1440deg) rotateY(1260deg) scale(1.08);
+            }
+            100% {
+                transform: translateY(0) rotateX(2160deg) rotateY(1620deg) scale(1);
+            }
+        }
+
+        .coin-box.flipping-heads {
+            animation: flipHeads 1.6s cubic-bezier(0.2, 0.8, 0.25, 1) forwards;
+        }
+        .coin-box.flipping-tails {
+            animation: flipTails 1.6s cubic-bezier(0.2, 0.8, 0.25, 1) forwards;
+        }
+
+        .arena.flipping .coin-shadow {
+            transform: scale(0.4);
+            opacity: 0.2;
+        }
+
+        /* In-Arena Overlays */
+        .arena-status {
+            position: absolute;
+            top: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(11, 17, 24, 0.8);
+            border: 1px solid var(--border-color);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 800;
+            backdrop-filter: blur(4px);
+        }
+
+        .arena-payout-banner {
+            position: absolute;
+            bottom: 14px;
+            background: rgba(19, 28, 40, 0.9);
+            border: 1px solid #38bdf8;
+            padding: 6px 14px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            font-weight: 800;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+        }
+        .payout-amt {
+            color: var(--gold);
+            font-size: 1rem;
+            font-weight: 900;
+        }
+
+        /* History Beads */
+        .history-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 8px 12px;
+        }
+
+        .history-label {
+            font-size: 0.72rem;
+            font-weight: 800;
+            color: var(--text-sub);
+        }
+
+        .history-beads {
+            display: flex;
+            gap: 6px;
+        }
+
+        .bead {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.65rem;
+            font-weight: 900;
+            color: #000;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+            animation: beadPop 0.3s ease;
+        }
+        @keyframes beadPop {
+            from { transform: scale(0); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .bead-heads {
+            background: linear-gradient(135deg, #fef08a 0%, #f59e0b 100%);
+            border: 1px solid #ca8a04;
+        }
+        .bead-tails {
+            background: linear-gradient(135deg, #bae6fd 0%, #0284c7 100%);
+            border: 1px solid #0369a1;
+            color: #fff;
+        }
+
+        /* Action & Choice Buttons */
+        .choice-panel {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .choice-btn {
+            background: var(--panel-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            padding: 14px 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .choice-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+        }
+        .choice-btn:active:not(:disabled) {
+            transform: scale(0.97);
+        }
+
+        .choice-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .choice-heads {
+            border-color: rgba(245, 197, 24, 0.3);
+        }
+        .choice-heads:hover:not(:disabled), .choice-heads.selected {
+            border-color: var(--gold);
+            background: linear-gradient(180deg, rgba(245, 197, 24, 0.15) 0%, rgba(19, 28, 40, 0.95) 100%);
+            box-shadow: 0 0 16px rgba(245, 197, 24, 0.3);
+        }
+
+        .choice-tails {
+            border-color: rgba(56, 189, 248, 0.3);
+        }
+        .choice-tails:hover:not(:disabled), .choice-tails.selected {
+            border-color: #38bdf8;
+            background: linear-gradient(180deg, rgba(56, 189, 248, 0.15) 0%, rgba(19, 28, 40, 0.95) 100%);
+            box-shadow: 0 0 16px rgba(56, 189, 248, 0.3);
+        }
+
+        .choice-icon {
+            font-size: 2.2rem;
+            transition: transform 0.2s;
+        }
+        .choice-btn:hover .choice-icon {
+            transform: scale(1.12);
+        }
+
+        .choice-name {
+            font-size: 1.1rem;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+        }
+        .heads-name { color: var(--gold); }
+        .tails-name { color: #38bdf8; }
+
+        .choice-sub {
+            font-size: 0.75rem;
+            color: var(--text-sub);
+            font-weight: 600;
+        }
+
+        /* Cashout Banner Button (When in Streak) */
+        .cashout-btn {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border: none;
+            color: #fff;
+            padding: 16px;
+            border-radius: 16px;
+            font-size: 1.15rem;
+            font-weight: 900;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4);
+            transition: all 0.2s;
+            animation: pulseCashout 1.5s infinite;
+        }
+        @keyframes pulseCashout {
+            0%, 100% { transform: scale(1); box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4); }
+            50% { transform: scale(1.02); box-shadow: 0 8px 24px rgba(16, 185, 129, 0.6); }
+        }
+        .cashout-btn:hover {
+            filter: brightness(1.1);
+        }
+        .cashout-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* Betting Controls Panel */
+        .bet-panel {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .bet-input-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--panel-sub);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 6px 12px;
+        }
+
+        .bet-label {
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: var(--text-sub);
+        }
+
+        .bet-amount {
+            font-size: 1.25rem;
+            font-weight: 900;
+            color: var(--gold);
+        }
+
+        .chip-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+        }
+
+        .chip-btn {
+            background: var(--panel-sub);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-main);
+            font-size: 0.78rem;
+            font-weight: 800;
+            padding: 8px 4px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .chip-btn:hover:not(:disabled) {
+            border-color: var(--gold);
+            background: rgba(245, 197, 24, 0.1);
+            color: var(--gold);
+        }
+        .chip-btn:active:not(:disabled) {
+            transform: scale(0.95);
+        }
+        .chip-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .chip-btn.special {
+            color: #38bdf8;
+            border-color: rgba(56, 189, 248, 0.3);
+        }
+        .chip-btn.special:hover:not(:disabled) {
+            border-color: #38bdf8;
+            color: #38bdf8;
+            background: rgba(56, 189, 248, 0.1);
+        }
+
+        .chip-btn.allin {
+            color: var(--red);
+            border-color: rgba(239, 68, 68, 0.4);
+            font-weight: 900;
+        }
+        .chip-btn.allin:hover:not(:disabled) {
+            border-color: var(--red);
+            color: var(--red);
+            background: rgba(239, 68, 68, 0.15);
+        }
+
+        /* Modals (Rewarded Ad & Guide) */
+        .ad-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(6px);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+        }
+        .ad-modal-overlay.active {
+            display: flex;
+        }
+        .ad-modal-box {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 400px;
+            overflow: hidden;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.8);
+            animation: adModalPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        @keyframes adModalPop {
+            from { transform: scale(0.85); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .ad-modal-header {
+            background: #0d1117;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #30363d;
+        }
+        .ad-badge {
+            background: #f59e0b;
+            color: #000;
+            font-size: 0.7rem;
+            font-weight: 900;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        .ad-timer {
+            font-size: 0.85rem;
+            color: #94a3b8;
+            font-weight: 700;
+        }
+        .ad-screen {
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+            text-align: center;
+            background: radial-gradient(circle at 50% 50%, #1e293b 0%, #0f172a 100%);
+        }
+        .ad-brand-icon {
+            font-size: 3.5rem;
+            animation: bounce 1.5s infinite;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+        .ad-headline {
+            font-size: 1.15rem;
+            font-weight: 900;
+            color: #f8fafc;
+        }
+        .ad-tagline {
+            font-size: 0.85rem;
+            color: #94a3b8;
+            line-height: 1.4;
+        }
+        .ad-progress-track {
+            width: 100%;
+            height: 8px;
+            background: #334155;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 6px;
+        }
+        .ad-progress-bar {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #f59e0b 0%, #10b981 100%);
+            border-radius: 4px;
+            transition: width 0.1s linear;
+        }
+        .ad-notice {
+            font-size: 0.7rem;
+            color: #64748b;
+            margin-top: 4px;
+        }
+        .ad-modal-footer {
+            background: #0d1117;
+            padding: 12px 16px;
+            display: flex;
+            gap: 10px;
+            border-top: 1px solid #30363d;
+        }
+        .ad-skip-btn {
+            flex: 1;
+            background: #21262d;
+            border: 1px solid #30363d;
+            color: #8b949e;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .ad-claim-btn {
+            flex: 2;
+            background: #238636;
+            border: none;
+            color: #fff;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 800;
+            cursor: pointer;
+            opacity: 0.5;
+        }
+        .ad-claim-btn:enabled {
+            opacity: 1;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+        }
+
+        /* Confetti Canvas */
+        #confettiCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 9999;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="confettiCanvas"></canvas>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-left">
+                <a href="../index.html" class="lobby-btn">🏠 로비</a>
+                <div class="brand">🪙 COIN FLIP</div>
+            </div>
+            <div class="header-right">
+                <button class="icon-btn" onclick="openAdModal()">
+                    <span class="free-chip-badge">+5,000</span>
+                    <span>무료 칩</span>
+                </button>
+                <button class="icon-btn" id="soundBtn" onclick="toggleSound()">🔊</button>
+            </div>
+        </div>
+
+        <!-- Status & Stats -->
+        <div class="status-bar">
+            <div class="stat-card">
+                <div class="stat-label">💰 보유 칩</div>
+                <div class="stat-val val-gold"><span id="balanceText">10,000</span> <span style="font-size: 0.8rem; font-weight: normal;">CHIPS</span></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">🔥 현재 스트릭 (최고: <span id="bestStreak">0</span>)</div>
+                <div class="stat-val val-streak"><span id="currentStreak">0</span> <span style="font-size: 0.8rem; font-weight: normal;">연승 (x<span id="currentMult">1</span>)</span></div>
+            </div>
+        </div>
+
+        <!-- Streak Multiplier Ladder -->
+        <div class="ladder-wrapper">
+            <div class="ladder-header">
+                <span>⚡ 연승 배당 사다리 (연속 성공 시 올인 배당 급상승)</span>
+                <span id="ladderTargetText">목표: 1연승 (x2)</span>
+            </div>
+            <div class="ladder-track" id="ladderTrack">
+                <div class="ladder-step" data-step="1"><span class="step-num">1연승</span><span class="step-mult">2X</span></div>
+                <div class="ladder-step" data-step="2"><span class="step-num">2연승</span><span class="step-mult">4X</span></div>
+                <div class="ladder-step" data-step="3"><span class="step-num">3연승</span><span class="step-mult">8X</span></div>
+                <div class="ladder-step" data-step="4"><span class="step-num">4연승</span><span class="step-mult">16X</span></div>
+                <div class="ladder-step" data-step="5"><span class="step-num">5연승</span><span class="step-mult">32X</span></div>
+                <div class="ladder-step" data-step="6"><span class="step-num">6연승</span><span class="step-mult">64X</span></div>
+                <div class="ladder-step" data-step="7"><span class="step-num">7연승</span><span class="step-mult">128X</span></div>
+                <div class="ladder-step" data-step="8"><span class="step-num">8연승</span><span class="step-mult">256X</span></div>
+                <div class="ladder-step" data-step="9"><span class="step-num">9연승</span><span class="step-mult">512X</span></div>
+                <div class="ladder-step jackpot" data-step="10"><span class="step-num">10연승</span><span class="step-mult">1,024X</span></div>
+            </div>
+        </div>
+
+        <!-- 3D Coin Arena -->
+        <div class="arena" id="arena">
+            <div class="arena-spotlight"></div>
+            
+            <div class="arena-status" id="arenaStatus">
+                <span>🪙 앞면 또는 뒷면을 선택하세요</span>
+            </div>
+
+            <div class="coin-box" id="coinBox">
+                <div class="coin-side coin-heads">
+                    <div class="coin-symbol">👑</div>
+                    <div class="coin-text">HEADS</div>
+                </div>
+                <div class="coin-side coin-tails">
+                    <div class="coin-symbol">⚡</div>
+                    <div class="coin-text">TAILS</div>
+                </div>
+            </div>
+
+            <div class="coin-shadow" id="coinShadow"></div>
+
+            <div class="arena-payout-banner" id="payoutBanner" style="display: none;">
+                <span>현재 누적 상금:</span>
+                <span class="payout-amt" id="accumulatedPayout">0 CHIPS</span>
+            </div>
+        </div>
+
+        <!-- History Bar -->
+        <div class="history-bar">
+            <span class="history-label">최근 10회 결과:</span>
+            <div class="history-beads" id="historyBeads">
+                <!-- Beads injected by JS -->
+            </div>
+        </div>
+
+        <!-- Cashout Button (Visible when streak >= 1) -->
+        <div id="cashoutContainer" style="display: none;">
+            <button class="cashout-btn" onclick="cashOut()">
+                <span>💰 캐시아웃 (상금 확정)</span>
+                <span id="cashoutBtnAmount">+0 CHIPS</span>
+            </button>
+        </div>
+
+        <!-- Choice Buttons (Heads vs Tails) -->
+        <div class="choice-panel">
+            <button class="choice-btn choice-heads" id="headsBtn" onclick="playFlip('heads')">
+                <div class="choice-icon">👑</div>
+                <div class="choice-name heads-name">앞면 (HEADS)</div>
+                <div class="choice-sub" id="headsOddsText">다음 배당 2.0X</div>
+            </button>
+            <button class="choice-btn choice-tails" id="tailsBtn" onclick="playFlip('tails')">
+                <div class="choice-icon">⚡</div>
+                <div class="choice-name tails-name">뒷면 (TAILS)</div>
+                <div class="choice-sub" id="tailsOddsText">다음 배당 2.0X</div>
+            </button>
+        </div>
+
+        <!-- Betting Controls (Disabled during active streak) -->
+        <div class="bet-panel" id="betPanel">
+            <div class="bet-input-row">
+                <span class="bet-label">기본 베팅 칩</span>
+                <span class="bet-amount" id="betAmountDisplay">1,000 CHIPS</span>
+            </div>
+            <div class="chip-grid">
+                <button class="chip-btn" onclick="addBet(500)">+500</button>
+                <button class="chip-btn" onclick="addBet(1000)">+1,000</button>
+                <button class="chip-btn" onclick="addBet(5000)">+5,000</button>
+                <button class="chip-btn" onclick="addBet(10000)">+10,000</button>
+                <button class="chip-btn special" onclick="multiplyBet(0.5)">1/2</button>
+                <button class="chip-btn special" onclick="multiplyBet(2)">2X</button>
+                <button class="chip-btn allin" onclick="setAllIn()">ALL IN</button>
+                <button class="chip-btn special" onclick="resetBet()">초기화</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rewarded Ad Modal -->
+    <div id="rewardedAdModal" class="ad-modal-overlay">
+        <div class="ad-modal-box">
+            <div class="ad-modal-header">
+                <div class="ad-badge">SPONSORED AD</div>
+                <div class="ad-timer" id="adTimerText">⏳ 보상까지 <span id="adCountdown">5</span>초</div>
+            </div>
+            <div class="ad-screen">
+                <div class="ad-brand-icon">🪙</div>
+                <div class="ad-headline">도파민 폭발! 코인 토스 올인 스트릭</div>
+                <div class="ad-tagline">10연승 시 1,024배 대박 잭팟 터진다!<br>지금 무료 칩 충전하고 무한 더블업 도전!</div>
+                <div class="ad-progress-track">
+                    <div class="ad-progress-bar" id="adProgressBar"></div>
+                </div>
+                <div class="ad-notice">💡 실제 배포 시 Google AdSense / AdinPlay 보상형 비디오가 연동됩니다.</div>
+            </div>
+            <div class="ad-modal-footer">
+                <button class="ad-skip-btn" id="adSkipBtn" onclick="skipAd()">건너뛰기 (보상 미지급)</button>
+                <button class="ad-claim-btn" id="adClaimBtn" onclick="claimAdReward()" disabled>광고 시청 중...</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* --- Web Audio Sound System --- */
+        let audioCtx = null;
+        let soundEnabled = true;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function playSound(type, param = 0) {
+            if (!soundEnabled) return;
+            initAudio();
+            if (!audioCtx) return;
+
+            const t = audioCtx.currentTime;
+
+            if (type === 'flip') {
+                // High metallic ping of tossed coin
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(1400, t);
+                osc.frequency.exponentialRampToValueAtTime(3200, t + 0.08);
+                gain.gain.setValueAtTime(0.3, t);
+                gain.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(t);
+                osc.stop(t + 0.35);
+
+                // Quick whoosh
+                const noise = audioCtx.createOscillator();
+                const noiseGain = audioCtx.createGain();
+                noise.type = 'triangle';
+                noise.frequency.setValueAtTime(300, t);
+                noise.frequency.linearRampToValueAtTime(800, t + 0.2);
+                noiseGain.gain.setValueAtTime(0.15, t);
+                noiseGain.gain.linearRampToValueAtTime(0.001, t + 0.2);
+                noise.connect(noiseGain);
+                noiseGain.connect(audioCtx.destination);
+                noise.start(t);
+                noise.stop(t + 0.2);
+            } else if (type === 'land') {
+                // Metallic clink when landing
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(800, t);
+                osc.frequency.exponentialRampToValueAtTime(200, t + 0.08);
+                gain.gain.setValueAtTime(0.4, t);
+                gain.gain.exponentialRampToValueAtTime(0.001, t + 0.1);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(t);
+                osc.stop(t + 0.1);
+            } else if (type === 'win') {
+                // Pitch rises based on streak count!
+                const baseFreq = 440 + Math.min(param * 65, 600);
+                [0, 0.08, 0.16].forEach((delay, idx) => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(baseFreq * (1 + idx * 0.25), t + delay);
+                    gain.gain.setValueAtTime(0.25, t + delay);
+                    gain.gain.exponentialRampToValueAtTime(0.001, t + delay + 0.25);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(t + delay);
+                    osc.stop(t + delay + 0.25);
+                });
+            } else if (type === 'bust') {
+                // Low descending tone
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(260, t);
+                osc.frequency.exponentialRampToValueAtTime(80, t + 0.35);
+                gain.gain.setValueAtTime(0.3, t);
+                gain.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(t);
+                osc.stop(t + 0.35);
+            } else if (type === 'cashout') {
+                // Ka-ching victory chime
+                [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(freq, t + idx * 0.06);
+                    gain.gain.setValueAtTime(0.3, t + idx * 0.06);
+                    gain.gain.exponentialRampToValueAtTime(0.001, t + idx * 0.06 + 0.4);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(t + idx * 0.06);
+                    osc.stop(t + idx * 0.06 + 0.4);
+                });
+            } else if (type === 'chip') {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(1200, t);
+                gain.gain.setValueAtTime(0.15, t);
+                gain.gain.exponentialRampToValueAtTime(0.001, t + 0.04);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(t);
+                osc.stop(t + 0.04);
+            } else if (type === 'jackpot') {
+                // Siren fanfare
+                for (let i = 0; i < 8; i++) {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(500 + (i % 2) * 400, t + i * 0.12);
+                    gain.gain.setValueAtTime(0.35, t + i * 0.12);
+                    gain.gain.exponentialRampToValueAtTime(0.001, t + i * 0.12 + 0.18);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(t + i * 0.12);
+                    osc.stop(t + i * 0.12 + 0.18);
+                }
+            }
+        }
+
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            document.getElementById('soundBtn').textContent = soundEnabled ? '🔊' : '🔇';
+        }
+
+        /* --- Game State --- */
+        let balance = 10000;
+        let baseBet = 1000;
+        let currentStreak = 0;
+        let bestStreak = 0;
+        let isFlipping = false;
+        let history = [];
+        let accumulatedPayout = 0; // Cumulative payout during streak
+
+        // Multipliers: 1st=2x, 2nd=4x, 3rd=8x, ... 10th=1024x
+        const multipliers = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024];
+
+        function loadSavedState() {
+            try {
+                const saved = localStorage.getItem('arcade_coin_flip_state');
+                if (saved) {
+                    const data = JSON.parse(saved);
+                    balance = typeof data.balance === 'number' ? data.balance : 10000;
+                    bestStreak = data.bestStreak || 0;
+                }
+            } catch (e) {}
+            updateUI();
+        }
+
+        function saveState() {
+            try {
+                localStorage.setItem('arcade_coin_flip_state', JSON.stringify({
+                    balance,
+                    bestStreak
+                }));
+            } catch (e) {}
+        }
+
+        function updateUI() {
+            document.getElementById('balanceText').textContent = balance.toLocaleString();
+            document.getElementById('betAmountDisplay').textContent = baseBet.toLocaleString() + ' CHIPS';
+            document.getElementById('currentStreak').textContent = currentStreak;
+            document.getElementById('currentMult').textContent = (currentStreak > 0 ? multipliers[currentStreak] : 1).toLocaleString();
+            document.getElementById('bestStreak').textContent = bestStreak;
+
+            // Ladder highlights
+            document.querySelectorAll('.ladder-step').forEach(step => {
+                const stepNum = parseInt(step.getAttribute('data-step'), 10);
+                if (stepNum === currentStreak + 1) {
+                    step.classList.add('active');
+                } else {
+                    step.classList.remove('active');
+                }
+            });
+
+            // Target Text
+            const nextMult = currentStreak < 10 ? multipliers[currentStreak + 1] : 1024;
+            document.getElementById('ladderTargetText').textContent = `목표: ${currentStreak + 1}연승 (x${nextMult})`;
+
+            // Odds on buttons
+            document.getElementById('headsOddsText').textContent = `다음 배당 ${nextMult}X`;
+            document.getElementById('tailsOddsText').textContent = `다음 배당 ${nextMult}X`;
+
+            // Cashout container & Payout Banner
+            const cashoutBox = document.getElementById('cashoutContainer');
+            const payoutBanner = document.getElementById('payoutBanner');
+            const betPanel = document.getElementById('betPanel');
+
+            if (currentStreak > 0) {
+                cashoutBox.style.display = 'block';
+                payoutBanner.style.display = 'flex';
+                document.getElementById('accumulatedPayout').textContent = accumulatedPayout.toLocaleString() + ' CHIPS';
+                document.getElementById('cashoutBtnAmount').textContent = '+' + accumulatedPayout.toLocaleString() + ' CHIPS';
+                // Lock bet controls during streak
+                betPanel.style.opacity = '0.5';
+                betPanel.style.pointerEvents = 'none';
+            } else {
+                cashoutBox.style.display = 'none';
+                payoutBanner.style.display = 'none';
+                betPanel.style.opacity = '1';
+                betPanel.style.pointerEvents = 'auto';
+            }
+
+            // Buttons state
+            document.getElementById('headsBtn').disabled = isFlipping;
+            document.getElementById('tailsBtn').disabled = isFlipping;
+
+            renderHistory();
+        }
+
+        function renderHistory() {
+            const container = document.getElementById('historyBeads');
+            container.innerHTML = '';
+            history.slice(-10).forEach(side => {
+                const bead = document.createElement('div');
+                bead.className = `bead bead-${side}`;
+                bead.textContent = side === 'heads' ? 'H' : 'T';
+                container.appendChild(bead);
+            });
+        }
+
+        /* --- Betting Logic --- */
+        function addBet(amt) {
+            if (isFlipping || currentStreak > 0) return;
+            initAudio();
+            playSound('chip');
+            baseBet = Math.min(balance, baseBet + amt);
+            if (baseBet <= 0 && balance > 0) baseBet = Math.min(500, balance);
+            updateUI();
+        }
+
+        function multiplyBet(factor) {
+            if (isFlipping || currentStreak > 0) return;
+            initAudio();
+            playSound('chip');
+            baseBet = Math.max(100, Math.min(balance, Math.floor(baseBet * factor)));
+            updateUI();
+        }
+
+        function setAllIn() {
+            if (isFlipping || currentStreak > 0) return;
+            initAudio();
+            playSound('chip');
+            baseBet = balance;
+            updateUI();
+        }
+
+        function resetBet() {
+            if (isFlipping || currentStreak > 0) return;
+            initAudio();
+            playSound('chip');
+            baseBet = Math.min(balance, 1000);
+            updateUI();
+        }
+
+        /* --- Flip Execution --- */
+        function playFlip(userChoice) {
+            if (isFlipping) return;
+            initAudio();
+
+            // First round of streak: deduct bet
+            if (currentStreak === 0) {
+                if (balance < baseBet || baseBet <= 0) {
+                    if (balance < 500) {
+                        alert('보유 칩이 부족합니다! 상단의 [무료 칩 +5,000] 광고를 시청해 충전하세요.');
+                        openAdModal();
+                    } else {
+                        baseBet = balance;
+                        updateUI();
+                    }
+                    return;
+                }
+                balance -= baseBet;
+                accumulatedPayout = baseBet;
+            }
+
+            isFlipping = true;
+            updateUI();
+
+            // Highlight chosen button
+            document.getElementById('headsBtn').classList.toggle('selected', userChoice === 'heads');
+            document.getElementById('tailsBtn').classList.toggle('selected', userChoice === 'tails');
+
+            // Sound & Arena setup
+            playSound('flip');
+            const arena = document.getElementById('arena');
+            const coinBox = document.getElementById('coinBox');
+            const statusEl = document.getElementById('arenaStatus');
+
+            arena.classList.remove('won', 'lost');
+            arena.classList.add('flipping');
+            statusEl.innerHTML = `<span>⏳ 공중 회전 중... (${userChoice === 'heads' ? '앞면' : '뒷면'} 베팅)</span>`;
+
+            // Clear existing animation classes
+            coinBox.classList.remove('flipping-heads', 'flipping-tails');
+            void coinBox.offsetWidth; // Trigger reflow
+
+            // Determine Outcome (50:50 provably fair)
+            const outcome = Math.random() < 0.5 ? 'heads' : 'tails';
+
+            // Start CSS 3D animation
+            coinBox.classList.add(outcome === 'heads' ? 'flipping-heads' : 'flipping-tails');
+
+            setTimeout(() => {
+                // Coin lands
+                arena.classList.remove('flipping');
+                playSound('land');
+
+                const isWin = (userChoice === outcome);
+                history.push(outcome);
+
+                if (isWin) {
+                    currentStreak++;
+                    bestStreak = Math.max(bestStreak, currentStreak);
+                    accumulatedPayout = baseBet * multipliers[currentStreak];
+
+                    arena.classList.add('won');
+                    playSound('win', currentStreak);
+
+                    if (currentStreak === 10) {
+                        // JACKPOT 1024X!!
+                        statusEl.innerHTML = `<span>🎉 10연승 대박 잭팟! 1,024배 달성!!</span>`;
+                        playSound('jackpot');
+                        triggerConfetti(120);
+                        setTimeout(() => {
+                            cashOut();
+                        }, 2500);
+                    } else {
+                        statusEl.innerHTML = `<span>🔥 ${currentStreak}연승 성공! (+${accumulatedPayout.toLocaleString()} CHIPS)</span>`;
+                        if (currentStreak >= 4) triggerConfetti(35);
+                    }
+                } else {
+                    // Lost / Bust
+                    arena.classList.add('lost');
+                    playSound('bust');
+                    statusEl.innerHTML = `<span style="color: #ef4444;">💥 버스트! 결과는 ${outcome === 'heads' ? '앞면' : '뒷면'}였습니다.</span>`;
+                    currentStreak = 0;
+                    accumulatedPayout = 0;
+
+                    // Bankruptcy Emergency Relief
+                    if (balance <= 0) {
+                        setTimeout(() => {
+                            balance = 1000;
+                            alert('파산 구호금 1,000 칩이 긴급 지급되었습니다! 🎁');
+                            saveState();
+                            updateUI();
+                        }, 1200);
+                    }
+                }
+
+                document.getElementById('headsBtn').classList.remove('selected');
+                document.getElementById('tailsBtn').classList.remove('selected');
+
+                saveState();
+                isFlipping = false;
+                updateUI();
+            }, 1600);
+        }
+
+        /* --- Cash Out (Lock in Profits) --- */
+        function cashOut() {
+            if (isFlipping || currentStreak === 0) return;
+            initAudio();
+            playSound('cashout');
+
+            const profit = accumulatedPayout;
+            balance += profit;
+
+            const arena = document.getElementById('arena');
+            const statusEl = document.getElementById('arenaStatus');
+            statusEl.innerHTML = `<span style="color: #10b981;">💰 캐시아웃 완료! +${profit.toLocaleString()} 칩 획득!</span>`;
+
+            triggerConfetti(50);
+
+            currentStreak = 0;
+            accumulatedPayout = 0;
+
+            saveState();
+            updateUI();
+        }
+
+        /* --- Confetti System --- */
+        const confettiCanvas = document.getElementById('confettiCanvas');
+        const ctx = confettiCanvas.getContext('2d');
+        let confettis = [];
+
+        function resizeCanvas() {
+            confettiCanvas.width = window.innerWidth;
+            confettiCanvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        function triggerConfetti(count = 50) {
+            const colors = ['#f5c518', '#38bdf8', '#10b981', '#ef4444', '#ec4899', '#a855f7'];
+            for (let i = 0; i < count; i++) {
+                confettis.push({
+                    x: window.innerWidth / 2,
+                    y: window.innerHeight / 2,
+                    vx: (Math.random() - 0.5) * 14,
+                    vy: (Math.random() - 0.7) * 16,
+                    size: Math.random() * 8 + 4,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    rot: Math.random() * 360,
+                    vRot: (Math.random() - 0.5) * 12,
+                    life: 1.0,
+                    decay: Math.random() * 0.015 + 0.012
+                });
+            }
+        }
+
+        function updateConfetti() {
+            ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+            for (let i = confettis.length - 1; i >= 0; i--) {
+                const c = confettis[i];
+                c.x += c.vx;
+                c.y += c.vy;
+                c.vy += 0.4; // Gravity
+                c.rot += c.vRot;
+                c.life -= c.decay;
+
+                if (c.life <= 0) {
+                    confettis.splice(i, 1);
+                    continue;
+                }
+
+                ctx.save();
+                ctx.translate(c.x, c.y);
+                ctx.rotate(c.rot * Math.PI / 180);
+                ctx.fillStyle = c.color;
+                ctx.globalAlpha = c.life;
+                ctx.fillRect(-c.size / 2, -c.size / 2, c.size, c.size);
+                ctx.restore();
+            }
+            requestAnimationFrame(updateConfetti);
+        }
+        requestAnimationFrame(updateConfetti);
+
+        /* --- Rewarded Video Ad Modal System --- */
+        let adTimer = null;
+        let adSecondsLeft = 5;
+
+        function openAdModal() {
+            initAudio();
+            const modal = document.getElementById('rewardedAdModal');
+            modal.classList.add('active');
+            adSecondsLeft = 5;
+
+            const timerText = document.getElementById('adCountdown');
+            const claimBtn = document.getElementById('adClaimBtn');
+            const progressBar = document.getElementById('adProgressBar');
+
+            claimBtn.disabled = true;
+            claimBtn.textContent = '광고 시청 중...';
+            timerText.textContent = adSecondsLeft;
+            progressBar.style.width = '0%';
+
+            clearInterval(adTimer);
+            const startTime = Date.now();
+            const duration = 5000;
+
+            adTimer = setInterval(() => {
+                const elapsed = Date.now() - startTime;
+                const progress = Math.min(100, (elapsed / duration) * 100);
+                progressBar.style.width = progress + '%';
+
+                const remaining = Math.max(0, Math.ceil((duration - elapsed) / 1000));
+                timerText.textContent = remaining;
+
+                if (elapsed >= duration) {
+                    clearInterval(adTimer);
+                    claimBtn.disabled = false;
+                    claimBtn.textContent = '🎉 +5,000 칩 받기';
+                    document.getElementById('adTimerText').textContent = '✅ 보상 획득 가능!';
+                    playSound('win', 2);
+                }
+            }, 100);
+        }
+
+        function skipAd() {
+            clearInterval(adTimer);
+            document.getElementById('rewardedAdModal').classList.remove('active');
+        }
+
+        function claimAdReward() {
+            clearInterval(adTimer);
+            document.getElementById('rewardedAdModal').classList.remove('active');
+            balance += 5000;
+            playSound('cashout');
+            triggerConfetti(60);
+            saveState();
+            updateUI();
+            alert('🎉 무료 칩 5,000이 성공적으로 충전되었습니다!');
+        }
+
+        // Initialize on load
+        window.addEventListener('DOMContentLoaded', () => {
+            loadSavedState();
+        });
+    </script>
+</body>
+</html>
