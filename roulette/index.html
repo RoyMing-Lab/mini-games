@@ -1,0 +1,1533 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🎡 CASINO ROULETTE - 유러피언 룰렛</title>
+    <style>
+        :root {
+            --bg-color: #080d14;
+            --panel-bg: #121924;
+            --panel-sub: #1a2332;
+            --border-color: #26354a;
+            --gold: #f5c518;
+            --gold-glow: rgba(245, 197, 24, 0.4);
+            --gold-dark: #b8860b;
+            --red-num: #e11d48;
+            --black-num: #1e293b;
+            --green-zero: #10b981;
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+            --felt-green: #064e3b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px 8px 36px 8px;
+            overflow-x: hidden;
+            background-image: radial-gradient(circle at 50% 0%, #172a45 0%, #080d14 80%);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 480px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        /* Top Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 8px 12px;
+        }
+
+        .header-left, .header-right {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .lobby-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: var(--panel-sub);
+            color: var(--text-sub);
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 700;
+            padding: 6px 10px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            transition: all 0.2s;
+        }
+
+        .lobby-btn:hover {
+            color: var(--text-main);
+            border-color: var(--gold);
+        }
+
+        .title-badge {
+            font-size: 1.05rem;
+            font-weight: 900;
+            letter-spacing: -0.3px;
+            background: linear-gradient(135deg, #fff 0%, var(--gold) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .icon-btn {
+            background: var(--panel-sub);
+            border: 1px solid var(--border-color);
+            color: var(--text-sub);
+            font-size: 0.95rem;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .icon-btn:hover {
+            color: var(--text-main);
+            border-color: var(--gold);
+        }
+
+        /* Balance & Bet Info Bar */
+        .status-bar {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .status-card {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 8px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .status-label {
+            font-size: 0.72rem;
+            color: var(--text-sub);
+            font-weight: 600;
+        }
+
+        .status-val {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: var(--gold);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .bet-val {
+            color: #38bdf8;
+        }
+
+        /* Recent History Strip */
+        .history-strip {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 6px 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        .history-strip::-webkit-scrollbar { display: none; }
+
+        .history-label {
+            font-size: 0.7rem;
+            color: var(--text-sub);
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .history-items {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
+
+        .badge-num {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.72rem;
+            font-weight: 800;
+            color: #fff;
+            flex-shrink: 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.15);
+        }
+        .badge-red { background: var(--red-num); }
+        .badge-black { background: var(--black-num); border-color: #475569; }
+        .badge-green { background: var(--green-zero); }
+
+        /* Roulette Wheel Arena */
+        .wheel-arena {
+            background: radial-gradient(circle at 50% 50%, #162438 0%, #0e1724 100%);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.7);
+        }
+
+        #wheelCanvas {
+            width: 320px;
+            height: 320px;
+            max-width: 100%;
+            border-radius: 50%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8), 0 0 15px rgba(245,197,24,0.15);
+        }
+
+        .result-display {
+            position: absolute;
+            bottom: 12px;
+            background: rgba(10, 16, 26, 0.9);
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(8px);
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 0.82rem;
+            font-weight: 800;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            transition: all 0.3s;
+        }
+
+        .result-display.highlight {
+            border-color: var(--gold);
+            box-shadow: 0 0 20px var(--gold-glow);
+            transform: scale(1.05);
+        }
+
+        /* Betting Table */
+        .betting-table-wrap {
+            background: #092e20;
+            border: 2px solid #166534;
+            border-radius: 14px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            box-shadow: inset 0 0 25px rgba(0,0,0,0.8), 0 6px 18px rgba(0,0,0,0.6);
+            user-select: none;
+        }
+
+        /* 0 Zero Row */
+        .zero-cell {
+            background: var(--green-zero);
+            border: 1px solid #34d399;
+            color: #fff;
+            border-radius: 8px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.15rem;
+            font-weight: 900;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.15s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        .zero-cell:active { transform: scale(0.97); }
+
+        /* Grid 1 to 36 (12 rows x 3 cols) */
+        .numbers-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 4px;
+        }
+
+        .num-cell {
+            height: 38px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.05rem;
+            font-weight: 900;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.15s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.15);
+        }
+        .num-cell:active { transform: scale(0.96); }
+
+        .num-red {
+            background: linear-gradient(145deg, #e11d48, #be123c);
+            color: #ffffff;
+        }
+        .num-black {
+            background: linear-gradient(145deg, #1e293b, #0f172a);
+            color: #f8fafc;
+            border-color: #334155;
+        }
+
+        /* Column Bet Row (2:1) */
+        .col-bets {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 4px;
+        }
+
+        .outside-btn {
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid #334155;
+            color: #e2e8f0;
+            border-radius: 6px;
+            padding: 8px 4px;
+            font-size: 0.8rem;
+            font-weight: 800;
+            text-align: center;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.15s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        .outside-btn:active { transform: scale(0.96); }
+
+        /* Dozens (1st 12, 2nd 12, 3rd 12) */
+        .dozen-bets {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 4px;
+        }
+
+        /* Even Money Bets (1-18, EVEN, RED, BLACK, ODD, 19-36) */
+        .even-money-bets {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 4px;
+        }
+
+        .btn-red-bet {
+            background: linear-gradient(145deg, #e11d48, #be123c);
+            color: #fff;
+            border-color: #fb7185;
+        }
+        .btn-black-bet {
+            background: linear-gradient(145deg, #1e293b, #0f172a);
+            color: #fff;
+            border-color: #475569;
+        }
+
+        /* Placed Chip Badge */
+        .chip-badge {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--gold);
+            color: #000;
+            border-radius: 50%;
+            width: 26px;
+            height: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.65rem;
+            font-weight: 900;
+            border: 2px dashed #000;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.8), 0 0 10px rgba(245,197,24,0.6);
+            pointer-events: none;
+            z-index: 5;
+            animation: chipDrop 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes chipDrop {
+            0% { transform: translate(-50%, -80%) scale(1.3); opacity: 0; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+
+        /* Chip Selection Selector */
+        .chip-tray {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 8px 10px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        .chip-item {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.72rem;
+            font-weight: 900;
+            cursor: pointer;
+            border: 3px dashed rgba(255,255,255,0.7);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+            transition: all 0.2s;
+            user-select: none;
+        }
+
+        .chip-item:hover { transform: translateY(-2px); }
+        .chip-item.active {
+            transform: translateY(-5px) scale(1.12);
+            box-shadow: 0 0 15px var(--gold-glow), 0 6px 12px rgba(0,0,0,0.6);
+            border-color: #ffffff;
+        }
+
+        .chip-100 { background: #3b82f6; color: #fff; }
+        .chip-500 { background: #10b981; color: #fff; }
+        .chip-1000 { background: #ef4444; color: #fff; }
+        .chip-5000 { background: #8b5cf6; color: #fff; }
+        .chip-10000 { background: #eab308; color: #000; }
+
+        /* Control Action Buttons */
+        .action-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1.6fr;
+            gap: 6px;
+        }
+
+        .ctrl-btn {
+            background: var(--panel-sub);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            font-size: 0.85rem;
+            font-weight: 700;
+            padding: 12px 6px;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            transition: all 0.2s;
+        }
+        .ctrl-btn:active { transform: scale(0.97); }
+
+        .ctrl-btn.clear-btn:hover { border-color: #ef4444; color: #ef4444; }
+        .ctrl-btn.double-btn:hover { border-color: #38bdf8; color: #38bdf8; }
+        .ctrl-btn.rebet-btn:hover { border-color: #a855f7; color: #a855f7; }
+
+        .spin-btn {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            border: 1px solid #fbbf24;
+            color: #000;
+            font-size: 1.1rem;
+            font-weight: 900;
+            letter-spacing: -0.3px;
+            border-radius: 10px;
+            cursor: pointer;
+            box-shadow: 0 4px 14px rgba(245, 158, 11, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+        .spin-btn:hover {
+            box-shadow: 0 6px 20px rgba(245, 158, 11, 0.6);
+            transform: translateY(-1px);
+        }
+        .spin-btn:active { transform: scale(0.97); }
+        .spin-btn:disabled {
+            background: #334155;
+            border-color: #475569;
+            color: #64748b;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        /* Relief & Free Bonus Button */
+        .relief-card {
+            background: linear-gradient(90deg, rgba(239,68,68,0.15) 0%, rgba(245,197,24,0.15) 100%);
+            border: 1px solid rgba(245,197,24,0.3);
+            border-radius: 10px;
+            padding: 8px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .relief-text {
+            font-size: 0.78rem;
+            color: var(--text-sub);
+        }
+        .relief-text strong {
+            color: var(--gold);
+        }
+
+        .relief-btn {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border: 1px solid #34d399;
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.78rem;
+            font-weight: 800;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.2s;
+        }
+        .relief-btn:active { transform: scale(0.96); }
+
+        /* Modals */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s;
+        }
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-content {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 380px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            transform: translateY(20px);
+            transition: all 0.3s;
+        }
+        .modal-overlay.active .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-title {
+            font-size: 1.15rem;
+            font-weight: 900;
+            color: var(--text-main);
+        }
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-sub);
+            font-size: 1.3rem;
+            cursor: pointer;
+        }
+
+        .win-announcement {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .win-num-badge {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+            border: 3px solid rgba(255,255,255,0.3);
+        }
+
+        .win-payout-text {
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: var(--gold);
+        }
+
+        .win-details {
+            font-size: 0.85rem;
+            color: var(--text-sub);
+            line-height: 1.4;
+        }
+
+        /* Ad Simulation Modal */
+        .ad-timer-bar {
+            width: 100%;
+            height: 6px;
+            background: #334155;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .ad-timer-progress {
+            width: 0%;
+            height: 100%;
+            background: var(--gold);
+            transition: width 1s linear;
+        }
+
+        .ad-banner-box {
+            background: #1e293b;
+            border: 1px dashed #475569;
+            border-radius: 10px;
+            padding: 24px 16px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        /* Highlighting on Winning Cells */
+        .winning-cell {
+            animation: winPulse 0.8s infinite alternate !important;
+            border-color: #ffd700 !important;
+        }
+        @keyframes winPulse {
+            from { box-shadow: 0 0 8px rgba(255,215,0,0.4); transform: scale(1); }
+            to { box-shadow: 0 0 20px rgba(255,215,0,0.9); transform: scale(1.04); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Top Header -->
+        <div class="header">
+            <div class="header-left">
+                <a href="../index.html" class="lobby-btn">
+                    <span>🏠</span> 로비
+                </a>
+            </div>
+            <div class="title-badge">
+                <span>🎡</span> CASINO ROULETTE
+            </div>
+            <div class="header-right">
+                <button id="soundToggle" class="icon-btn" title="음향 ON/OFF">🔊</button>
+                <button id="rulesBtn" class="icon-btn" title="게임 가이드">ℹ️</button>
+            </div>
+        </div>
+
+        <!-- Balance & Bet Bar -->
+        <div class="status-bar">
+            <div class="status-card">
+                <span class="status-label">보유 칩 (BALANCE)</span>
+                <span id="balanceVal" class="status-val">🪙 10,000</span>
+            </div>
+            <div class="status-card">
+                <span class="status-label">총 베팅액 (TOTAL BET)</span>
+                <span id="totalBetVal" class="status-val bet-val">🪙 0</span>
+            </div>
+        </div>
+
+        <!-- Recent Results History -->
+        <div class="history-strip">
+            <span class="history-label">최근 기록:</span>
+            <div id="historyContainer" class="history-items">
+                <!-- Dynamically generated badges -->
+            </div>
+        </div>
+
+        <!-- Roulette Wheel Canvas -->
+        <div class="wheel-arena">
+            <canvas id="wheelCanvas" width="640" height="640"></canvas>
+            <div id="resultDisplay" class="result-display">
+                <span>🎡</span> <span id="resultSummaryText">베팅 후 SPIN을 눌러주세요</span>
+            </div>
+        </div>
+
+        <!-- Betting Table -->
+        <div class="betting-table-wrap">
+            <!-- 0 Cell -->
+            <div class="zero-cell bet-target" data-bet="num-0">
+                0
+            </div>
+
+            <!-- Numbers Grid: 1 to 36 -->
+            <div id="numbersGrid" class="numbers-grid">
+                <!-- 1 to 36 cells generated via JS in 3 columns -->
+            </div>
+
+            <!-- Column Bets (2:1) -->
+            <div class="col-bets">
+                <div class="outside-btn bet-target" data-bet="col-1">1st Col (2:1)</div>
+                <div class="outside-btn bet-target" data-bet="col-2">2nd Col (2:1)</div>
+                <div class="outside-btn bet-target" data-bet="col-3">3rd Col (2:1)</div>
+            </div>
+
+            <!-- Dozens Bets (1-12, 13-24, 25-36) -->
+            <div class="dozen-bets">
+                <div class="outside-btn bet-target" data-bet="doz-1">1st 12 (3:1)</div>
+                <div class="outside-btn bet-target" data-bet="doz-2">2nd 12 (3:1)</div>
+                <div class="outside-btn bet-target" data-bet="doz-3">3rd 12 (3:1)</div>
+            </div>
+
+            <!-- Even Money Bets (1-18, EVEN, RED, BLACK, ODD, 19-36) -->
+            <div class="even-money-bets">
+                <div class="outside-btn bet-target" data-bet="low">1-18</div>
+                <div class="outside-btn bet-target" data-bet="even">EVEN</div>
+                <div class="outside-btn btn-red-bet bet-target" data-bet="red">RED</div>
+                <div class="outside-btn btn-black-bet bet-target" data-bet="black">BLACK</div>
+                <div class="outside-btn bet-target" data-bet="odd">ODD</div>
+                <div class="outside-btn bet-target" data-bet="high">19-36</div>
+            </div>
+        </div>
+
+        <!-- Chip Tray Selector -->
+        <div class="chip-tray">
+            <div class="chip-item chip-100 active" data-amount="100">100</div>
+            <div class="chip-item chip-500" data-amount="500">500</div>
+            <div class="chip-item chip-1000" data-amount="1000">1K</div>
+            <div class="chip-item chip-5000" data-amount="5000">5K</div>
+            <div class="chip-item chip-10000" data-amount="10000">10K</div>
+        </div>
+
+        <!-- Action Controls -->
+        <div class="action-row">
+            <button id="clearBtn" class="ctrl-btn clear-btn">
+                <span>🗑️</span> 초기화
+            </button>
+            <button id="doubleBtn" class="ctrl-btn double-btn">
+                <span>✖️2</span> 2배
+            </button>
+            <button id="rebetBtn" class="ctrl-btn rebet-btn">
+                <span>🔄</span> 재베팅
+            </button>
+            <button id="spinBtn" class="spin-btn">
+                <span>🎡</span> SPIN
+            </button>
+        </div>
+
+        <!-- Relief Card (Free Chips) -->
+        <div class="relief-card">
+            <div class="relief-text">
+                칩이 부족하신가요? <strong>긴급 구호금</strong>
+            </div>
+            <button id="reliefBtn" class="relief-btn">
+                <span>🎁</span> +5,000 충전
+            </button>
+        </div>
+    </div>
+
+    <!-- Win / Result Modal -->
+    <div id="winModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title" id="winModalTitle">🎉 당첨 결과</div>
+                <button class="modal-close" id="winModalClose">&times;</button>
+            </div>
+            <div class="win-announcement">
+                <div id="winBadge" class="win-num-badge">0</div>
+                <div id="winPayoutText" class="win-payout-text">+0 칩</div>
+                <div id="winDetailsText" class="win-details">
+                    축하합니다! 베팅에 성공하셨습니다.
+                </div>
+            </div>
+            <button id="confirmWinBtn" class="spin-btn" style="width: 100%; height: 44px;">
+                확인
+            </button>
+        </div>
+    </div>
+
+    <!-- Reward Ad Modal -->
+    <div id="adModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">📺 무료 칩 보상 광고</div>
+                <button class="modal-close" id="adModalClose">&times;</button>
+            </div>
+            <div class="ad-banner-box">
+                <div style="font-size: 2rem;">💎</div>
+                <div style="font-weight: 800; font-size: 1.1rem; color: var(--gold);">
+                    VIP 카지노 스폰서 리워드
+                </div>
+                <div style="font-size: 0.8rem; color: var(--text-sub);">
+                    광고 시청 후 5,000칩이 즉시 무료 충전됩니다!
+                </div>
+            </div>
+            <div class="ad-timer-bar">
+                <div id="adProgressBar" class="ad-timer-progress"></div>
+            </div>
+            <div id="adCountdownText" style="text-align: center; font-size: 0.85rem; font-weight: 700; color: var(--text-sub);">
+                5초 후 충전 완료...
+            </div>
+        </div>
+    </div>
+
+    <!-- Rules / Info Modal -->
+    <div id="rulesModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">ℹ️ 유러피언 룰렛 배당표</div>
+                <button class="modal-close" id="rulesModalClose">&times;</button>
+            </div>
+            <div style="font-size: 0.85rem; color: var(--text-sub); line-height: 1.6; display: flex; flex-direction: column; gap: 8px;">
+                <div>• <strong>싱글 넘버 (0~36)</strong>: <strong>36배</strong> (35:1 순수익)</div>
+                <div>• <strong>더즌 (1st, 2nd, 3rd 12)</strong>: <strong>3배</strong> (2:1 순수익)</div>
+                <div>• <strong>컬럼 (1st, 2nd, 3rd Col)</strong>: <strong>3배</strong> (2:1 순수익)</div>
+                <div>• <strong>레드 / 블랙 (Red/Black)</strong>: <strong>2배</strong> (1:1 순수익)</div>
+                <div>• <strong>홀 / 짝 (Odd/Even)</strong>: <strong>2배</strong> (1:1 순수익)</div>
+                <div>• <strong>로우 / 하이 (1-18 / 19-36)</strong>: <strong>2배</strong> (1:1 순수익)</div>
+                <div style="color: #f59e0b; margin-top: 4px;">* 0(그린)이 나오면 0 단독 베팅을 제외한 모든 외부 베팅(레드/블랙, 홀/짝 등)은 하우스 수익이 됩니다.</div>
+            </div>
+            <button id="closeRulesBtn" class="ctrl-btn" style="width: 100%; height: 40px; font-weight: 800;">
+                닫기
+            </button>
+        </div>
+    </div>
+
+    <script>
+        /* --- European Roulette Constants & Order --- */
+        // Clockwise European wheel sequence
+        const WHEEL_NUMBERS = [
+            0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6, 27, 13, 36, 11, 30, 8, 23, 10,
+            5, 24, 16, 33, 1, 20, 14, 31, 9, 22, 18, 29, 7, 28, 12, 35, 3, 26
+        ];
+
+        const RED_NUMBERS = new Set([
+            1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36
+        ]);
+
+        function getNumberColor(num) {
+            if (num === 0) return 'green';
+            return RED_NUMBERS.has(num) ? 'red' : 'black';
+        }
+
+        /* --- Audio Engine (Web Audio API) --- */
+        let audioCtx = null;
+        let soundEnabled = true;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function playSound(type, param = 0) {
+            if (!soundEnabled) return;
+            initAudio();
+            if (!audioCtx) return;
+
+            const t = audioCtx.currentTime;
+
+            if (type === 'chip') {
+                // Crisp poker chip click
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(1800, t);
+                osc.frequency.exponentialRampToValueAtTime(800, t + 0.05);
+                gain.gain.setValueAtTime(0.3, t);
+                gain.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(t);
+                osc.stop(t + 0.05);
+            } else if (type === 'fretClick') {
+                // Ball bouncing across brass pocket separator
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'triangle';
+                const f = 900 + Math.random() * 300;
+                osc.frequency.setValueAtTime(f, t);
+                osc.frequency.exponentialRampToValueAtTime(300, t + 0.03);
+                gain.gain.setValueAtTime(0.2, t);
+                gain.gain.exponentialRampToValueAtTime(0.001, t + 0.03);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(t);
+                osc.stop(t + 0.03);
+            } else if (type === 'ballDrop') {
+                // Ball clinks and drops into final pocket
+                [0, 0.04, 0.08].forEach((delay, idx) => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(1200 - idx * 250, t + delay);
+                    gain.gain.setValueAtTime(0.35, t + delay);
+                    gain.gain.exponentialRampToValueAtTime(0.001, t + delay + 0.08);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(t + delay);
+                    osc.stop(t + delay + 0.08);
+                });
+            } else if (type === 'win') {
+                // Celebratory chords
+                const freqs = [523.25, 659.25, 783.99, 1046.50];
+                freqs.forEach((freq, idx) => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(freq, t + idx * 0.08);
+                    gain.gain.setValueAtTime(0.3, t + idx * 0.08);
+                    gain.gain.exponentialRampToValueAtTime(0.001, t + idx * 0.08 + 0.4);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(t + idx * 0.08);
+                    osc.stop(t + idx * 0.08 + 0.4);
+                });
+            } else if (type === 'lose') {
+                // Low descending thud
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(220, t);
+                osc.frequency.exponentialRampToValueAtTime(70, t + 0.35);
+                gain.gain.setValueAtTime(0.25, t);
+                gain.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(t);
+                osc.stop(t + 0.35);
+            }
+        }
+
+        /* --- Game State & Data --- */
+        let balance = parseInt(localStorage.getItem('roulette_balance')) || 10000;
+        let selectedChip = 100;
+        let currentBets = {}; // { 'num-7': 1000, 'red': 5000, ... }
+        let previousBets = {};
+        let isSpinning = false;
+        let recentResults = [32, 15, 19, 4, 0, 26, 35, 12, 28, 7]; // Initial seeded history
+
+        /* --- UI Elements --- */
+        const balanceVal = document.getElementById('balanceVal');
+        const totalBetVal = document.getElementById('totalBetVal');
+        const historyContainer = document.getElementById('historyContainer');
+        const numbersGrid = document.getElementById('numbersGrid');
+        const spinBtn = document.getElementById('spinBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const doubleBtn = document.getElementById('doubleBtn');
+        const rebetBtn = document.getElementById('rebetBtn');
+        const reliefBtn = document.getElementById('reliefBtn');
+        const soundToggle = document.getElementById('soundToggle');
+        const resultDisplay = document.getElementById('resultDisplay');
+        const resultSummaryText = document.getElementById('resultSummaryText');
+
+        // Modals
+        const winModal = document.getElementById('winModal');
+        const winBadge = document.getElementById('winBadge');
+        const winPayoutText = document.getElementById('winPayoutText');
+        const winDetailsText = document.getElementById('winDetailsText');
+        const winModalClose = document.getElementById('winModalClose');
+        const confirmWinBtn = document.getElementById('confirmWinBtn');
+
+        const adModal = document.getElementById('adModal');
+        const adProgressBar = document.getElementById('adProgressBar');
+        const adCountdownText = document.getElementById('adCountdownText');
+        const adModalClose = document.getElementById('adModalClose');
+
+        const rulesModal = document.getElementById('rulesModal');
+        const rulesBtn = document.getElementById('rulesBtn');
+        const rulesModalClose = document.getElementById('rulesModalClose');
+        const closeRulesBtn = document.getElementById('closeRulesBtn');
+
+        /* --- Initialize Numbers Table --- */
+        function initNumbersTable() {
+            // 3 columns:
+            // Col 1: 1, 4, 7, 10, 13, 16, 19, 22, 25, 28, 31, 34
+            // Col 2: 2, 5, 8, 11, 14, 17, 20, 23, 26, 29, 32, 35
+            // Col 3: 3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36
+            numbersGrid.innerHTML = '';
+            for (let row = 0; row < 12; row++) {
+                for (let col = 0; col < 3; col++) {
+                    const num = row * 3 + (col + 1);
+                    const color = getNumberColor(num);
+                    const cell = document.createElement('div');
+                    cell.className = `num-cell num-${color} bet-target`;
+                    cell.dataset.bet = `num-${num}`;
+                    cell.textContent = num;
+                    numbersGrid.appendChild(cell);
+                }
+            }
+        }
+
+        /* --- Render Recent Results Strip --- */
+        function renderHistory() {
+            historyContainer.innerHTML = '';
+            recentResults.slice(0, 10).forEach(num => {
+                const color = getNumberColor(num);
+                const badge = document.createElement('div');
+                badge.className = `badge-num badge-${color}`;
+                badge.textContent = num;
+                historyContainer.appendChild(badge);
+            });
+        }
+
+        /* --- Update Balances & Bet Badges on Table --- */
+        function formatNumber(num) {
+            return num.toLocaleString();
+        }
+
+        function updateUI() {
+            balanceVal.textContent = `🪙 ${formatNumber(balance)}`;
+            localStorage.setItem('roulette_balance', balance);
+
+            let total = 0;
+            for (let key in currentBets) {
+                total += currentBets[key];
+            }
+            totalBetVal.textContent = `🪙 ${formatNumber(total)}`;
+
+            // Clear all existing chip badges
+            document.querySelectorAll('.chip-badge').forEach(el => el.remove());
+
+            // Place chip badges on active targets
+            for (let targetKey in currentBets) {
+                const amount = currentBets[targetKey];
+                if (amount > 0) {
+                    const el = document.querySelector(`[data-bet="${targetKey}"]`);
+                    if (el) {
+                        const badge = document.createElement('div');
+                        badge.className = 'chip-badge';
+                        badge.textContent = amount >= 10000 ? `${Math.floor(amount/1000)}k` : (amount >= 1000 ? `${(amount/1000).toFixed(amount%1000===0?0:1)}k` : amount);
+                        el.appendChild(badge);
+                    }
+                }
+            }
+
+            spinBtn.disabled = isSpinning || total === 0;
+            clearBtn.disabled = isSpinning || total === 0;
+            doubleBtn.disabled = isSpinning || total === 0;
+            rebetBtn.disabled = isSpinning || Object.keys(previousBets).length === 0;
+        }
+
+        /* --- Betting Interactions --- */
+        document.querySelectorAll('.chip-item').forEach(item => {
+            item.addEventListener('click', () => {
+                document.querySelectorAll('.chip-item').forEach(c => c.classList.remove('active'));
+                item.classList.add('active');
+                selectedChip = parseInt(item.dataset.amount);
+                playSound('chip');
+            });
+        });
+
+        document.addEventListener('click', (e) => {
+            const target = e.target.closest('.bet-target');
+            if (target && !isSpinning) {
+                const betKey = target.dataset.bet;
+                let currentTotal = 0;
+                for (let k in currentBets) currentTotal += currentBets[k];
+
+                if (balance < selectedChip) {
+                    playSound('lose');
+                    alert('보유 칩이 부족합니다! 긴급 구호금을 충전해보세요.');
+                    return;
+                }
+
+                balance -= selectedChip;
+                currentBets[betKey] = (currentBets[betKey] || 0) + selectedChip;
+                playSound('chip');
+                updateUI();
+            }
+        });
+
+        clearBtn.addEventListener('click', () => {
+            if (isSpinning) return;
+            for (let k in currentBets) {
+                balance += currentBets[k];
+            }
+            currentBets = {};
+            playSound('chip');
+            updateUI();
+        });
+
+        doubleBtn.addEventListener('click', () => {
+            if (isSpinning) return;
+            let needed = 0;
+            for (let k in currentBets) needed += currentBets[k];
+            if (balance < needed) {
+                playSound('lose');
+                alert('2배 베팅을 위한 보유 칩이 부족합니다.');
+                return;
+            }
+            balance -= needed;
+            for (let k in currentBets) currentBets[k] *= 2;
+            playSound('chip');
+            updateUI();
+        });
+
+        rebetBtn.addEventListener('click', () => {
+            if (isSpinning) return;
+            let needed = 0;
+            for (let k in previousBets) needed += previousBets[k];
+            if (balance < needed) {
+                playSound('lose');
+                alert('이전 베팅을 복원할 칩이 부족합니다.');
+                return;
+            }
+            // Refund current
+            for (let k in currentBets) balance += currentBets[k];
+            currentBets = JSON.parse(JSON.stringify(previousBets));
+            balance -= needed;
+            playSound('chip');
+            updateUI();
+        });
+
+        /* --- Roulette Wheel Canvas Rendering & Physics --- */
+        const canvas = document.getElementById('wheelCanvas');
+        const ctx = canvas.getContext('2d');
+        const size = 640;
+        const center = size / 2;
+        const outerR = 300;
+        const numbersR = 245;
+        const innerR = 175;
+        const centerHubR = 70;
+
+        let wheelRotation = 0; // Current wheel angle
+        let ballAngle = 0;     // Current ball angle
+        let ballR = outerR - 15;
+        let isBallInPocket = false;
+        let winningNumber = 0;
+
+        function drawWheel(rotation) {
+            ctx.clearRect(0, 0, size, size);
+
+            ctx.save();
+            ctx.translate(center, center);
+
+            // 1. Mahogany / Dark Wood Outer Rim
+            const woodGrad = ctx.createRadialGradient(0, 0, outerR - 25, 0, 0, outerR + 20);
+            woodGrad.addColorStop(0, '#2d1810');
+            woodGrad.addColorStop(0.5, '#4a2511');
+            woodGrad.addColorStop(0.8, '#1f0d07');
+            woodGrad.addColorStop(1, '#0f0503');
+
+            ctx.beginPath();
+            ctx.arc(0, 0, outerR + 15, 0, Math.PI * 2);
+            ctx.fillStyle = woodGrad;
+            ctx.fill();
+
+            // Metallic Gold Track Border
+            ctx.beginPath();
+            ctx.arc(0, 0, outerR, 0, Math.PI * 2);
+            ctx.strokeStyle = '#d4af37';
+            ctx.lineWidth = 4;
+            ctx.stroke();
+
+            // 2. Ball Track Ring (Dark Slate)
+            ctx.beginPath();
+            ctx.arc(0, 0, outerR - 2, 0, Math.PI * 2);
+            ctx.arc(0, 0, numbersR, 0, Math.PI * 2, true);
+            ctx.fillStyle = '#0f172a';
+            ctx.fill();
+
+            // 3. Rotating Wheel Head (Pockets & Numbers)
+            ctx.save();
+            ctx.rotate(rotation);
+
+            const sliceAngle = (Math.PI * 2) / 37;
+
+            for (let i = 0; i < 37; i++) {
+                const angle = i * sliceAngle;
+                const num = WHEEL_NUMBERS[i];
+                const color = getNumberColor(num);
+
+                // Pocket Slice
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.arc(0, 0, numbersR, angle, angle + sliceAngle);
+                ctx.closePath();
+
+                if (color === 'green') {
+                    ctx.fillStyle = '#10b981';
+                } else if (color === 'red') {
+                    ctx.fillStyle = '#e11d48';
+                } else {
+                    ctx.fillStyle = '#1e293b';
+                }
+                ctx.fill();
+
+                // Brass separator frets
+                ctx.beginPath();
+                ctx.moveTo(Math.cos(angle) * innerR, Math.sin(angle) * innerR);
+                ctx.lineTo(Math.cos(angle) * numbersR, Math.sin(angle) * numbersR);
+                ctx.strokeStyle = '#d4af37';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                // Number Label
+                ctx.save();
+                ctx.rotate(angle + sliceAngle / 2);
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 19px -apple-system, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(num.toString(), (numbersR + innerR) / 2, 0);
+                ctx.restore();
+            }
+
+            // Inner Ring Separator
+            ctx.beginPath();
+            ctx.arc(0, 0, innerR, 0, Math.PI * 2);
+            ctx.fillStyle = '#18181b';
+            ctx.fill();
+            ctx.strokeStyle = '#f5c518';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            // Brass Cone & Center Hub
+            const brassGrad = ctx.createRadialGradient(0, 0, 5, 0, 0, centerHubR);
+            brassGrad.addColorStop(0, '#fef08a');
+            brassGrad.addColorStop(0.4, '#eab308');
+            brassGrad.addColorStop(0.8, '#a16207');
+            brassGrad.addColorStop(1, '#713f12');
+
+            ctx.beginPath();
+            ctx.arc(0, 0, centerHubR, 0, Math.PI * 2);
+            ctx.fillStyle = brassGrad;
+            ctx.fill();
+            ctx.strokeStyle = '#ca8a04';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            // 8 Spoke Turret Handles
+            for (let s = 0; s < 8; s++) {
+                const sAngle = (s * Math.PI) / 4;
+                ctx.beginPath();
+                ctx.moveTo(Math.cos(sAngle) * (centerHubR - 10), Math.sin(sAngle) * (centerHubR - 10));
+                ctx.lineTo(Math.cos(sAngle) * (innerR - 15), Math.sin(sAngle) * (innerR - 15));
+                ctx.strokeStyle = '#fef08a';
+                ctx.lineWidth = 4;
+                ctx.stroke();
+            }
+
+            ctx.restore(); // restore wheel rotation
+
+            // 4. Draw Ball
+            const bX = Math.cos(ballAngle) * ballR;
+            const bY = Math.sin(ballAngle) * ballR;
+
+            const ballGrad = ctx.createRadialGradient(bX - 2, bY - 2, 1, bX, bY, 11);
+            ballGrad.addColorStop(0, '#ffffff');
+            ballGrad.addColorStop(0.4, '#e2e8f0');
+            ballGrad.addColorStop(0.8, '#94a3b8');
+            ballGrad.addColorStop(1, '#475569');
+
+            ctx.beginPath();
+            ctx.arc(bX, bY, 10, 0, Math.PI * 2);
+            ctx.fillStyle = ballGrad;
+            ctx.fill();
+            ctx.shadowColor = 'rgba(0,0,0,0.8)';
+            ctx.shadowBlur = 6;
+            ctx.strokeStyle = '#cbd5e1';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+            ctx.shadowBlur = 0;
+
+            ctx.restore();
+        }
+
+        drawWheel(0);
+
+        /* --- Spin Execution Animation --- */
+        spinBtn.addEventListener('click', () => {
+            if (isSpinning) return;
+            let total = 0;
+            for (let k in currentBets) total += currentBets[k];
+            if (total === 0) {
+                alert('베팅 구역에 칩을 올려주세요!');
+                return;
+            }
+
+            isSpinning = true;
+            previousBets = JSON.parse(JSON.stringify(currentBets));
+            updateUI();
+
+            // Pick winning number randomly (0-36)
+            winningNumber = Math.floor(Math.random() * 37);
+            const winIdx = WHEEL_NUMBERS.indexOf(winningNumber);
+            const sliceAngle = (Math.PI * 2) / 37;
+
+            // Target relative pocket angle on wheel
+            const pocketCenterAngle = winIdx * sliceAngle + sliceAngle / 2;
+
+            // Animation params
+            const duration = 5500; // 5.5 seconds spin
+            const startTime = performance.now();
+
+            const initialWheelSpeed = 0.04;
+            const wheelFriction = 0.9992;
+            let currentWheelSpeed = initialWheelSpeed;
+
+            // Ball starts fast in opposite direction
+            let ballSpeed = -0.22;
+            ballR = outerR - 18;
+
+            let lastFretPassed = -1;
+
+            resultSummaryText.textContent = '회전 중... 볼 낙하 대기';
+            resultDisplay.classList.remove('highlight');
+
+            function animate(now) {
+                const elapsed = now - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+
+                // Wheel rotates smoothly
+                wheelRotation += currentWheelSpeed;
+                currentWheelSpeed = Math.max(0.005, currentWheelSpeed * wheelFriction);
+
+                if (progress < 0.65) {
+                    // Ball rolling along outer track
+                    ballSpeed *= 0.992;
+                    ballAngle += ballSpeed;
+                    ballR = outerR - 18 + Math.sin(now * 0.05) * 2;
+                } else if (progress < 0.92) {
+                    // Ball dropping onto frets (clinking)
+                    const p = (progress - 0.65) / 0.27;
+                    ballR = (outerR - 18) * (1 - p) + (numbersR - 20) * p + Math.sin(now * 0.08) * 3;
+                    ballSpeed *= 0.97;
+                    ballAngle += ballSpeed;
+
+                    // Play fret click
+                    const currentSector = Math.floor((ballAngle % (Math.PI * 2)) / sliceAngle);
+                    if (currentSector !== lastFretPassed) {
+                        playSound('fretClick');
+                        lastFretPassed = currentSector;
+                    }
+                } else {
+                    // Final settling into the target pocket
+                    const settleProgress = (progress - 0.92) / 0.08;
+                    const finalBallAngle = wheelRotation + pocketCenterAngle;
+                    ballAngle = ballAngle * (1 - settleProgress) + finalBallAngle * settleProgress;
+                    ballR = (numbersR - 20) * (1 - settleProgress) + ((numbersR + innerR) / 2) * settleProgress;
+                }
+
+                drawWheel(wheelRotation);
+
+                if (progress < 1) {
+                    requestAnimationFrame(animate);
+                } else {
+                    // Final stop exactly in winning pocket
+                    ballAngle = wheelRotation + pocketCenterAngle;
+                    ballR = (numbersR + innerR) / 2;
+                    drawWheel(wheelRotation);
+                    playSound('ballDrop');
+                    finalizeSpin();
+                }
+            }
+
+            requestAnimationFrame(animate);
+        });
+
+        /* --- Finalize Spin & Calculate Payouts --- */
+        function finalizeSpin() {
+            isSpinning = false;
+            const winNum = winningNumber;
+            const winColor = getNumberColor(winNum);
+
+            // Add to history
+            recentResults.unshift(winNum);
+            renderHistory();
+
+            // Evaluate Payouts
+            let totalWinPayout = 0;
+            let winningBetNames = [];
+
+            // 1. Straight Up (Single Number: num-0 ~ num-36)
+            const straightKey = `num-${winNum}`;
+            if (currentBets[straightKey]) {
+                const win = currentBets[straightKey] * 36;
+                totalWinPayout += win;
+                winningBetNames.push(`단일 번호 [${winNum}] (${formatNumber(win)}칩)`);
+            }
+
+            if (winNum !== 0) {
+                // 2. Red / Black
+                if (winColor === 'red' && currentBets['red']) {
+                    const win = currentBets['red'] * 2;
+                    totalWinPayout += win;
+                    winningBetNames.push(`RED (${formatNumber(win)}칩)`);
+                } else if (winColor === 'black' && currentBets['black']) {
+                    const win = currentBets['black'] * 2;
+                    totalWinPayout += win;
+                    winningBetNames.push(`BLACK (${formatNumber(win)}칩)`);
+                }
+
+                // 3. Even / Odd
+                const isEven = winNum % 2 === 0;
+                if (isEven && currentBets['even']) {
+                    const win = currentBets['even'] * 2;
+                    totalWinPayout += win;
+                    winningBetNames.push(`EVEN 짝수 (${formatNumber(win)}칩)`);
+                } else if (!isEven && currentBets['odd']) {
+                    const win = currentBets['odd'] * 2;
+                    totalWinPayout += win;
+                    winningBetNames.push(`ODD 홀수 (${formatNumber(win)}칩)`);
+                }
+
+                // 4. Low (1-18) / High (19-36)
+                if (winNum <= 18 && currentBets['low']) {
+                    const win = currentBets['low'] * 2;
+                    totalWinPayout += win;
+                    winningBetNames.push(`1-18 로우 (${formatNumber(win)}칩)`);
+                } else if (winNum >= 19 && currentBets['high']) {
+                    const win = currentBets['high'] * 2;
+                    totalWinPayout += win;
+                    winningBetNames.push(`19-36 하이 (${formatNumber(win)}칩)`);
+                }
+
+                // 5. Dozens (1st 12: 1-12, 2nd 12: 13-24, 3rd 12: 25-36)
+                if (winNum <= 12 && currentBets['doz-1']) {
+                    const win = currentBets['doz-1'] * 3;
+                    totalWinPayout += win;
+                    winningBetNames.push(`1st 12 (${formatNumber(win)}칩)`);
+                } else if (winNum >= 13 && winNum <= 24 && currentBets['doz-2']) {
+                    const win = currentBets['doz-2'] * 3;
+                    totalWinPayout += win;
+                    winningBetNames.push(`2nd 12 (${formatNumber(win)}칩)`);
+                } else if (winNum >= 25 && currentBets['doz-3']) {
+                    const win = currentBets['doz-3'] * 3;
+                    totalWinPayout += win;
+                    winningBetNames.push(`3rd 12 (${formatNumber(win)}칩)`);
+                }
+
+                // 6. Columns (1st col: 1,4,7... / 2nd col: 2,5,8... / 3rd col: 3,6,9...)
+                const colIdx = ((winNum - 1) % 3) + 1;
+                const colKey = `col-${colIdx}`;
+                if (currentBets[colKey]) {
+                    const win = currentBets[colKey] * 3;
+                    totalWinPayout += win;
+                    winningBetNames.push(`${colIdx}st Col (${formatNumber(win)}칩)`);
+                }
+            }
+
+            // Summary text
+            const colorKr = winColor === 'green' ? '그린' : (winColor === 'red' ? '레드' : '블랙');
+            resultSummaryText.textContent = `당첨 번호: ${winNum} (${colorKr})`;
+            resultDisplay.classList.add('highlight');
+
+            // Apply payouts
+            balance += totalWinPayout;
+            currentBets = {}; // bets resolved
+
+            if (totalWinPayout > 0) {
+                playSound('win');
+                winBadge.className = `win-num-badge badge-${winColor}`;
+                winBadge.textContent = winNum;
+                winPayoutText.textContent = `+${formatNumber(totalWinPayout)} 칩 획득!`;
+                winDetailsText.innerHTML = `<strong>축하합니다!</strong><br>${winningBetNames.join('<br>')}`;
+                winModal.classList.add('active');
+            } else {
+                playSound('lose');
+                winBadge.className = `win-num-badge badge-${winColor}`;
+                winBadge.textContent = winNum;
+                winPayoutText.textContent = `아쉬운 결과입니다`;
+                winPayoutText.style.color = '#ef4444';
+                winDetailsText.textContent = `당첨 번호 ${winNum} (${colorKr}). 다음 라운드에서 대박을 노려보세요!`;
+                winModal.classList.add('active');
+            }
+
+            updateUI();
+        }
+
+        /* --- Modal Closures --- */
+        winModalClose.addEventListener('click', () => winModal.classList.remove('active'));
+        confirmWinBtn.addEventListener('click', () => winModal.classList.remove('active'));
+
+        rulesBtn.addEventListener('click', () => rulesModal.classList.add('active'));
+        rulesModalClose.addEventListener('click', () => rulesModal.classList.remove('active'));
+        closeRulesBtn.addEventListener('click', () => rulesModal.classList.remove('active'));
+
+        /* --- Relief & Ad Flow --- */
+        reliefBtn.addEventListener('click', () => {
+            if (isSpinning) return;
+            adModal.classList.add('active');
+            adProgressBar.style.width = '0%';
+            let timeLeft = 5;
+            adCountdownText.textContent = `${timeLeft}초 후 충전 완료...`;
+
+            setTimeout(() => { adProgressBar.style.width = '100%'; }, 50);
+
+            const timer = setInterval(() => {
+                timeLeft--;
+                if (timeLeft > 0) {
+                    adCountdownText.textContent = `${timeLeft}초 후 충전 완료...`;
+                } else {
+                    clearInterval(timer);
+                    balance += 5000;
+                    playSound('win');
+                    updateUI();
+                    adModal.classList.remove('active');
+                    alert('🎁 긴급 구호금 5,000칩이 정상 충전되었습니다!');
+                }
+            }, 1000);
+        });
+
+        adModalClose.addEventListener('click', () => adModal.classList.remove('active'));
+
+        /* --- Sound Toggle --- */
+        soundToggle.addEventListener('click', () => {
+            soundEnabled = !soundEnabled;
+            soundToggle.textContent = soundEnabled ? '🔊' : '🔇';
+        });
+
+        /* --- Initial Setup --- */
+        initNumbersTable();
+        renderHistory();
+        updateUI();
+    </script>
+</body>
+</html>
