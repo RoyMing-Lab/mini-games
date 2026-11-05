@@ -1,0 +1,1590 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🀄 SHANGHAI MAHJONG - 상하이 마작 솔리테어 카지노</title>
+    <style>
+        :root {
+            --bg-color: #051410;
+            --felt-dark: #07221b;
+            --felt-light: #0d382c;
+            --panel-bg: #0f2b23;
+            --panel-border: #1a4d3e;
+            --gold: #f5c518;
+            --gold-glow: rgba(245, 197, 24, 0.4);
+            --gold-dark: #b8860b;
+            --red-accent: #e11d48;
+            --blue-accent: #2563eb;
+            --green-accent: #10b981;
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+            --tile-face: #fefcf5;
+            --tile-shadow: rgba(0, 0, 0, 0.6);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px 6px 32px 6px;
+            overflow-x: hidden;
+            background-image: radial-gradient(circle at 50% 0%, #134234 0%, #051410 85%);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 480px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        /* Top Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 12px;
+            padding: 8px 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        .header-left, .header-right {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .lobby-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text-sub);
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 700;
+            padding: 6px 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.2s;
+        }
+        .lobby-btn:hover {
+            color: var(--text-main);
+            border-color: var(--gold);
+        }
+
+        .icon-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-sub);
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        .icon-btn:hover {
+            color: var(--text-main);
+            border-color: var(--gold);
+        }
+
+        .chip-balance-box {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--gold-dark);
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 0.9rem;
+            font-weight: 800;
+            color: var(--gold);
+        }
+
+        /* Banner Card */
+        .title-banner {
+            text-align: center;
+            background: linear-gradient(180deg, rgba(245, 197, 24, 0.12) 0%, rgba(15, 43, 35, 0.9) 100%);
+            border: 1px solid var(--panel-border);
+            border-radius: 14px;
+            padding: 10px 8px;
+            position: relative;
+            overflow: hidden;
+        }
+        .title-banner h1 {
+            font-size: 1.3rem;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+            color: var(--gold);
+            text-shadow: 0 0 12px rgba(245, 197, 24, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        .title-banner p {
+            font-size: 0.75rem;
+            color: var(--text-sub);
+            margin-top: 2px;
+        }
+
+        /* Status & Multiplier Dashboard */
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 6px;
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 12px;
+            padding: 8px;
+        }
+        .dash-item {
+            background: rgba(0, 0, 0, 0.35);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 6px 4px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .dash-label {
+            font-size: 0.65rem;
+            color: var(--text-sub);
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        .dash-val {
+            font-size: 0.95rem;
+            font-weight: 900;
+            color: var(--text-main);
+        }
+        .dash-val.highlight {
+            color: var(--gold);
+        }
+        .dash-val.timer {
+            color: #38bdf8;
+        }
+
+        /* Combo Bar */
+        .combo-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 10px;
+            padding: 6px 10px;
+        }
+        .combo-badge {
+            font-size: 0.75rem;
+            font-weight: 900;
+            color: var(--gold);
+            background: rgba(245, 197, 24, 0.15);
+            border: 1px solid var(--gold-dark);
+            border-radius: 6px;
+            padding: 2px 8px;
+            white-space: nowrap;
+        }
+        .combo-track {
+            flex: 1;
+            height: 8px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+        .combo-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #f59e0b, #ef4444);
+            border-radius: 4px;
+            transition: width 0.1s linear;
+        }
+
+        /* Mahjong Felt Table */
+        .table-area {
+            background: radial-gradient(circle at 50% 50%, var(--felt-light) 0%, var(--felt-dark) 100%);
+            border: 3px solid #144335;
+            border-radius: 18px;
+            padding: 12px 6px;
+            position: relative;
+            box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.7), 0 8px 24px rgba(0, 0, 0, 0.5);
+            min-height: 320px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Tile Board Grid */
+        .board {
+            position: relative;
+            width: 324px;
+            height: 288px;
+            margin: 0 auto;
+        }
+
+        /* 3D Mahjong Tile */
+        .tile {
+            position: absolute;
+            width: 50px;
+            height: 68px;
+            background: linear-gradient(135deg, #ffffff 0%, #fef8e8 70%, #eddcc0 100%);
+            border-radius: 6px;
+            border: 1px solid #d4c4a8;
+            box-shadow: 0 4px 8px var(--tile-shadow), 0 1px 0 rgba(255, 255, 255, 0.8) inset;
+            cursor: pointer;
+            transition: transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.15s ease, opacity 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+        }
+
+        /* Mahjong Tile Green Back edge (3D bevel effect) */
+        .tile::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 2px;
+            right: -3px;
+            height: 4px;
+            background: #15803d;
+            border-radius: 0 0 4px 4px;
+            opacity: 0.9;
+            z-index: -1;
+        }
+
+        /* Layer Stacking Offsets */
+        .tile[data-z="0"] {
+            z-index: 10;
+        }
+        .tile[data-z="1"] {
+            z-index: 20;
+            box-shadow: 0 7px 14px rgba(0, 0, 0, 0.65), 0 1px 0 rgba(255, 255, 255, 0.9) inset;
+            transform: translateY(-3px);
+        }
+        .tile[data-z="2"] {
+            z-index: 30;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.75), 0 1px 0 rgba(255, 255, 255, 0.95) inset;
+            transform: translateY(-6px);
+        }
+
+        /* Tile States */
+        .tile.blocked {
+            opacity: 0.52;
+            cursor: not-allowed;
+            filter: grayscale(40%) brightness(0.85);
+        }
+        .tile.blocked::before {
+            content: '🔒';
+            position: absolute;
+            font-size: 0.7rem;
+            top: 2px;
+            right: 2px;
+            opacity: 0.45;
+        }
+
+        .tile.free:hover {
+            transform: translateY(-8px) scale(1.04);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.8), 0 0 12px rgba(245, 197, 24, 0.5);
+        }
+
+        .tile.selected {
+            transform: translateY(-12px) scale(1.08) !important;
+            border: 2px solid var(--gold);
+            box-shadow: 0 0 20px var(--gold), 0 14px 28px rgba(0, 0, 0, 0.9) !important;
+            z-index: 99 !important;
+            animation: pulse-select 1.2s infinite alternate;
+        }
+
+        @keyframes pulse-select {
+            0% { box-shadow: 0 0 12px var(--gold); }
+            100% { box-shadow: 0 0 24px var(--gold), 0 0 8px #ffffff; }
+        }
+
+        .tile.hinted {
+            animation: hint-glow 0.8s infinite alternate;
+        }
+        @keyframes hint-glow {
+            0% { box-shadow: 0 0 8px #38bdf8; border-color: #38bdf8; }
+            100% { box-shadow: 0 0 24px #38bdf8, 0 0 12px #ffffff; border-color: #ffffff; }
+        }
+
+        .tile.matched {
+            animation: tile-vanish 0.4s forwards;
+            pointer-events: none;
+        }
+        @keyframes tile-vanish {
+            0% { transform: scale(1.1) translateY(-10px); opacity: 1; }
+            100% { transform: scale(0) rotate(20deg); opacity: 0; }
+        }
+
+        /* Tile Face Engravings */
+        .tile-char {
+            font-size: 1.7rem;
+            line-height: 1;
+            font-weight: 900;
+        }
+        .tile-label {
+            font-size: 0.65rem;
+            font-weight: 800;
+            margin-top: 1px;
+            letter-spacing: -0.2px;
+        }
+        .tile-badge {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            font-size: 0.55rem;
+            font-weight: 900;
+            padding: 1px 3px;
+            border-radius: 3px;
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        /* Color Variants */
+        .color-red .tile-char, .color-red .tile-label { color: #dc2626; }
+        .color-green .tile-char, .color-green .tile-label { color: #15803d; }
+        .color-blue .tile-char, .color-blue .tile-label { color: #1e40af; }
+        .is-dragon .tile-badge {
+            background: linear-gradient(135deg, #f59e0b, #ef4444);
+            color: #ffffff;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+
+        /* Game In-Progress Controls */
+        .game-controls {
+            display: flex;
+            gap: 8px;
+        }
+        .ctrl-btn {
+            flex: 1;
+            padding: 10px 8px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: var(--panel-bg);
+            color: var(--text-main);
+            font-size: 0.85rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .ctrl-btn:hover:not(:disabled) {
+            border-color: var(--gold);
+            background: #174236;
+        }
+        .ctrl-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .cashout-btn {
+            flex: 1.4;
+            background: linear-gradient(135deg, #b45309 0%, #f59e0b 50%, #d97706 100%);
+            color: #051410;
+            font-weight: 900;
+            font-size: 0.95rem;
+            border: 1px solid #fef08a;
+            box-shadow: 0 4px 14px rgba(245, 158, 11, 0.4);
+            animation: cashout-pulse 1.5s infinite;
+        }
+        @keyframes cashout-pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); box-shadow: 0 6px 20px rgba(245, 158, 11, 0.6); }
+            100% { transform: scale(1); }
+        }
+
+        /* Betting Control Section (Before Game Start) */
+        .bet-section {
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 14px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .bet-row-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .bet-input-box {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--panel-border);
+            border-radius: 8px;
+            padding: 6px 12px;
+            font-size: 1.1rem;
+            font-weight: 900;
+            color: var(--gold);
+        }
+        .bet-chips-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+        }
+        .chip-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-main);
+            padding: 8px 0;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .chip-btn:hover {
+            border-color: var(--gold);
+            background: rgba(245, 197, 24, 0.1);
+        }
+
+        .start-btn {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border: 1px solid #34d399;
+            color: #ffffff;
+            font-size: 1.1rem;
+            font-weight: 900;
+            padding: 14px;
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .start-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(16, 185, 129, 0.6);
+        }
+
+        /* Relief / Ad Floating Banner */
+        .relief-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            border-radius: 10px;
+            padding: 8px 12px;
+            font-size: 0.8rem;
+        }
+        .relief-btn {
+            background: var(--red-accent);
+            color: #ffffff;
+            border: none;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        /* Modal Overlay */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 16px;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal-content {
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 18px;
+            width: 100%;
+            max-width: 420px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
+            position: relative;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-title {
+            font-size: 1.15rem;
+            font-weight: 900;
+            color: var(--gold);
+        }
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-sub);
+            font-size: 1.4rem;
+            cursor: pointer;
+        }
+
+        .ad-banner-box {
+            background: linear-gradient(135deg, rgba(245, 197, 24, 0.1) 0%, rgba(0, 0, 0, 0.5) 100%);
+            border: 1px dashed var(--gold);
+            border-radius: 12px;
+            padding: 24px 16px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            align-items: center;
+        }
+        .ad-timer-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .ad-timer-progress {
+            width: 0%;
+            height: 100%;
+            background: var(--gold);
+            transition: width 0.1s linear;
+        }
+
+        /* Confetti Canvas */
+        #confettiCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 2000;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="confettiCanvas"></canvas>
+
+    <div class="container">
+        <!-- Top Header -->
+        <div class="header">
+            <div class="header-left">
+                <a href="../index.html" class="lobby-btn">🏠 로비</a>
+                <button id="soundToggle" class="icon-btn" title="음소거 토글">🔊</button>
+                <button id="rulesBtn" class="icon-btn" title="게임 규칙">❓</button>
+            </div>
+            <div class="header-right">
+                <div class="chip-balance-box">
+                    <span>🪙</span>
+                    <span id="balanceText">10,000</span>
+                </div>
+                <button id="adBtn" class="icon-btn" style="color: var(--gold); border-color: var(--gold);" title="무료 칩 충전">📺</button>
+            </div>
+        </div>
+
+        <!-- Title Banner -->
+        <div class="title-banner">
+            <h1>🀄 SHANGHAI MAHJONG</h1>
+            <p>카지노 패 매칭 & 타임어택 30배 캐시아웃 잭팟 챌린지</p>
+        </div>
+
+        <!-- Dashboard -->
+        <div class="dashboard">
+            <div class="dash-item">
+                <span class="dash-label">남은 패</span>
+                <span id="tilesLeftText" class="dash-val">36 / 36</span>
+            </div>
+            <div class="dash-item">
+                <span class="dash-label">남은 시간</span>
+                <span id="timerText" class="dash-val timer">01:30</span>
+            </div>
+            <div class="dash-item">
+                <span class="dash-label">현재 배당</span>
+                <span id="multiplierText" class="dash-val highlight">0.00x</span>
+            </div>
+            <div class="dash-item">
+                <span class="dash-label">획득 가능</span>
+                <span id="potentialWinText" class="dash-val highlight">0</span>
+            </div>
+        </div>
+
+        <!-- Combo Bar -->
+        <div class="combo-container">
+            <div id="comboBadge" class="combo-badge">COMBO 0x</div>
+            <div class="combo-track">
+                <div id="comboFill" class="combo-fill"></div>
+            </div>
+            <span id="matchesText" style="font-size: 0.75rem; color: var(--text-sub); font-weight: 700;">0쌍 매칭</span>
+        </div>
+
+        <!-- Relief Bar (when low balance) -->
+        <div id="reliefBar" class="relief-bar" style="display: none;">
+            <span>⚠️ 칩이 부족합니다! 카지노 긴급 구호금을 받으세요.</span>
+            <button id="reliefBtn" class="relief-btn">+1,000 칩</button>
+        </div>
+
+        <!-- Mahjong Table Area -->
+        <div class="table-area">
+            <div id="board" class="board">
+                <!-- Tiles dynamically generated here -->
+            </div>
+        </div>
+
+        <!-- In-Game Action Bar -->
+        <div id="gameControls" class="game-controls" style="display: none;">
+            <button id="hintBtn" class="ctrl-btn">
+                <span>💡 힌트</span>
+                <span id="hintCount" style="color: var(--gold);">(3)</span>
+            </button>
+            <button id="shuffleBtn" class="ctrl-btn">
+                <span>🔀 셔플</span>
+                <span id="shuffleCount" style="color: var(--gold);">(2)</span>
+            </button>
+            <button id="cashoutBtn" class="ctrl-btn cashout-btn" disabled>
+                <span>💰 캐시아웃</span>
+            </button>
+        </div>
+
+        <!-- Betting & Start Panel (Visible when idle) -->
+        <div id="betSection" class="bet-section">
+            <div class="bet-row-top">
+                <span style="font-size: 0.85rem; font-weight: 800; color: var(--text-sub);">베팅 금액 설정</span>
+                <div class="bet-input-box">
+                    <span>🪙</span>
+                    <span id="currentBetText">1,000</span>
+                </div>
+            </div>
+
+            <div class="bet-chips-grid">
+                <button class="chip-btn" data-val="100">+100</button>
+                <button class="chip-btn" data-val="500">+500</button>
+                <button class="chip-btn" data-val="1000">+1,000</button>
+                <button class="chip-btn" data-val="5000">+5,000</button>
+                <button class="chip-btn" data-action="half">1/2</button>
+                <button class="chip-btn" data-action="double">2X</button>
+                <button class="chip-btn" data-action="max">MAX</button>
+                <button class="chip-btn" data-action="allin" style="color: #ef4444;">ALL IN</button>
+            </div>
+
+            <button id="startBtn" class="start-btn">
+                <span>🀄 게임 시작 (베팅: 1,000)</span>
+            </button>
+        </div>
+
+        <!-- Recent Record Strip -->
+        <div style="background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 10px; padding: 8px 12px; display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-sub);">
+            <span>전적: <strong id="statsGames" style="color: var(--text-main);">0전 0승</strong></span>
+            <span>최고 배당: <strong id="statsMaxMult" style="color: var(--gold);">0.0x</strong></span>
+            <span>최고 콤보: <strong id="statsMaxCombo" style="color: #38bdf8;">0연속</strong></span>
+        </div>
+    </div>
+
+    <!-- Rewarded Ad Modal -->
+    <div id="adModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">📺 무료 칩 보상 광고</div>
+                <button class="modal-close" id="adModalClose">&times;</button>
+            </div>
+            <div class="ad-banner-box">
+                <div style="font-size: 2.2rem;">💎</div>
+                <div style="font-weight: 800; font-size: 1.1rem; color: var(--gold);">
+                    VIP 마작 살롱 스폰서 리워드
+                </div>
+                <div style="font-size: 0.8rem; color: var(--text-sub);">
+                    광고 시청 완료 시 5,000칩이 즉시 무료 지급됩니다!
+                </div>
+            </div>
+            <div class="ad-timer-bar">
+                <div id="adProgressBar" class="ad-timer-progress"></div>
+            </div>
+            <div id="adCountdownText" style="text-align: center; font-size: 0.85rem; font-weight: 700; color: var(--text-sub);">
+                5초 후 충전 완료...
+            </div>
+        </div>
+    </div>
+
+    <!-- Rules Modal -->
+    <div id="rulesModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">📖 상하이 마작 규칙 & 배당표</div>
+                <button class="modal-close" id="rulesModalClose">&times;</button>
+            </div>
+            <div style="font-size: 0.85rem; line-height: 1.5; color: var(--text-sub); display: flex; flex-direction: column; gap: 8px; max-height: 380px; overflow-y: auto;">
+                <p><strong style="color: var(--text-main);">1. 패 매칭 규칙:</strong> 위가 덮이지 않고 좌우 중 최소 한쪽이 열려 있는 자유 패(Free Tile) 2개를 클릭해 제거합니다.</p>
+                <p><strong style="color: var(--text-main);">2. 실시간 캐시아웃 (Cash Out):</strong> 매칭에 성공할 때마다 배당이 상승하며, 1.0배 이상 도달 시 언제든지 [캐시아웃]으로 수익을 확정할 수 있습니다!</p>
+                <p><strong style="color: var(--gold);">3. 대박 배당 사다리:</strong><br>
+                - 1~6쌍: 0.1배 ~ 0.9배 (도전 구간)<br>
+                - 7쌍: 1.1배 (원금 회복 달성!)<br>
+                - 10쌍: 2.0배 (2배 달성)<br>
+                - 14쌍: 5.2배<br>
+                - 17쌍: 15.0배<br>
+                - 18쌍 완봉승 (All Clear): <strong>30.0배 + 잔여 시간 보너스 잭팟!</strong></p>
+                <p><strong style="color: #38bdf8;">4. 콤보 & 드래곤 보너스:</strong> 4초 내 연속 매칭 시 콤보 배당이 추가 가산되며, 삼원패(홍중/녹발/백판) 매칭 시 즉시 +0.5배 보너스가 지급됩니다.</p>
+                <p><strong style="color: var(--red-accent);">5. 패배 조건:</strong> 제한시간(90초)이 초과되거나, 더 이상 매칭 가능한 패가 없는데 셔플을 모두 소진한 경우 베팅금을 잃게 됩니다.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* --- Web Audio API Sound Engine --- */
+        let audioCtx = null;
+        let soundEnabled = true;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function playSound(type, param = 0) {
+            if (!soundEnabled) return;
+            initAudio();
+            if (!audioCtx) return;
+
+            const t = audioCtx.currentTime;
+
+            if (type === 'chip') {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(1800, t);
+                osc.frequency.exponentialRampToValueAtTime(400, t + 0.04);
+                gain.gain.setValueAtTime(0.3, t);
+                gain.gain.exponentialRampToValueAtTime(0.01, t + 0.04);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(t);
+                osc.stop(t + 0.04);
+            } else if (type === 'select') {
+                // Crisp ivory click
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(800, t);
+                osc.frequency.exponentialRampToValueAtTime(180, t + 0.05);
+                gain.gain.setValueAtTime(0.4, t);
+                gain.gain.exponentialRampToValueAtTime(0.01, t + 0.05);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(t);
+                osc.stop(t + 0.05);
+            } else if (type === 'match') {
+                // Sparkling 3-note harmonic chime
+                const freqs = [523.25, 659.25, 783.99]; // C5, E5, G5
+                freqs.forEach((f, idx) => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(f, t + idx * 0.05);
+                    gain.gain.setValueAtTime(0.25, t + idx * 0.05);
+                    gain.gain.exponentialRampToValueAtTime(0.001, t + idx * 0.05 + 0.25);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(t + idx * 0.05);
+                    osc.stop(t + idx * 0.05 + 0.25);
+                });
+            } else if (type === 'dragon') {
+                // Deep gong + chime
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(146.83, t); // D3
+                osc.frequency.exponentialRampToValueAtTime(110, t + 0.6);
+                gain.gain.setValueAtTime(0.5, t);
+                gain.gain.exponentialRampToValueAtTime(0.001, t + 0.6);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(t);
+                osc.stop(t + 0.6);
+            } else if (type === 'combo') {
+                const pitch = 440 * Math.pow(1.12, Math.min(param, 8));
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(pitch, t);
+                osc.frequency.exponentialRampToValueAtTime(pitch * 1.5, t + 0.12);
+                gain.gain.setValueAtTime(0.3, t);
+                gain.gain.exponentialRampToValueAtTime(0.01, t + 0.12);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(t);
+                osc.stop(t + 0.12);
+            } else if (type === 'cashout') {
+                // Casino register bell & coin shower
+                const freqs = [987.77, 1318.51, 1567.98, 1975.53];
+                freqs.forEach((f, idx) => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(f, t + idx * 0.06);
+                    gain.gain.setValueAtTime(0.25, t + idx * 0.06);
+                    gain.gain.exponentialRampToValueAtTime(0.001, t + idx * 0.06 + 0.3);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(t + idx * 0.06);
+                    osc.stop(t + idx * 0.06 + 0.3);
+                });
+            } else if (type === 'shuffle') {
+                for (let i = 0; i < 4; i++) {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(300 + Math.random() * 400, t + i * 0.04);
+                    gain.gain.setValueAtTime(0.15, t + i * 0.04);
+                    gain.gain.exponentialRampToValueAtTime(0.01, t + i * 0.04 + 0.05);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(t + i * 0.04);
+                    osc.stop(t + i * 0.04 + 0.05);
+                }
+            } else if (type === 'lose') {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(220, t);
+                osc.frequency.linearRampToValueAtTime(110, t + 0.4);
+                gain.gain.setValueAtTime(0.3, t);
+                gain.gain.exponentialRampToValueAtTime(0.01, t + 0.4);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(t);
+                osc.stop(t + 0.4);
+            }
+        }
+
+        /* --- Mahjong Tile Definitions (9 Types x 4 = 36 Tiles) --- */
+        const TILE_TYPES = [
+            { id: 'wan1', name: '1만', char: '🀇', label: '一萬', color: 'color-red', dragon: false },
+            { id: 'wan5', name: '5만', char: '🀋', label: '五萬', color: 'color-red', dragon: false },
+            { id: 'wan9', name: '9만', char: '🀏', label: '九萬', color: 'color-red', dragon: false },
+            { id: 'tong1', name: '1통', char: '🀙', label: '一筒', color: 'color-blue', dragon: false },
+            { id: 'tong5', name: '5통', char: '🀝', label: '五筒', color: 'color-blue', dragon: false },
+            { id: 'sou1', name: '1삭', char: '🀐', label: '一索', color: 'color-green', dragon: false },
+            { id: 'd_red', name: '홍중', char: '🀄', label: '中', color: 'color-red', dragon: true },
+            { id: 'd_green', name: '녹발', char: '🀅', label: '發', color: 'color-green', dragon: true },
+            { id: 'd_white', name: '백판', char: '🀆', label: '白', color: 'color-blue', dragon: true }
+        ];
+
+        /* --- Board Slot Grid (36 Slots in 3 Layers) --- */
+        // Col: 0..5 (width step 54px), Row: 0..3 (height step 72px)
+        const SLOT_DEFINITIONS = [];
+        // Layer 0: 6x4 = 24 slots
+        for (let r = 0; r < 4; r++) {
+            for (let c = 0; c < 6; c++) {
+                SLOT_DEFINITIONS.push({ c, r, z: 0 });
+            }
+        }
+        // Layer 1: 4x2 = 8 slots (c=1..4, r=1..2)
+        for (let r = 1; r <= 2; r++) {
+            for (let c = 1; c <= 4; c++) {
+                SLOT_DEFINITIONS.push({ c, r, z: 1 });
+            }
+        }
+        // Layer 2: 2x2 = 4 slots (c=2..3, r=1..2)
+        for (let r = 1; r <= 2; r++) {
+            for (let c = 2; c <= 3; c++) {
+                SLOT_DEFINITIONS.push({ c, r, z: 2 });
+            }
+        }
+
+        /* --- Multiplier Table (1 to 18 pairs) --- */
+        const MULTIPLIER_TABLE = [
+            0.0,  // 0
+            0.10, // 1
+            0.20, // 2
+            0.35, // 3
+            0.50, // 4
+            0.70, // 5
+            0.90, // 6
+            1.10, // 7 (Win start)
+            1.35, // 8
+            1.65, // 9
+            2.00, // 10
+            2.50, // 11
+            3.20, // 12
+            4.00, // 13
+            5.20, // 14
+            7.00, // 15
+            10.00, // 16
+            15.00, // 17
+            30.00  // 18 (All Clear!)
+        ];
+
+        /* --- Game State --- */
+        let balance = parseInt(localStorage.getItem('mahjong_balance')) || 10000;
+        let currentBet = 1000;
+        let isGameActive = false;
+        let activeTiles = []; // list of tile objects on board
+        let selectedTile = null;
+        let matchedCount = 0;
+        let bonusMultiplier = 0.0;
+        let comboCount = 0;
+        let comboTimer = null;
+        let gameTimeLeft = 90;
+        let timerInterval = null;
+        let hintsLeft = 3;
+        let shufflesLeft = 2;
+
+        let stats = JSON.parse(localStorage.getItem('mahjong_stats')) || {
+            games: 0,
+            wins: 0,
+            maxMult: 0.0,
+            maxCombo: 0
+        };
+
+        /* --- DOM Elements --- */
+        const balanceText = document.getElementById('balanceText');
+        const currentBetText = document.getElementById('currentBetText');
+        const boardEl = document.getElementById('board');
+        const tilesLeftText = document.getElementById('tilesLeftText');
+        const timerText = document.getElementById('timerText');
+        const multiplierText = document.getElementById('multiplierText');
+        const potentialWinText = document.getElementById('potentialWinText');
+        const comboBadge = document.getElementById('comboBadge');
+        const comboFill = document.getElementById('comboFill');
+        const matchesText = document.getElementById('matchesText');
+        const gameControls = document.getElementById('gameControls');
+        const betSection = document.getElementById('betSection');
+        const startBtn = document.getElementById('startBtn');
+        const hintBtn = document.getElementById('hintBtn');
+        const hintCountEl = document.getElementById('hintCount');
+        const shuffleBtn = document.getElementById('shuffleBtn');
+        const shuffleCountEl = document.getElementById('shuffleCount');
+        const cashoutBtn = document.getElementById('cashoutBtn');
+        const reliefBar = document.getElementById('reliefBar');
+        const reliefBtn = document.getElementById('reliefBtn');
+        const soundToggle = document.getElementById('soundToggle');
+        const adBtn = document.getElementById('adBtn');
+        const adModal = document.getElementById('adModal');
+        const adModalClose = document.getElementById('adModalClose');
+        const adProgressBar = document.getElementById('adProgressBar');
+        const adCountdownText = document.getElementById('adCountdownText');
+        const rulesBtn = document.getElementById('rulesBtn');
+        const rulesModal = document.getElementById('rulesModal');
+        const rulesModalClose = document.getElementById('rulesModalClose');
+        const statsGames = document.getElementById('statsGames');
+        const statsMaxMult = document.getElementById('statsMaxMult');
+        const statsMaxCombo = document.getElementById('statsMaxCombo');
+
+        /* --- Init UI --- */
+        function updateUI() {
+            balanceText.textContent = balance.toLocaleString();
+            currentBetText.textContent = currentBet.toLocaleString();
+            startBtn.innerHTML = `<span>🀄 게임 시작 (베팅: ${currentBet.toLocaleString()})</span>`;
+            statsGames.textContent = `${stats.games}전 ${stats.wins}승`;
+            statsMaxMult.textContent = `${stats.maxMult.toFixed(1)}x`;
+            statsMaxCombo.textContent = `${stats.maxCombo}연속`;
+
+            reliefBar.style.display = (balance < 100 && !isGameActive) ? 'flex' : 'none';
+        }
+
+        function saveState() {
+            localStorage.setItem('mahjong_balance', balance);
+            localStorage.setItem('mahjong_stats', JSON.stringify(stats));
+        }
+
+        /* --- Free / Blocked Logic --- */
+        function isTileFree(targetTile, tileList = activeTiles) {
+            // 1. Is there a tile directly above it?
+            const isCovered = tileList.some(t => 
+                t.id !== targetTile.id &&
+                t.z === targetTile.z + 1 &&
+                t.c === targetTile.c &&
+                t.r === targetTile.r
+            );
+            if (isCovered) return false;
+
+            // 2. Are both left and right neighbors occupied at the same layer?
+            const hasLeft = tileList.some(t =>
+                t.id !== targetTile.id &&
+                t.z === targetTile.z &&
+                t.c === targetTile.c - 1 &&
+                t.r === targetTile.r
+            );
+            const hasRight = tileList.some(t =>
+                t.id !== targetTile.id &&
+                t.z === targetTile.z &&
+                t.c === targetTile.c + 1 &&
+                t.r === targetTile.r
+            );
+
+            // Free if left is open OR right is open
+            return (!hasLeft || !hasRight);
+        }
+
+        /* --- Reverse Solvable Board Generator --- */
+        function generateSolvableBoard() {
+            // 1. Prepare 18 pairs (9 types x 2 pairs = 36 tiles)
+            const tilePool = [];
+            TILE_TYPES.forEach(type => {
+                tilePool.push({ ...type }, { ...type }, { ...type }, { ...type });
+            });
+            // Shuffle pool
+            for (let i = tilePool.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [tilePool[i], tilePool[j]] = [tilePool[j], tilePool[i]];
+            }
+
+            // 2. Clone all slots
+            let remainingSlots = SLOT_DEFINITIONS.map((s, idx) => ({ ...s, slotId: idx }));
+            const boardTiles = [];
+
+            // We place pairs onto slots that would be FREE to be removed at each step in reverse
+            for (let pair = 0; pair < 18; pair++) {
+                // Find all free slots among remainingSlots
+                const freeSlots = remainingSlots.filter(slot => isTileFree(slot, remainingSlots));
+                
+                let slotA, slotB;
+                if (freeSlots.length >= 2) {
+                    const idxA = Math.floor(Math.random() * freeSlots.length);
+                    slotA = freeSlots[idxA];
+                    freeSlots.splice(idxA, 1);
+                    const idxB = Math.floor(Math.random() * freeSlots.length);
+                    slotB = freeSlots[idxB];
+                } else {
+                    // Fallback in case of edge case: pick any 2 remaining
+                    slotA = remainingSlots[0];
+                    slotB = remainingSlots[1];
+                }
+
+                const tileTypeA = tilePool.pop();
+                const tileTypeB = tilePool.pop();
+
+                boardTiles.push({
+                    id: 't_' + slotA.slotId,
+                    c: slotA.c,
+                    r: slotA.r,
+                    z: slotA.z,
+                    type: tileTypeA
+                });
+                boardTiles.push({
+                    id: 't_' + slotB.slotId,
+                    c: slotB.c,
+                    r: slotB.r,
+                    z: slotB.z,
+                    type: tileTypeB
+                });
+
+                // Remove slotA and slotB from remaining
+                remainingSlots = remainingSlots.filter(s => s.slotId !== slotA.slotId && s.slotId !== slotB.slotId);
+            }
+
+            return boardTiles;
+        }
+
+        /* --- Render Board --- */
+        function renderBoard() {
+            boardEl.innerHTML = '';
+            
+            // Sort by z (bottom to top) so DOM order respects layers
+            activeTiles.sort((a, b) => a.z - b.z);
+
+            activeTiles.forEach(tile => {
+                const el = document.createElement('div');
+                el.className = `tile ${tile.type.color} ${tile.type.dragon ? 'is-dragon' : ''}`;
+                el.dataset.id = tile.id;
+                el.dataset.z = tile.z;
+
+                // Position: 54px col, 72px row
+                el.style.left = `${tile.c * 54}px`;
+                el.style.top = `${tile.r * 72}px`;
+
+                const isFree = isTileFree(tile);
+                if (isFree) {
+                    el.classList.add('free');
+                } else {
+                    el.classList.add('blocked');
+                }
+
+                if (selectedTile && selectedTile.id === tile.id) {
+                    el.classList.add('selected');
+                }
+
+                el.innerHTML = `
+                    ${tile.type.dragon ? '<span class="tile-badge">★3X</span>' : ''}
+                    <div class="tile-char">${tile.type.char}</div>
+                    <div class="tile-label">${tile.type.name}</div>
+                `;
+
+                el.addEventListener('click', () => onTileClick(tile));
+                boardEl.appendChild(el);
+            });
+
+            tilesLeftText.textContent = `${activeTiles.length} / 36`;
+            matchesText.textContent = `${matchedCount}쌍 매칭`;
+            updateMultiplierDisplay();
+        }
+
+        /* --- Tile Click Handler --- */
+        function onTileClick(tile) {
+            if (!isGameActive) return;
+            if (!isTileFree(tile)) {
+                playSound('select');
+                return;
+            }
+
+            // Remove any hint glows
+            document.querySelectorAll('.tile.hinted').forEach(el => el.classList.remove('hinted'));
+
+            if (!selectedTile) {
+                selectedTile = tile;
+                playSound('select');
+                renderBoard();
+                return;
+            }
+
+            if (selectedTile.id === tile.id) {
+                // Deselect
+                selectedTile = null;
+                playSound('select');
+                renderBoard();
+                return;
+            }
+
+            // Check if matches
+            if (selectedTile.type.id === tile.type.id) {
+                // MATCH!
+                executeMatch(selectedTile, tile);
+            } else {
+                // Different tile -> switch selection
+                selectedTile = tile;
+                playSound('select');
+                renderBoard();
+            }
+        }
+
+        /* --- Execute Match --- */
+        function executeMatch(tileA, tileB) {
+            matchedCount++;
+            
+            // Dragon bonus
+            if (tileA.type.dragon) {
+                bonusMultiplier += 0.5;
+                playSound('dragon');
+            } else {
+                playSound('match');
+            }
+
+            // Combo calculation
+            triggerCombo();
+
+            // Animate removal in DOM
+            const elA = document.querySelector(`.tile[data-id="${tileA.id}"]`);
+            const elB = document.querySelector(`.tile[data-id="${tileB.id}"]`);
+            if (elA) elA.classList.add('matched');
+            if (elB) elB.classList.add('matched');
+
+            selectedTile = null;
+
+            setTimeout(() => {
+                activeTiles = activeTiles.filter(t => t.id !== tileA.id && t.id !== tileB.id);
+                renderBoard();
+
+                // Check Win or Deadlock
+                if (activeTiles.length === 0) {
+                    onAllClearWin();
+                } else {
+                    checkDeadlock();
+                }
+            }, 250);
+        }
+
+        /* --- Combo System --- */
+        function triggerCombo() {
+            comboCount++;
+            if (comboCount > stats.maxCombo) {
+                stats.maxCombo = comboCount;
+            }
+            playSound('combo', comboCount);
+
+            comboBadge.textContent = `COMBO ${comboCount}x (+${(comboCount * 0.15).toFixed(2)}x)`;
+            comboFill.style.width = '100%';
+
+            if (comboTimer) clearInterval(comboTimer);
+            let timeLeftMs = 4000;
+            const step = 50;
+
+            comboTimer = setInterval(() => {
+                timeLeftMs -= step;
+                const pct = Math.max(0, (timeLeftMs / 4000) * 100);
+                comboFill.style.width = `${pct}%`;
+
+                if (timeLeftMs <= 0) {
+                    clearInterval(comboTimer);
+                    comboTimer = null;
+                    comboCount = 0;
+                    comboBadge.textContent = 'COMBO 0x';
+                    updateMultiplierDisplay();
+                }
+            }, step);
+        }
+
+        /* --- Multiplier & Cashout Display --- */
+        function getCurrentMultiplier() {
+            const baseMult = MULTIPLIER_TABLE[Math.min(matchedCount, 18)];
+            const comboBonus = comboCount * 0.15;
+            return baseMult + bonusMultiplier + comboBonus;
+        }
+
+        function updateMultiplierDisplay() {
+            const totalMult = getCurrentMultiplier();
+            multiplierText.textContent = `${totalMult.toFixed(2)}x`;
+            const potentialWin = Math.floor(currentBet * totalMult);
+            potentialWinText.textContent = potentialWin.toLocaleString();
+
+            if (totalMult >= 1.0) {
+                cashoutBtn.disabled = false;
+                cashoutBtn.innerHTML = `<span>💰 캐시아웃 (${potentialWin.toLocaleString()})</span>`;
+            } else {
+                cashoutBtn.disabled = true;
+                cashoutBtn.innerHTML = `<span>💰 캐시아웃 (1.0x부터)</span>`;
+            }
+        }
+
+        /* --- Deadlock / Game Over Check --- */
+        function checkDeadlock() {
+            const freeTiles = activeTiles.filter(t => isTileFree(t));
+            let hasMove = false;
+
+            for (let i = 0; i < freeTiles.length; i++) {
+                for (let j = i + 1; j < freeTiles.length; j++) {
+                    if (freeTiles[i].type.id === freeTiles[j].type.id) {
+                        hasMove = true;
+                        break;
+                    }
+                }
+                if (hasMove) break;
+            }
+
+            if (!hasMove) {
+                if (shufflesLeft > 0) {
+                    // Auto suggest shuffle
+                    shuffleBtn.style.animation = 'pulse-select 0.8s infinite';
+                } else {
+                    // Deadlock game over!
+                    endGame(false, '더 이상 매칭 가능한 패가 없습니다! (No Moves)');
+                }
+            } else {
+                shuffleBtn.style.animation = 'none';
+            }
+        }
+
+        /* --- Start Game --- */
+        startBtn.addEventListener('click', () => {
+            if (isGameActive) return;
+            if (balance < currentBet) {
+                alert('칩 잔액이 부족합니다!');
+                return;
+            }
+
+            playSound('chip');
+            balance -= currentBet;
+            saveState();
+            updateUI();
+
+            isGameActive = true;
+            matchedCount = 0;
+            bonusMultiplier = 0.0;
+            comboCount = 0;
+            hintsLeft = 3;
+            shufflesLeft = 2;
+            gameTimeLeft = 90;
+            selectedTile = null;
+
+            hintCountEl.textContent = `(${hintsLeft})`;
+            shuffleCountEl.textContent = `(${shufflesLeft})`;
+
+            betSection.style.display = 'none';
+            gameControls.style.display = 'flex';
+
+            activeTiles = generateSolvableBoard();
+            renderBoard();
+
+            // Start Timer
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                gameTimeLeft--;
+                const m = String(Math.floor(gameTimeLeft / 60)).padStart(2, '0');
+                const s = String(gameTimeLeft % 60).padStart(2, '0');
+                timerText.textContent = `${m}:${s}`;
+
+                if (gameTimeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    endGame(false, '시간 초과! 타임오버 패배');
+                }
+            }, 1000);
+        });
+
+        /* --- Cash Out Button --- */
+        cashoutBtn.addEventListener('click', () => {
+            if (!isGameActive) return;
+            const finalMult = getCurrentMultiplier();
+            if (finalMult < 1.0) return;
+
+            const winAmount = Math.floor(currentBet * finalMult);
+            balance += winAmount;
+            stats.games++;
+            stats.wins++;
+            if (finalMult > stats.maxMult) stats.maxMult = finalMult;
+            saveState();
+
+            playSound('cashout');
+            fireConfetti();
+            endGame(true, `축하합니다! ${finalMult.toFixed(2)}배 캐시아웃 성공! (+${winAmount.toLocaleString()} 칩)`);
+        });
+
+        /* --- All Clear Win --- */
+        function onAllClearWin() {
+            const timeBonus = (gameTimeLeft * 0.1);
+            const finalMult = getCurrentMultiplier() + timeBonus;
+            const winAmount = Math.floor(currentBet * finalMult);
+
+            balance += winAmount;
+            stats.games++;
+            stats.wins++;
+            if (finalMult > stats.maxMult) stats.maxMult = finalMult;
+            saveState();
+
+            playSound('cashout');
+            fireConfetti();
+            endGame(true, `👑 올 클리어 완봉승 대박 잭팟! 총 ${finalMult.toFixed(2)}배 (+${winAmount.toLocaleString()} 칩)`);
+        }
+
+        /* --- End Game --- */
+        function endGame(won, msg) {
+            isGameActive = false;
+            if (timerInterval) clearInterval(timerInterval);
+            if (comboTimer) clearInterval(comboTimer);
+
+            if (!won) {
+                stats.games++;
+                saveState();
+                playSound('lose');
+            }
+
+            alert(msg);
+            betSection.style.display = 'flex';
+            gameControls.style.display = 'none';
+            updateUI();
+        }
+
+        /* --- Hint Ability --- */
+        hintBtn.addEventListener('click', () => {
+            if (!isGameActive || hintsLeft <= 0) return;
+
+            const freeTiles = activeTiles.filter(t => isTileFree(t));
+            let matchPair = null;
+
+            for (let i = 0; i < freeTiles.length; i++) {
+                for (let j = i + 1; j < freeTiles.length; j++) {
+                    if (freeTiles[i].type.id === freeTiles[j].type.id) {
+                        matchPair = [freeTiles[i], freeTiles[j]];
+                        break;
+                    }
+                }
+                if (matchPair) break;
+            }
+
+            if (matchPair) {
+                hintsLeft--;
+                hintCountEl.textContent = `(${hintsLeft})`;
+                playSound('select');
+
+                const elA = document.querySelector(`.tile[data-id="${matchPair[0].id}"]`);
+                const elB = document.querySelector(`.tile[data-id="${matchPair[1].id}"]`);
+                if (elA) elA.classList.add('hinted');
+                if (elB) elB.classList.add('hinted');
+            } else {
+                alert('현재 매칭 가능한 패가 없습니다. 셔플을 사용하세요!');
+            }
+        });
+
+        /* --- Shuffle Ability --- */
+        shuffleBtn.addEventListener('click', () => {
+            if (!isGameActive || shufflesLeft <= 0) return;
+
+            shufflesLeft--;
+            shuffleCountEl.textContent = `(${shufflesLeft})`;
+            playSound('shuffle');
+
+            // Extract remaining tile types and re-assign to remaining positions
+            const remainingTypes = activeTiles.map(t => t.type);
+            for (let i = remainingTypes.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [remainingTypes[i], remainingTypes[j]] = [remainingTypes[j], remainingTypes[i]];
+            }
+
+            activeTiles.forEach((tile, idx) => {
+                tile.type = remainingTypes[idx];
+            });
+
+            selectedTile = null;
+            renderBoard();
+        });
+
+        /* --- Quick Bet Buttons --- */
+        document.querySelectorAll('.chip-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                playSound('chip');
+                const val = btn.dataset.val;
+                const act = btn.dataset.action;
+
+                if (val) {
+                    currentBet = Math.min(balance, currentBet + parseInt(val));
+                } else if (act === 'half') {
+                    currentBet = Math.max(100, Math.floor(currentBet / 2));
+                } else if (act === 'double') {
+                    currentBet = Math.min(balance, currentBet * 2);
+                } else if (act === 'max') {
+                    currentBet = Math.min(balance, 50000);
+                } else if (act === 'allin') {
+                    currentBet = Math.max(100, balance);
+                }
+                updateUI();
+            });
+        });
+
+        /* --- Relief Fund (+1,000 chips) --- */
+        reliefBtn.addEventListener('click', () => {
+            playSound('cashout');
+            balance += 1000;
+            saveState();
+            updateUI();
+            alert('카지노 긴급 구호금 1,000칩이 지급되었습니다! 💵');
+        });
+
+        /* --- Sound Toggle --- */
+        soundToggle.addEventListener('click', () => {
+            soundEnabled = !soundEnabled;
+            soundToggle.textContent = soundEnabled ? '🔊' : '🔇';
+        });
+
+        /* --- Modals --- */
+        rulesBtn.addEventListener('click', () => rulesModal.classList.add('active'));
+        rulesModalClose.addEventListener('click', () => rulesModal.classList.remove('active'));
+
+        adBtn.addEventListener('click', startAdReward);
+        adModalClose.addEventListener('click', () => adModal.classList.remove('active'));
+
+        function startAdReward() {
+            adModal.classList.add('active');
+            adProgressBar.style.width = '0%';
+            adCountdownText.textContent = '5초 후 충전 완료...';
+
+            let count = 5;
+            const timer = setInterval(() => {
+                count--;
+                const progressPct = ((5 - count) / 5) * 100;
+                adProgressBar.style.width = `${progressPct}%`;
+                adCountdownText.textContent = `${count}초 후 충전 완료...`;
+
+                if (count <= 0) {
+                    clearInterval(timer);
+                    balance += 5000;
+                    saveState();
+                    updateUI();
+                    playSound('cashout');
+                    setTimeout(() => {
+                        adModal.classList.remove('active');
+                        alert('보상 광고 시청 완료! 5,000칩이 충전되었습니다. 💎');
+                    }, 300);
+                }
+            }, 1000);
+        }
+
+        /* --- Confetti Generator --- */
+        function fireConfetti() {
+            const canvas = document.getElementById('confettiCanvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            const particles = [];
+            const colors = ['#f5c518', '#10b981', '#ef4444', '#3b82f6', '#ec4899', '#ffffff'];
+
+            for (let i = 0; i < 90; i++) {
+                particles.push({
+                    x: canvas.width / 2,
+                    y: canvas.height / 2,
+                    vx: (Math.random() - 0.5) * 16,
+                    vy: (Math.random() - 0.7) * 18,
+                    size: Math.random() * 8 + 4,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    rot: Math.random() * 360,
+                    vRot: (Math.random() - 0.5) * 10,
+                    alpha: 1
+                });
+            }
+
+            let startAnim = Date.now();
+            function anim() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                particles.forEach(p => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vy += 0.35; // gravity
+                    p.rot += p.vRot;
+                    p.alpha -= 0.012;
+
+                    ctx.save();
+                    ctx.globalAlpha = Math.max(0, p.alpha);
+                    ctx.translate(p.x, p.y);
+                    ctx.rotate((p.rot * Math.PI) / 180);
+                    ctx.fillStyle = p.color;
+                    ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+                    ctx.restore();
+                });
+
+                if (Date.now() - startAnim < 2200) {
+                    requestAnimationFrame(anim);
+                } else {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                }
+            }
+            requestAnimationFrame(anim);
+        }
+
+        // Initial setup
+        updateUI();
+    </script>
+</body>
+</html>
