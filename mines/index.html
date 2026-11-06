@@ -1,0 +1,1374 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>💣 CASINO MINES - 카지노 마인스위퍼 도파민 캐시아웃</title>
+    <style>
+        :root {
+            --bg-color: #080d1a;
+            --panel-bg: #101726;
+            --panel-border: #1e293b;
+            --panel-border-glow: rgba(56, 189, 248, 0.25);
+            --tile-bg: #1a2336;
+            --tile-border: #26354f;
+            --tile-hover: #2d3d5b;
+            --gem-bg: radial-gradient(circle, #0284c7 0%, #034f77 100%);
+            --mine-bg: radial-gradient(circle, #dc2626 0%, #7f1d1d 100%);
+            --gold: #f59e0b;
+            --gold-glow: rgba(245, 158, 11, 0.4);
+            --cyan: #38bdf8;
+            --cyan-glow: rgba(56, 189, 248, 0.4);
+            --green: #10b981;
+            --green-glow: rgba(16, 185, 129, 0.4);
+            --red: #ef4444;
+            --red-glow: rgba(239, 68, 68, 0.4);
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px 8px 32px 8px;
+            overflow-x: hidden;
+            background-image: radial-gradient(circle at 50% 0%, #152238 0%, #080d1a 80%);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 460px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            position: relative;
+        }
+
+        /* Top Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 12px;
+            padding: 8px 12px;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+        }
+
+        .header-left, .header-right {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .lobby-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text-sub);
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 700;
+            padding: 6px 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.2s;
+        }
+        .lobby-btn:hover {
+            color: var(--text-main);
+            border-color: var(--cyan);
+        }
+
+        .icon-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-sub);
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        .icon-btn:hover {
+            color: var(--text-main);
+            border-color: var(--cyan);
+        }
+
+        .chip-balance-box {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: 20px;
+            padding: 4px 10px;
+        }
+
+        .chip-icon {
+            font-size: 0.95rem;
+            color: var(--gold);
+        }
+
+        .chip-amount {
+            font-size: 0.9rem;
+            font-weight: 800;
+            color: var(--gold);
+            letter-spacing: 0.3px;
+        }
+
+        .ad-free-btn {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: #000;
+            border: none;
+            border-radius: 6px;
+            padding: 3px 7px;
+            font-size: 0.7rem;
+            font-weight: 900;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            box-shadow: 0 0 8px var(--gold-glow);
+            transition: transform 0.15s;
+        }
+        .ad-free-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Status & Multiplier Board */
+        .status-board {
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 12px;
+            padding: 10px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .status-board::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+        }
+
+        .stat-col {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .stat-col.center {
+            align-items: center;
+        }
+        .stat-col.right {
+            align-items: flex-end;
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            color: var(--text-sub);
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .stat-value {
+            font-size: 1.15rem;
+            font-weight: 900;
+            color: var(--text-main);
+        }
+
+        .stat-value.highlight {
+            color: var(--green);
+            text-shadow: 0 0 10px var(--green-glow);
+        }
+        .stat-value.gold {
+            color: var(--gold);
+            text-shadow: 0 0 10px var(--gold-glow);
+        }
+
+        /* 5x5 Mines Board Grid */
+        .grid-wrapper {
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 16px;
+            padding: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            position: relative;
+        }
+
+        .mines-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            width: 100%;
+            aspect-ratio: 1 / 1;
+        }
+
+        .mine-tile {
+            background: var(--tile-bg);
+            border: 2px solid var(--tile-border);
+            border-radius: 10px;
+            position: relative;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.08);
+            transition: transform 0.15s, border-color 0.2s, background-color 0.2s;
+            perspective: 800px;
+        }
+
+        .mine-tile:hover:not(.opened):not(.disabled) {
+            background: var(--tile-hover);
+            border-color: var(--cyan);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.5), 0 0 10px var(--cyan-glow);
+        }
+
+        .mine-tile:active:not(.opened):not(.disabled) {
+            transform: scale(0.95);
+        }
+
+        .mine-tile.disabled {
+            cursor: default;
+        }
+
+        /* Tile Reveal State (Gem / Mine) */
+        .mine-tile.opened {
+            cursor: default;
+            transform: none !important;
+            animation: flipIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        .mine-tile.opened.gem {
+            background: var(--gem-bg);
+            border-color: #38bdf8;
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.6), inset 0 0 8px rgba(255, 255, 255, 0.3);
+        }
+
+        .mine-tile.opened.bomb {
+            background: var(--mine-bg);
+            border-color: #ef4444;
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.8), inset 0 0 10px rgba(255, 255, 255, 0.4);
+            animation: explodePulse 0.4s ease forwards;
+        }
+
+        /* Inactive / Dimmed Reveal at End of Game */
+        .mine-tile.revealed-gem {
+            background: rgba(2, 132, 199, 0.25);
+            border-color: rgba(56, 189, 248, 0.3);
+            opacity: 0.5;
+        }
+        .mine-tile.revealed-bomb {
+            background: rgba(220, 38, 38, 0.25);
+            border-color: rgba(239, 68, 68, 0.3);
+            opacity: 0.6;
+        }
+
+        @keyframes flipIn {
+            0% { transform: scale(0.8) rotateY(90deg); opacity: 0.5; }
+            100% { transform: scale(1) rotateY(0deg); opacity: 1; }
+        }
+
+        @keyframes explodePulse {
+            0% { transform: scale(1); }
+            40% { transform: scale(1.15); filter: brightness(1.5); }
+            100% { transform: scale(1); }
+        }
+
+        .screen-shake {
+            animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+        }
+
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-2px, 0, 0); }
+            20%, 80% { transform: translate3d(3px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-5px, 0, 0); }
+            40%, 60% { transform: translate3d(5px, 0, 0); }
+        }
+
+        /* Primary Action Buttons (Start / Cashout) */
+        .action-area {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .main-btn {
+            width: 100%;
+            padding: 14px 16px;
+            border-radius: 12px;
+            border: none;
+            font-size: 1.1rem;
+            font-weight: 900;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        .main-btn.start {
+            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+            color: #fff;
+            box-shadow: 0 4px 16px var(--cyan-glow);
+        }
+        .main-btn.start:hover {
+            background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px var(--cyan-glow);
+        }
+
+        .main-btn.cashout {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: #fff;
+            box-shadow: 0 4px 20px var(--green-glow);
+            animation: pulseGlow 1.2s infinite alternate;
+        }
+        .main-btn.cashout:hover {
+            background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+            transform: translateY(-2px);
+        }
+
+        .main-btn.waiting {
+            background: #334155;
+            color: var(--text-sub);
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 10px rgba(16, 185, 129, 0.4); }
+            100% { box-shadow: 0 0 25px rgba(16, 185, 129, 0.85); transform: scale(1.01); }
+        }
+
+        /* Control Panel (Mines selector & Bet config) */
+        .controls-panel {
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 12px;
+            padding: 12px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .setting-row {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .setting-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .setting-title {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-sub);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .setting-sub {
+            font-size: 0.75rem;
+            color: var(--cyan);
+            font-weight: 600;
+        }
+
+        /* Mine presets */
+        .mine-presets {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 6px;
+        }
+
+        .preset-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--panel-border);
+            color: var(--text-sub);
+            padding: 7px 0;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.15s;
+        }
+        .preset-btn:hover {
+            color: var(--text-main);
+            border-color: var(--cyan);
+        }
+        .preset-btn.active {
+            background: rgba(56, 189, 248, 0.15);
+            border-color: var(--cyan);
+            color: var(--cyan);
+            box-shadow: 0 0 8px var(--cyan-glow);
+        }
+
+        /* Bet Amount Row */
+        .bet-input-box {
+            display: flex;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--panel-border);
+            border-radius: 8px;
+            padding: 4px 8px;
+        }
+
+        .bet-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--gold);
+            font-size: 1rem;
+            font-weight: 800;
+            outline: none;
+            width: 100%;
+        }
+
+        .quick-chips {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 4px;
+            margin-top: 4px;
+        }
+
+        .chip-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--panel-border);
+            color: var(--text-sub);
+            padding: 6px 0;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.15s;
+        }
+        .chip-btn:hover {
+            color: var(--gold);
+            border-color: var(--gold);
+        }
+
+        /* Relief Bar */
+        .relief-bar {
+            background: rgba(239, 68, 68, 0.12);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 10px;
+            padding: 8px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+        }
+        .relief-btn {
+            background: var(--red);
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 4px 10px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        /* History Strip */
+        .history-box {
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 10px;
+            padding: 6px 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+        .history-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--text-sub);
+            flex-shrink: 0;
+        }
+        .history-strip {
+            display: flex;
+            gap: 6px;
+            flex: 1;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        .history-strip::-webkit-scrollbar {
+            display: none;
+        }
+        .hist-tag {
+            font-size: 0.75rem;
+            font-weight: 800;
+            padding: 2px 7px;
+            border-radius: 6px;
+            flex-shrink: 0;
+        }
+        .hist-tag.win {
+            background: rgba(16, 185, 129, 0.2);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.4);
+        }
+        .hist-tag.loss {
+            background: rgba(239, 68, 68, 0.2);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.4);
+        }
+
+        /* Stats Strip */
+        .stats-bar {
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 10px;
+            padding: 8px 12px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: var(--text-sub);
+        }
+
+        /* Modals */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+            padding: 16px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+            backdrop-filter: blur(4px);
+        }
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .modal-content {
+            background: #111827;
+            border: 1px solid #374151;
+            border-radius: 16px;
+            padding: 20px;
+            width: 100%;
+            max-width: 380px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #1f2937;
+            padding-bottom: 10px;
+        }
+        .modal-title {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: var(--text-main);
+        }
+        .modal-close {
+            background: transparent;
+            border: none;
+            color: var(--text-sub);
+            font-size: 1.4rem;
+            cursor: pointer;
+        }
+
+        /* Rewarded Ad Box */
+        .ad-banner-box {
+            background: #1f2937;
+            border: 1px dashed var(--gold);
+            border-radius: 12px;
+            padding: 24px 16px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            align-items: center;
+        }
+        .progress-bar-wrap {
+            width: 100%;
+            height: 8px;
+            background: #374151;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #f59e0b, #10b981);
+            transition: width 1s linear;
+        }
+
+        /* Confetti Canvas */
+        #confettiCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="confettiCanvas"></canvas>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-left">
+                <a href="../index.html" class="lobby-btn">🏠 로비</a>
+                <button id="soundToggle" class="icon-btn" title="사운드 켜기/끄기">🔊</button>
+                <button id="rulesBtn" class="icon-btn" title="게임 룰 설명">📖</button>
+            </div>
+            <div class="header-right">
+                <div class="chip-balance-box">
+                    <span class="chip-icon">🪙</span>
+                    <span id="chipBalance" class="chip-amount">10,000</span>
+                </div>
+                <button id="adBtn" class="ad-free-btn">+5,000</button>
+            </div>
+        </div>
+
+        <!-- Relief Bar -->
+        <div id="reliefBar" class="relief-bar" style="display: none;">
+            <span>칩이 부족합니다! 긴급 구호금을 지원해 드려요.</span>
+            <button id="reliefBtn" class="relief-btn">2,000칩 받기</button>
+        </div>
+
+        <!-- Status & Multiplier Board -->
+        <div class="status-board">
+            <div class="stat-col">
+                <span class="stat-label">현재 배당</span>
+                <span id="currentMultText" class="stat-value highlight">1.00x</span>
+            </div>
+            <div class="stat-col center">
+                <span class="stat-label">획득 가능 칩</span>
+                <span id="payoutText" class="stat-value gold">+0 칩</span>
+            </div>
+            <div class="stat-col right">
+                <span class="stat-label">다음 다이아</span>
+                <span id="nextMultText" class="stat-value">1.10x</span>
+            </div>
+        </div>
+
+        <!-- 5x5 Mines Grid -->
+        <div class="grid-wrapper" id="gridWrapper">
+            <div class="mines-grid" id="minesGrid">
+                <!-- 25 Tiles Generated dynamically -->
+            </div>
+        </div>
+
+        <!-- Primary Action Area -->
+        <div class="action-area">
+            <button id="actionBtn" class="main-btn start">
+                💣 게임 시작 (1,000칩)
+            </button>
+        </div>
+
+        <!-- Control Panel -->
+        <div class="controls-panel" id="controlsPanel">
+            <!-- Mines Count Selector -->
+            <div class="setting-row">
+                <div class="setting-header">
+                    <span class="setting-title">💣 지뢰 개수</span>
+                    <span id="mineCountText" class="setting-sub">3개 지뢰 (안전 22개)</span>
+                </div>
+                <div class="mine-presets">
+                    <button class="preset-btn" data-mines="1">1</button>
+                    <button class="preset-btn active" data-mines="3">3</button>
+                    <button class="preset-btn" data-mines="5">5</button>
+                    <button class="preset-btn" data-mines="10">10</button>
+                    <button class="preset-btn" data-mines="24">24 ⚡</button>
+                </div>
+            </div>
+
+            <!-- Bet Amount Config -->
+            <div class="setting-row">
+                <div class="setting-header">
+                    <span class="setting-title">🪙 배팅 금액</span>
+                    <span class="setting-sub" id="maxPayoutEstimate">최대 2,450x</span>
+                </div>
+                <div class="bet-input-box">
+                    <input type="number" id="betInput" class="bet-input" value="1000" min="100" step="100">
+                </div>
+                <div class="quick-chips">
+                    <button class="chip-btn" data-val="100">+100</button>
+                    <button class="chip-btn" data-val="500">+500</button>
+                    <button class="chip-btn" data-val="1000">+1K</button>
+                    <button class="chip-btn" data-val="5000">+5K</button>
+                    <button class="chip-btn" data-op="half">1/2</button>
+                    <button class="chip-btn" data-op="double">2X</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Round History Strip -->
+        <div class="history-box">
+            <span class="history-label">최근 기록</span>
+            <div class="history-strip" id="historyStrip">
+                <span class="hist-tag win">2.45x</span>
+                <span class="hist-tag loss">💥BOOM</span>
+                <span class="hist-tag win">1.82x</span>
+                <span class="hist-tag win">3.10x</span>
+            </div>
+        </div>
+
+        <!-- Stats Bar -->
+        <div class="stats-bar">
+            <span>전적: <strong id="statsGames" style="color: var(--text-main);">0전 0승</strong></span>
+            <span>승률: <strong id="statsWinRate" style="color: var(--cyan);">0%</strong></span>
+            <span>최고 배당: <strong id="statsMaxMult" style="color: var(--gold);">0.00x</strong></span>
+        </div>
+    </div>
+
+    <!-- Rules Modal -->
+    <div id="rulesModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">📖 카지노 마인스위퍼 룰</div>
+                <button class="modal-close" id="rulesModalClose">&times;</button>
+            </div>
+            <div style="font-size: 0.85rem; line-height: 1.5; color: var(--text-sub); display: flex; flex-direction: column; gap: 8px;">
+                <p>1. <strong>5x5 (25개) 그리드</strong>에 숨겨진 지뢰를 피해 다이아몬드 💎를 찾으세요.</p>
+                <p>2. 다이아몬드를 하나씩 열 때마다 배당 배수가 실시간으로 치솟습니다.</p>
+                <p>3. <strong>원할 때 언제든지 [캐시아웃]</strong>을 눌러 현재 배당으로 안전하게 상금을 챙기세요!</p>
+                <p>4. 만약 지뢰 💣를 밟으면 폭발하며 배팅금을 모두 잃습니다.</p>
+                <p>5. 지뢰 개수가 많을수록(1~24개) 배당 상승 폭이 기하급수적으로 커집니다. (24개 지뢰 설정 시 1타 24.25배 잭팟!)</p>
+                <p style="color: var(--cyan); font-weight: 700;">* 97% 공정 환수율(RTP) 수학 공식 적용</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rewarded Ad Modal -->
+    <div id="adModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">📺 무료 칩 보상 광고</div>
+                <button class="modal-close" id="adModalClose">&times;</button>
+            </div>
+            <div class="ad-banner-box">
+                <div style="font-size: 2.2rem;">💎</div>
+                <div style="font-weight: 800; font-size: 1.1rem; color: var(--gold);">
+                    VIP 카지노 스폰서 리워드
+                </div>
+                <div style="font-size: 0.8rem; color: var(--text-sub);">
+                    광고 시청 완료 시 5,000칩이 즉시 무료 지급됩니다!
+                </div>
+                <div class="progress-bar-wrap">
+                    <div id="adProgressBar" class="progress-bar"></div>
+                </div>
+                <div id="adCountdownText" style="font-size: 0.75rem; color: var(--text-sub); margin-top: 4px;">5초 후 충전 완료...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* --- Audio Engine (Web Audio API) --- */
+        let audioCtx = null;
+        let soundEnabled = true;
+
+        function getAudioContext() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            return audioCtx;
+        }
+
+        function playSound(type, step = 1) {
+            if (!soundEnabled) return;
+            try {
+                const ctx = getAudioContext();
+                const now = ctx.currentTime;
+
+                if (type === 'click') {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(600, now);
+                    osc.frequency.exponentialRampToValueAtTime(200, now + 0.04);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.04);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.04);
+                } else if (type === 'gem') {
+                    // Ascending crystal pentatonic harp chime
+                    const baseFreq = 440;
+                    const scale = [1, 1.125, 1.25, 1.333, 1.5, 1.666, 1.875, 2.0];
+                    const noteFreq = baseFreq * Math.pow(1.08, step);
+
+                    const osc = ctx.createOscillator();
+                    const osc2 = ctx.createOscillator();
+                    const gain = ctx.createGain();
+
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(noteFreq, now);
+
+                    osc2.type = 'triangle';
+                    osc2.frequency.setValueAtTime(noteFreq * 2, now);
+
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+
+                    osc.connect(gain);
+                    osc2.connect(gain);
+                    gain.connect(ctx.destination);
+
+                    osc.start(now);
+                    osc2.start(now);
+                    osc.stop(now + 0.35);
+                    osc2.stop(now + 0.35);
+                } else if (type === 'boom') {
+                    // Explosion noise + sub rumble
+                    const bufferSize = ctx.sampleRate * 0.5;
+                    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+                    const data = buffer.getChannelData(0);
+                    for (let i = 0; i < bufferSize; i++) {
+                        data[i] = Math.random() * 2 - 1;
+                    }
+
+                    const noise = ctx.createBufferSource();
+                    noise.buffer = buffer;
+
+                    const filter = ctx.createBiquadFilter();
+                    filter.type = 'lowpass';
+                    filter.frequency.setValueAtTime(400, now);
+                    filter.frequency.exponentialRampToValueAtTime(40, now + 0.45);
+
+                    const gain = ctx.createGain();
+                    gain.gain.setValueAtTime(0.8, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+
+                    noise.connect(filter);
+                    filter.connect(gain);
+                    gain.connect(ctx.destination);
+
+                    // Sub oscillator
+                    const sub = ctx.createOscillator();
+                    const subGain = ctx.createGain();
+                    sub.type = 'sine';
+                    sub.frequency.setValueAtTime(120, now);
+                    sub.frequency.exponentialRampToValueAtTime(30, now + 0.4);
+                    subGain.gain.setValueAtTime(0.6, now);
+                    subGain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+
+                    sub.connect(subGain);
+                    subGain.connect(ctx.destination);
+
+                    noise.start(now);
+                    sub.start(now);
+                    noise.stop(now + 0.5);
+                    sub.stop(now + 0.5);
+                } else if (type === 'cashout') {
+                    // Fanfare arpeggio + coin register
+                    const notes = [523.25, 659.25, 783.99, 1046.50];
+                    notes.forEach((freq, idx) => {
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        osc.type = 'triangle';
+                        osc.frequency.setValueAtTime(freq, now + idx * 0.08);
+                        gain.gain.setValueAtTime(0.3, now + idx * 0.08);
+                        gain.gain.exponentialRampToValueAtTime(0.01, now + idx * 0.08 + 0.25);
+                        osc.connect(gain);
+                        gain.connect(ctx.destination);
+                        osc.start(now + idx * 0.08);
+                        osc.stop(now + idx * 0.08 + 0.25);
+                    });
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        /* --- Math & Multipliers Engine --- */
+        const TOTAL_TILES = 25;
+        const RTP = 0.97;
+
+        function calcMultiplier(mines, gemsFound) {
+            if (gemsFound <= 0) return 1.00;
+            const safeTiles = TOTAL_TILES - mines;
+            let prob = 1.0;
+            for (let i = 0; i < gemsFound; i++) {
+                prob *= (safeTiles - i) / (TOTAL_TILES - i);
+            }
+            const mult = (1.0 / prob) * RTP;
+            return Math.max(1.01, parseFloat(mult.toFixed(2)));
+        }
+
+        /* --- State --- */
+        let balance = parseInt(localStorage.getItem('mines_balance')) || 10000;
+        let selectedMines = 3;
+        let currentBet = 1000;
+        let isGameActive = false;
+        let gridData = []; // array of 25: 'GEM' or 'MINE'
+        let openedTiles = []; // boolean array of 25
+        let gemsRevealed = 0;
+        let currentMultiplier = 1.00;
+
+        let stats = JSON.parse(localStorage.getItem('mines_stats')) || {
+            games: 0,
+            wins: 0,
+            maxMult: 0.0
+        };
+
+        /* --- DOM Elements --- */
+        const chipBalanceEl = document.getElementById('chipBalance');
+        const reliefBar = document.getElementById('reliefBar');
+        const reliefBtn = document.getElementById('reliefBtn');
+        const currentMultText = document.getElementById('currentMultText');
+        const payoutText = document.getElementById('payoutText');
+        const nextMultText = document.getElementById('nextMultText');
+        const gridWrapper = document.getElementById('gridWrapper');
+        const minesGrid = document.getElementById('minesGrid');
+        const actionBtn = document.getElementById('actionBtn');
+        const controlsPanel = document.getElementById('controlsPanel');
+        const mineCountText = document.getElementById('mineCountText');
+        const maxPayoutEstimate = document.getElementById('maxPayoutEstimate');
+        const betInput = document.getElementById('betInput');
+        const historyStrip = document.getElementById('historyStrip');
+        const statsGames = document.getElementById('statsGames');
+        const statsWinRate = document.getElementById('statsWinRate');
+        const statsMaxMult = document.getElementById('statsMaxMult');
+        const soundToggle = document.getElementById('soundToggle');
+        const adBtn = document.getElementById('adBtn');
+        const adModal = document.getElementById('adModal');
+        const adModalClose = document.getElementById('adModalClose');
+        const adProgressBar = document.getElementById('adProgressBar');
+        const adCountdownText = document.getElementById('adCountdownText');
+        const rulesBtn = document.getElementById('rulesBtn');
+        const rulesModal = document.getElementById('rulesModal');
+        const rulesModalClose = document.getElementById('rulesModalClose');
+
+        /* --- Initialize Grid UI --- */
+        function initGrid() {
+            minesGrid.innerHTML = '';
+            for (let i = 0; i < TOTAL_TILES; i++) {
+                const tile = document.createElement('div');
+                tile.className = 'mine-tile disabled';
+                tile.dataset.index = i;
+                tile.innerHTML = '';
+                tile.addEventListener('click', () => onTileClick(i));
+                minesGrid.appendChild(tile);
+            }
+        }
+
+        /* --- Update Multiplier Previews --- */
+        function updatePreviews() {
+            const nextMult = calcMultiplier(selectedMines, gemsRevealed + 1);
+            nextMultText.textContent = `${nextMult.toFixed(2)}x`;
+
+            const maxMult = calcMultiplier(selectedMines, TOTAL_TILES - selectedMines);
+            maxPayoutEstimate.textContent = `최대 ${maxMult >= 1000 ? Math.floor(maxMult).toLocaleString() : maxMult.toFixed(2)}x`;
+
+            mineCountText.textContent = `${selectedMines}개 지뢰 (안전 ${TOTAL_TILES - selectedMines}개)`;
+
+            if (isGameActive) {
+                if (gemsRevealed > 0) {
+                    currentMultText.textContent = `${currentMultiplier.toFixed(2)}x`;
+                    const winAmount = Math.floor(currentBet * currentMultiplier);
+                    payoutText.textContent = `+${winAmount.toLocaleString()} 칩`;
+                } else {
+                    currentMultText.textContent = '1.00x';
+                    payoutText.textContent = '+0 칩';
+                }
+            } else {
+                currentMultText.textContent = '1.00x';
+                payoutText.textContent = '+0 칩';
+            }
+        }
+
+        function updateUI() {
+            chipBalanceEl.textContent = balance.toLocaleString();
+            reliefBar.style.display = (balance < 100 && !isGameActive) ? 'flex' : 'none';
+
+            // Stats
+            statsGames.textContent = `${stats.games}전 ${stats.wins}승`;
+            const rate = stats.games > 0 ? Math.round((stats.wins / stats.games) * 100) : 0;
+            statsWinRate.textContent = `${rate}%`;
+            statsMaxMult.textContent = `${stats.maxMult.toFixed(2)}x`;
+
+            updatePreviews();
+        }
+
+        function saveState() {
+            localStorage.setItem('mines_balance', balance);
+            localStorage.setItem('mines_stats', JSON.stringify(stats));
+        }
+
+        /* --- Start Game --- */
+        function startGame() {
+            const betVal = parseInt(betInput.value);
+            if (isNaN(betVal) || betVal < 100) {
+                alert('최소 배팅 금액은 100칩입니다.');
+                return;
+            }
+            if (balance < betVal) {
+                alert('칩이 부족합니다! 무료 충전 광고나 긴급 구호금을 이용해 보세요.');
+                return;
+            }
+
+            // Deduct bet
+            currentBet = betVal;
+            balance -= currentBet;
+            saveState();
+
+            isGameActive = true;
+            gemsRevealed = 0;
+            currentMultiplier = 1.00;
+            openedTiles = new Array(TOTAL_TILES).fill(false);
+
+            // Generate Board: selectedMines of 'MINE', rest 'GEM'
+            gridData = [];
+            for (let i = 0; i < selectedMines; i++) gridData.push('MINE');
+            for (let i = 0; i < TOTAL_TILES - selectedMines; i++) gridData.push('GEM');
+
+            // Fisher-Yates Shuffle
+            for (let i = gridData.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [gridData[i], gridData[j]] = [gridData[j], gridData[i]];
+            }
+
+            // Lock controls
+            controlsPanel.style.opacity = '0.5';
+            controlsPanel.style.pointerEvents = 'none';
+
+            // Reset tiles
+            const tiles = minesGrid.querySelectorAll('.mine-tile');
+            tiles.forEach(t => {
+                t.className = 'mine-tile';
+                t.innerHTML = '';
+            });
+
+            // Update Action Button
+            actionBtn.className = 'main-btn waiting';
+            actionBtn.innerHTML = `타일을 선택하세요 (안전: 0/${TOTAL_TILES - selectedMines})`;
+
+            playSound('click');
+            updateUI();
+        }
+
+        /* --- Click Tile --- */
+        function onTileClick(index) {
+            if (!isGameActive) return;
+            if (openedTiles[index]) return;
+
+            openedTiles[index] = true;
+            const tile = minesGrid.children[index];
+
+            if (gridData[index] === 'GEM') {
+                // Safe Diamond!
+                gemsRevealed++;
+                currentMultiplier = calcMultiplier(selectedMines, gemsRevealed);
+
+                tile.classList.add('opened', 'gem');
+                tile.innerHTML = '💎';
+                playSound('gem', gemsRevealed);
+
+                // Update Cashout Button
+                const winAmount = Math.floor(currentBet * currentMultiplier);
+                actionBtn.className = 'main-btn cashout';
+                actionBtn.innerHTML = `💰 캐시아웃: +${winAmount.toLocaleString()} 칩 (${currentMultiplier.toFixed(2)}x)`;
+
+                updateUI();
+
+                // Check All Clear!
+                if (gemsRevealed === (TOTAL_TILES - selectedMines)) {
+                    // Found all gems! Auto-cashout jackpot!
+                    cashout(true);
+                }
+            } else {
+                // Bomb exploded!
+                tile.classList.add('opened', 'bomb');
+                tile.innerHTML = '💣';
+                playSound('boom');
+
+                gridWrapper.classList.add('screen-shake');
+                setTimeout(() => gridWrapper.classList.remove('screen-shake'), 450);
+
+                gameOver(false);
+            }
+        }
+
+        /* --- Cashout --- */
+        function cashout(isAllClear = false) {
+            if (!isGameActive || gemsRevealed === 0) return;
+
+            const winAmount = Math.floor(currentBet * currentMultiplier);
+            balance += winAmount;
+
+            stats.games++;
+            stats.wins++;
+            if (currentMultiplier > stats.maxMult) {
+                stats.maxMult = currentMultiplier;
+            }
+            saveState();
+
+            addHistory(currentMultiplier, true);
+            playSound('cashout');
+            fireConfetti();
+
+            revealAllBoard();
+
+            isGameActive = false;
+            actionBtn.className = 'main-btn start';
+            actionBtn.innerHTML = isAllClear ? `🏆 올클리어 잭팟! +${winAmount.toLocaleString()} 칩` : `🎉 캐시아웃 성공! +${winAmount.toLocaleString()} 칩`;
+
+            controlsPanel.style.opacity = '1';
+            controlsPanel.style.pointerEvents = 'auto';
+
+            updateUI();
+        }
+
+        /* --- Game Over (Loss) --- */
+        function gameOver() {
+            stats.games++;
+            saveState();
+
+            addHistory(0, false);
+            revealAllBoard();
+
+            isGameActive = false;
+            actionBtn.className = 'main-btn start';
+            actionBtn.innerHTML = `💥 폭발! (-${currentBet.toLocaleString()} 칩) 다시 도전`;
+
+            controlsPanel.style.opacity = '1';
+            controlsPanel.style.pointerEvents = 'auto';
+
+            updateUI();
+        }
+
+        /* --- Reveal Remaining Tiles --- */
+        function revealAllBoard() {
+            const tiles = minesGrid.querySelectorAll('.mine-tile');
+            tiles.forEach((t, i) => {
+                t.classList.add('disabled');
+                if (!openedTiles[i]) {
+                    if (gridData[i] === 'MINE') {
+                        t.classList.add('revealed-bomb');
+                        t.innerHTML = '💣';
+                    } else {
+                        t.classList.add('revealed-gem');
+                        t.innerHTML = '💎';
+                    }
+                }
+            });
+        }
+
+        /* --- History Management --- */
+        function addHistory(mult, won) {
+            const tag = document.createElement('span');
+            tag.className = `hist-tag ${won ? 'win' : 'loss'}`;
+            tag.textContent = won ? `${mult.toFixed(2)}x` : '💥BOOM';
+
+            historyStrip.insertBefore(tag, historyStrip.firstChild);
+            if (historyStrip.children.length > 8) {
+                historyStrip.removeChild(historyStrip.lastChild);
+            }
+        }
+
+        /* --- Event Listeners --- */
+        actionBtn.addEventListener('click', () => {
+            if (!isGameActive) {
+                startGame();
+            } else if (gemsRevealed > 0) {
+                cashout(false);
+            }
+        });
+
+        // Mine Presets
+        document.querySelectorAll('.preset-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (isGameActive) return;
+                document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                selectedMines = parseInt(btn.dataset.mines);
+                playSound('click');
+                updatePreviews();
+            });
+        });
+
+        // Quick Chips
+        document.querySelectorAll('.chip-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (isGameActive) return;
+                let cur = parseInt(betInput.value) || 0;
+                if (btn.dataset.val) {
+                    cur += parseInt(btn.dataset.val);
+                } else if (btn.dataset.op === 'half') {
+                    cur = Math.max(100, Math.floor(cur / 2));
+                } else if (btn.dataset.op === 'double') {
+                    cur = Math.min(balance > 0 ? balance : 100000, cur * 2);
+                }
+                betInput.value = cur;
+                playSound('click');
+            });
+        });
+
+        betInput.addEventListener('input', () => {
+            let val = parseInt(betInput.value);
+            if (isNaN(val) || val < 100) val = 100;
+            actionBtn.innerHTML = `💣 게임 시작 (${val.toLocaleString()}칩)`;
+        });
+
+        // Relief
+        reliefBtn.addEventListener('click', () => {
+            balance += 2000;
+            saveState();
+            updateUI();
+            playSound('cashout');
+            alert('긴급 구호금 2,000칩이 지급되었습니다! 힘내세요! 💪');
+        });
+
+        // Sound Toggle
+        soundToggle.addEventListener('click', () => {
+            soundEnabled = !soundEnabled;
+            soundToggle.textContent = soundEnabled ? '🔊' : '🔇';
+        });
+
+        // Modals
+        rulesBtn.addEventListener('click', () => rulesModal.classList.add('active'));
+        rulesModalClose.addEventListener('click', () => rulesModal.classList.remove('active'));
+
+        adBtn.addEventListener('click', startAdReward);
+        adModalClose.addEventListener('click', () => adModal.classList.remove('active'));
+
+        function startAdReward() {
+            adModal.classList.add('active');
+            adProgressBar.style.width = '0%';
+            adCountdownText.textContent = '5초 후 충전 완료...';
+
+            let count = 5;
+            const timer = setInterval(() => {
+                count--;
+                const progressPct = ((5 - count) / 5) * 100;
+                adProgressBar.style.width = `${progressPct}%`;
+                adCountdownText.textContent = `${count}초 후 충전 완료...`;
+
+                if (count <= 0) {
+                    clearInterval(timer);
+                    balance += 5000;
+                    saveState();
+                    updateUI();
+                    playSound('cashout');
+                    setTimeout(() => {
+                        adModal.classList.remove('active');
+                        alert('보상 광고 시청 완료! 5,000칩이 충전되었습니다. 💎');
+                    }, 300);
+                }
+            }, 1000);
+        }
+
+        /* --- Confetti Generator --- */
+        function fireConfetti() {
+            const canvas = document.getElementById('confettiCanvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            const pieces = [];
+            const colors = ['#f59e0b', '#38bdf8', '#10b981', '#ec4899', '#ffffff'];
+            for (let i = 0; i < 70; i++) {
+                pieces.push({
+                    x: canvas.width / 2,
+                    y: canvas.height * 0.45,
+                    vx: (Math.random() - 0.5) * 14,
+                    vy: (Math.random() - 0.7) * 16,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    size: Math.random() * 7 + 4,
+                    rot: Math.random() * 360,
+                    vrot: (Math.random() - 0.5) * 10
+                });
+            }
+
+            let start = null;
+            function step(ts) {
+                if (!start) start = ts;
+                const progress = ts - start;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                pieces.forEach(p => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vy += 0.35; // gravity
+                    p.rot += p.vrot;
+
+                    ctx.save();
+                    ctx.translate(p.x, p.y);
+                    ctx.rotate((p.rot * Math.PI) / 180);
+                    ctx.fillStyle = p.color;
+                    ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+                    ctx.restore();
+                });
+
+                if (progress < 1800) {
+                    requestAnimationFrame(step);
+                } else {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                }
+            }
+            requestAnimationFrame(step);
+        }
+
+        // Init
+        initGrid();
+        updateUI();
+    </script>
+</body>
+</html>
