@@ -1,0 +1,1956 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🔴🔵 바카라 드래곤 타이거 - Baccarat Dragon Tiger</title>
+    <style>
+        :root {
+            --bg-color: #051412;
+            --panel-bg: #0c2420;
+            --panel-sub: #143630;
+            --felt-green: #0a3a2f;
+            --felt-border: #1a5c4c;
+            --gold: #f5c518;
+            --gold-glow: rgba(245, 197, 24, 0.45);
+            --player-blue: #2563eb;
+            --player-glow: rgba(37, 99, 235, 0.45);
+            --banker-red: #dc2626;
+            --banker-glow: rgba(220, 38, 38, 0.45);
+            --tie-green: #10b981;
+            --tie-glow: rgba(16, 185, 129, 0.45);
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+            --border-color: #1e4a3f;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px 8px 30px 8px;
+            overflow-x: hidden;
+            background-image: radial-gradient(circle at 50% 0%, #114236 0%, #051412 85%);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 520px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        /* Top Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 8px 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .header-left, .header-right {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .lobby-btn {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 6px 10px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.2s;
+        }
+        .lobby-btn:hover { background: rgba(255, 255, 255, 0.15); }
+
+        .chip-display {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--gold);
+            border-radius: 20px;
+            padding: 4px 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 800;
+            font-size: 0.95rem;
+            color: var(--gold);
+            box-shadow: 0 0 10px var(--gold-glow);
+        }
+
+        .icon-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            border-radius: 8px;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .icon-btn:hover { background: rgba(255, 255, 255, 0.18); }
+
+        .ad-btn {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: #000;
+            font-weight: 800;
+            font-size: 0.75rem;
+            border: none;
+            border-radius: 8px;
+            padding: 6px 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            box-shadow: 0 2px 6px rgba(217, 119, 6, 0.4);
+        }
+
+        /* Mode Switcher Tabs */
+        .mode-tabs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 4px;
+            gap: 4px;
+        }
+
+        .mode-tab {
+            padding: 8px;
+            text-align: center;
+            font-size: 0.85rem;
+            font-weight: 800;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-sub);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .mode-tab.active {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4);
+        }
+
+        /* Baccarat Felt Table */
+        .table-felt {
+            background: radial-gradient(ellipse at 50% 30%, #114c3e 0%, #072a22 80%, #041a15 100%);
+            border: 2px solid var(--felt-border);
+            border-radius: 18px;
+            padding: 12px 10px;
+            box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.7), 0 8px 24px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            position: relative;
+        }
+
+        /* Shoe Info Bar */
+        .shoe-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.75rem;
+            color: #a7f3d0;
+            padding: 0 4px;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+            padding-bottom: 6px;
+        }
+
+        .shoe-stats {
+            display: flex;
+            gap: 10px;
+        }
+
+        .shoe-stat-item {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .dot-p { width: 8px; height: 8px; border-radius: 50%; background: var(--player-blue); }
+        .dot-b { width: 8px; height: 8px; border-radius: 50%; background: var(--banker-red); }
+        .dot-t { width: 8px; height: 8px; border-radius: 50%; background: var(--tie-green); }
+
+        /* Card Hands Area */
+        .hands-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            position: relative;
+        }
+
+        .vs-badge {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            background: #000;
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 900;
+            z-index: 5;
+            box-shadow: 0 0 8px var(--gold-glow);
+        }
+
+        .hand-box {
+            background: rgba(0, 0, 0, 0.35);
+            border-radius: 12px;
+            padding: 8px 6px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            min-height: 120px;
+            transition: all 0.3s;
+        }
+
+        .hand-box.player-box { border-top: 3px solid var(--player-blue); }
+        .hand-box.banker-box { border-top: 3px solid var(--banker-red); }
+
+        .hand-box.winner {
+            box-shadow: 0 0 16px var(--gold);
+            border-color: var(--gold);
+        }
+
+        .hand-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            padding: 0 4px;
+            font-size: 0.85rem;
+            font-weight: 800;
+        }
+
+        .hand-title.player-title { color: #60a5fa; }
+        .hand-title.banker-title { color: #f87171; }
+
+        .score-pill {
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 10px;
+            padding: 2px 8px;
+            font-size: 0.8rem;
+            font-weight: 900;
+            color: #fff;
+            min-width: 24px;
+            text-align: center;
+        }
+
+        .score-pill.natural {
+            background: var(--gold);
+            color: #000;
+            box-shadow: 0 0 8px var(--gold-glow);
+        }
+
+        .cards-row {
+            display: flex;
+            gap: 4px;
+            justify-content: center;
+            align-items: center;
+            min-height: 78px;
+        }
+
+        /* Playing Card */
+        .card {
+            width: 48px;
+            height: 72px;
+            background: #ffffff;
+            border-radius: 6px;
+            border: 1px solid #cbd5e1;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 3px 4px;
+            font-weight: 900;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.4s ease;
+            animation: cardDeal 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes cardDeal {
+            0% { transform: translateY(-20px) scale(0.6); opacity: 0; }
+            100% { transform: translateY(0) scale(1); opacity: 1; }
+        }
+
+        .card.card-3rd {
+            transform: rotate(90deg);
+            margin-left: 6px;
+            animation: cardDeal3rd 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes cardDeal3rd {
+            0% { transform: translateY(-20px) rotate(0deg) scale(0.6); opacity: 0; }
+            100% { transform: rotate(90deg) scale(1); opacity: 1; }
+        }
+
+        .card.red { color: #dc2626; }
+        .card.black { color: #0f172a; }
+
+        .card-top {
+            font-size: 0.85rem;
+            line-height: 1;
+            text-align: left;
+        }
+
+        .card-suit-mid {
+            font-size: 1.1rem;
+            text-align: center;
+            line-height: 1;
+        }
+
+        .card-bot {
+            font-size: 0.85rem;
+            line-height: 1;
+            text-align: right;
+            transform: rotate(180deg);
+        }
+
+        .card-back {
+            background: repeating-linear-gradient(45deg, #1e3a8a, #1e3a8a 5px, #172554 5px, #172554 10px);
+            border: 2px solid #ffffff;
+            border-radius: 6px;
+        }
+
+        /* Result Announcement Banner */
+        .result-banner {
+            background: rgba(0, 0, 0, 0.85);
+            border: 1px solid var(--gold);
+            border-radius: 10px;
+            padding: 8px 12px;
+            text-align: center;
+            font-weight: 800;
+            font-size: 0.95rem;
+            color: var(--gold);
+            min-height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 12px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s;
+        }
+
+        .result-banner.win {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.3), rgba(245, 197, 24, 0.3));
+            border-color: var(--gold);
+            color: #fff;
+            animation: pulseGlow 1.2s infinite alternate;
+        }
+
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 8px var(--gold-glow); }
+            100% { box-shadow: 0 0 20px var(--gold); }
+        }
+
+        /* Betting Grid */
+        .bet-table {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .side-bets-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 6px;
+        }
+
+        .main-bets-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+        }
+
+        .bet-spot {
+            background: rgba(10, 42, 34, 0.8);
+            border: 1.5px solid var(--border-color);
+            border-radius: 10px;
+            padding: 10px 4px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.15s;
+            position: relative;
+            min-height: 64px;
+        }
+
+        .bet-spot:active {
+            transform: scale(0.97);
+        }
+
+        .bet-spot.spot-player {
+            border-color: #3b82f6;
+            background: linear-gradient(180deg, rgba(37, 99, 235, 0.15) 0%, rgba(10, 30, 60, 0.8) 100%);
+        }
+
+        .bet-spot.spot-banker {
+            border-color: #ef4444;
+            background: linear-gradient(180deg, rgba(220, 38, 38, 0.15) 0%, rgba(60, 15, 15, 0.8) 100%);
+        }
+
+        .bet-spot.spot-tie {
+            border-color: #10b981;
+            background: linear-gradient(180deg, rgba(16, 185, 129, 0.15) 0%, rgba(10, 50, 35, 0.8) 100%);
+        }
+
+        .bet-spot.spot-pair-p { border-color: #60a5fa; }
+        .bet-spot.spot-pair-b { border-color: #f87171; }
+        .bet-spot.spot-super6 { border-color: var(--gold); }
+
+        .bet-spot.has-bet {
+            border-width: 2px;
+            box-shadow: inset 0 0 12px rgba(245, 197, 24, 0.3);
+        }
+
+        .bet-spot-title {
+            font-size: 0.85rem;
+            font-weight: 900;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .bet-spot-payout {
+            font-size: 0.7rem;
+            color: var(--text-sub);
+            font-weight: 700;
+        }
+
+        .chip-stack {
+            position: absolute;
+            bottom: 4px;
+            background: var(--gold);
+            color: #000;
+            font-weight: 900;
+            font-size: 0.72rem;
+            padding: 2px 8px;
+            border-radius: 12px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+            border: 1px solid #fff;
+            animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Roadmap Bead Plate */
+        .roadmap-card {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .roadmap-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: #a7f3d0;
+        }
+
+        .bead-plate-wrap {
+            width: 100%;
+            overflow-x: auto;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 8px;
+            padding: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .bead-grid {
+            display: grid;
+            grid-template-rows: repeat(6, 18px);
+            grid-auto-flow: column;
+            grid-auto-columns: 18px;
+            gap: 3px;
+            min-height: 123px;
+        }
+
+        .bead {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.65rem;
+            font-weight: 900;
+            color: #fff;
+            position: relative;
+            box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.4), 0 1px 3px rgba(0, 0, 0, 0.5);
+        }
+
+        .bead.bead-p { background: var(--player-blue); }
+        .bead.bead-b { background: var(--banker-red); }
+        .bead.bead-t { background: var(--tie-green); }
+
+        .bead-pair-p::before {
+            content: '';
+            position: absolute;
+            top: 1px;
+            left: 1px;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: #60a5fa;
+            border: 0.5px solid #fff;
+        }
+
+        .bead-pair-b::after {
+            content: '';
+            position: absolute;
+            bottom: 1px;
+            right: 1px;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: #f87171;
+            border: 0.5px solid #fff;
+        }
+
+        /* Chip Selector Bar */
+        .chip-selector-wrap {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 8px 10px;
+            gap: 6px;
+            overflow-x: auto;
+        }
+
+        .bet-chip {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.72rem;
+            font-weight: 900;
+            color: #fff;
+            cursor: pointer;
+            position: relative;
+            border: 2px dashed rgba(255, 255, 255, 0.6);
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.5);
+            transition: all 0.15s;
+            flex-shrink: 0;
+        }
+
+        .bet-chip:hover { transform: translateY(-2px); }
+        .bet-chip.active {
+            transform: scale(1.12);
+            border: 2px solid var(--gold);
+            box-shadow: 0 0 12px var(--gold);
+        }
+
+        .chip-100 { background: #64748b; }
+        .chip-500 { background: #0284c7; }
+        .chip-1k { background: #16a34a; }
+        .chip-5k { background: #dc2626; }
+        .chip-10k { background: #9333ea; }
+        .chip-50k { background: #ea580c; }
+
+        /* Action Buttons */
+        .action-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 2fr;
+            gap: 6px;
+        }
+
+        .action-btn {
+            padding: 12px 6px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 800;
+            border: 1px solid var(--border-color);
+            background: var(--panel-bg);
+            color: var(--text-main);
+            cursor: pointer;
+            transition: all 0.15s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .action-btn:hover { background: var(--panel-sub); }
+        .action-btn:active { transform: scale(0.97); }
+
+        .deal-btn {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: #000;
+            font-size: 1.05rem;
+            font-weight: 900;
+            border: none;
+            box-shadow: 0 4px 12px rgba(217, 119, 6, 0.4);
+        }
+
+        .deal-btn:hover { background: linear-gradient(135deg, #fbbf24, #f59e0b); }
+        .deal-btn:disabled {
+            background: #334155;
+            color: #64748b;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+
+        /* Modals */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            z-index: 100;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-overlay.active { display: flex; }
+
+        .modal-content {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 440px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.8);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+        }
+
+        .modal-title {
+            font-size: 1.1rem;
+            font-weight: 900;
+            color: var(--gold);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-sub);
+            font-size: 1.4rem;
+            cursor: pointer;
+        }
+
+        .rule-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+            margin-top: 6px;
+        }
+
+        .rule-table th, .rule-table td {
+            border: 1px solid var(--border-color);
+            padding: 6px 8px;
+            text-align: left;
+        }
+
+        .rule-table th {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--gold);
+        }
+
+        /* Ad Reward Banner Box */
+        .ad-banner-box {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px dashed var(--gold);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .progress-bar-wrap {
+            width: 100%;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #f59e0b, #10b981);
+            transition: width 0.2s linear;
+        }
+
+        /* Confetti Canvas */
+        #confettiCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 90;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="confettiCanvas"></canvas>
+
+    <div class="container">
+        <!-- Top Header -->
+        <div class="header">
+            <div class="header-left">
+                <a href="../index.html" class="lobby-btn">🏠 로비</a>
+                <div class="chip-display">
+                    🪙 <span id="chipBalance">10,000</span>
+                </div>
+            </div>
+            <div class="header-right">
+                <button class="ad-btn" id="adBtn">📺 +5,000칩</button>
+                <button class="icon-btn" id="soundToggle" title="음소거 토글">🔊</button>
+                <button class="icon-btn" id="statsBtn" title="전적 통계">📊</button>
+                <button class="icon-btn" id="rulesBtn" title="규칙 및 배당">📜</button>
+            </div>
+        </div>
+
+        <!-- Mode Switcher Tabs -->
+        <div class="mode-tabs">
+            <div class="mode-tab active" id="tabBaccarat">
+                👑 클래식 바카라 (Baccarat)
+            </div>
+            <div class="mode-tab" id="tabDragonTiger">
+                🐉🐯 드래곤 타이거 (Dragon Tiger)
+            </div>
+        </div>
+
+        <!-- Baccarat Felt Table -->
+        <div class="table-felt">
+            <!-- Shoe Stats Bar -->
+            <div class="shoe-bar">
+                <div id="shoeModeTitle">👑 8덱 바카라 슈 (Baccarat Shoe)</div>
+                <div class="shoe-stats">
+                    <div class="shoe-stat-item"><span class="dot-p"></span> <span id="statPCount">0</span></div>
+                    <div class="shoe-stat-item"><span class="dot-b"></span> <span id="statBCount">0</span></div>
+                    <div class="shoe-stat-item"><span class="dot-t"></span> <span id="statTCount">0</span></div>
+                </div>
+            </div>
+
+            <!-- Hands Area -->
+            <div class="hands-container">
+                <div class="vs-badge">VS</div>
+
+                <!-- Player Hand Box -->
+                <div class="hand-box player-box" id="playerHandBox">
+                    <div class="hand-title player-title">
+                        <span id="playerTitleLabel">🔵 PLAYER</span>
+                        <span class="score-pill" id="playerScorePill">0</span>
+                    </div>
+                    <div class="cards-row" id="playerCardsRow">
+                        <!-- Cards dealt dynamically -->
+                    </div>
+                </div>
+
+                <!-- Banker Hand Box -->
+                <div class="hand-box banker-box" id="bankerHandBox">
+                    <div class="hand-title banker-title">
+                        <span id="bankerTitleLabel">🔴 BANKER</span>
+                        <span class="score-pill" id="bankerScorePill">0</span>
+                    </div>
+                    <div class="cards-row" id="bankerCardsRow">
+                        <!-- Cards dealt dynamically -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Result Announcement Banner -->
+            <div class="result-banner" id="resultBanner">
+                원하는 베팅 구역을 터치하여 칩을 올린 후 DEAL을 누르세요!
+            </div>
+
+            <!-- Betting Layout: Baccarat Mode -->
+            <div class="bet-table" id="baccaratBetTable">
+                <div class="side-bets-row">
+                    <div class="bet-spot spot-pair-p" data-bet="p_pair">
+                        <div class="bet-spot-title">🔵 P.PAIR</div>
+                        <div class="bet-spot-payout">11:1 (12X)</div>
+                    </div>
+                    <div class="bet-spot spot-tie" data-bet="tie">
+                        <div class="bet-spot-title">🟢 TIE</div>
+                        <div class="bet-spot-payout">8:1 (9X)</div>
+                    </div>
+                    <div class="bet-spot spot-pair-b" data-bet="b_pair">
+                        <div class="bet-spot-title">🔴 B.PAIR</div>
+                        <div class="bet-spot-payout">11:1 (12X)</div>
+                    </div>
+                </div>
+                <div class="main-bets-row">
+                    <div class="bet-spot spot-player" data-bet="player">
+                        <div class="bet-spot-title" style="font-size: 1.05rem;">🔵 PLAYER</div>
+                        <div class="bet-spot-payout">1:1 (2X)</div>
+                    </div>
+                    <div class="bet-spot spot-banker" data-bet="banker">
+                        <div class="bet-spot-title" style="font-size: 1.05rem;">🔴 BANKER</div>
+                        <div class="bet-spot-payout">1:0.95 (1.95X)</div>
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr;">
+                    <div class="bet-spot spot-super6" data-bet="super6" style="min-height: 42px; padding: 4px;">
+                        <div class="bet-spot-title" style="font-size: 0.8rem; color: var(--gold);">⭐ SUPER 6 (뱅커 6점 승리)</div>
+                        <div class="bet-spot-payout">12:1 (13X)</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Betting Layout: Dragon Tiger Mode (Initially Hidden) -->
+            <div class="bet-table" id="dragonTigerBetTable" style="display: none;">
+                <div class="side-bets-row" style="grid-template-columns: 1fr 1fr;">
+                    <div class="bet-spot spot-tie" data-bet="dt_tie">
+                        <div class="bet-spot-title">🟢 TIE 무승부</div>
+                        <div class="bet-spot-payout">8:1 (9X)</div>
+                    </div>
+                    <div class="bet-spot spot-super6" data-bet="dt_suited_tie">
+                        <div class="bet-spot-title" style="color: var(--gold);">👑 SUITED TIE (동일무늬)</div>
+                        <div class="bet-spot-payout">50:1 (51X 잭팟)</div>
+                    </div>
+                </div>
+                <div class="main-bets-row">
+                    <div class="bet-spot spot-player" data-bet="dragon">
+                        <div class="bet-spot-title" style="font-size: 1.1rem;">🐉 DRAGON (용)</div>
+                        <div class="bet-spot-payout">1:1 (2X)</div>
+                    </div>
+                    <div class="bet-spot spot-banker" data-bet="tiger">
+                        <div class="bet-spot-title" style="font-size: 1.1rem;">🐯 TIGER (호)</div>
+                        <div class="bet-spot-payout">1:1 (2X)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Roadmap Bead Plate Card -->
+        <div class="roadmap-card">
+            <div class="roadmap-header">
+                <span>📊 출목표 비드 플레이트 (Roadmap Bead Plate)</span>
+                <span id="streakBadge" style="color: var(--gold);">최근 30회 기록</span>
+            </div>
+            <div class="bead-plate-wrap">
+                <div class="bead-grid" id="beadGrid">
+                    <!-- Dynamic Beads -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Chip Denomination Bar -->
+        <div class="chip-selector-wrap">
+            <div class="bet-chip chip-100" data-value="100">100</div>
+            <div class="bet-chip chip-500" data-value="500">500</div>
+            <div class="bet-chip chip-1k active" data-value="1000">1K</div>
+            <div class="bet-chip chip-5k" data-value="5000">5K</div>
+            <div class="bet-chip chip-10k" data-value="10000">10K</div>
+            <div class="bet-chip chip-50k" data-value="50000">50K</div>
+        </div>
+
+        <!-- Action Control Buttons -->
+        <div class="action-row">
+            <button class="action-btn" id="clearBtn">취소</button>
+            <button class="action-btn" id="doubleBtn">2X</button>
+            <button class="action-btn" id="rebetBtn">리벳</button>
+            <button class="action-btn deal-btn" id="dealBtn">DEAL 🎲</button>
+        </div>
+    </div>
+
+    <!-- Modals -->
+
+    <!-- Rules Modal -->
+    <div class="modal-overlay" id="rulesModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">📜 바카라 & 드래곤 타이거 규칙</div>
+                <button class="modal-close" id="rulesClose">&times;</button>
+            </div>
+            <div style="font-size: 0.85rem; line-height: 1.5; color: var(--text-sub); display: flex; flex-direction: column; gap: 8px;">
+                <p><strong style="color: #fff;">1. 바카라 (Baccarat) 기본 원리</strong><br>
+                A는 1점, 2~9는 숫자 그대로, 10·J·Q·K는 0점입니다. 카드 합의 마지막 일의 자리가 9에 가장 가까운 쪽이 승리합니다.</p>
+
+                <p><strong style="color: var(--gold);">2. 내추럴 (Natural Win)</strong><br>
+                첫 2장의 합이 8점 또는 9점이면 즉시 내추럴로 경기가 종료되며 양쪽 모두 추가 카드를 받지 않습니다.</p>
+
+                <p><strong style="color: #fff;">3. 3번째 카드 드로우 규칙 (Tableau)</strong><br>
+                • <strong>플레이어</strong>: 첫 2장 합 0~5점 시 3번째 카드 드로우, 6~7점 스탠드.<br>
+                • <strong>뱅커</strong>: 플레이어가 스탠드 시 0~5점 드로우 / 플레이어가 3번째 카드를 받았을 때는 플레이어의 3번째 카드 숫자에 따라 정통 바카라 드로우 룰 적용.</p>
+
+                <table class="rule-table">
+                    <tr><th>베팅 포지션</th><th>승리 배당</th><th>설명</th></tr>
+                    <tr><td>🔵 PLAYER</td><td>1 : 1 (2X)</td><td>플레이어 승리</td></tr>
+                    <tr><td>🔴 BANKER</td><td>1 : 0.95 (1.95X)</td><td>뱅커 승리 (5% 커미션)</td></tr>
+                    <tr><td>🟢 TIE</td><td>8 : 1 (9X)</td><td>무승부 (P/B 베팅 원금 반환)</td></tr>
+                    <tr><td>🔵 P.PAIR</td><td>11 : 1 (12X)</td><td>플레이어 첫 2장 페어</td></tr>
+                    <tr><td>🔴 B.PAIR</td><td>11 : 1 (12X)</td><td>뱅커 첫 2장 페어</td></tr>
+                    <tr><td>⭐ SUPER 6</td><td>12 : 1 (13X)</td><td>뱅커가 6점으로 승리 시</td></tr>
+                </table>
+
+                <p style="margin-top: 6px;"><strong style="color: #fff;">4. 드래곤 타이거 (Dragon Tiger)</strong><br>
+                초고속 1장 승부! K(13) 최고, A(1) 최저. 무승부 시 8배, 같은 무늬 무승부(Suited Tie) 시 <strong>50배 대박 잭팟</strong>!</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Modal -->
+    <div class="modal-overlay" id="statsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">📊 플레이어 통계</div>
+                <button class="modal-close" id="statsClose">&times;</button>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 8px; font-size: 0.85rem;">
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding: 4px 0;">
+                    <span>총 진행 라운드:</span>
+                    <strong id="statTotalRounds">0회</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding: 4px 0;">
+                    <span>승리 라운드:</span>
+                    <strong id="statWins" style="color: #10b981;">0회</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding: 4px 0;">
+                    <span>최대 단일 당첨금:</span>
+                    <strong id="statMaxWin" style="color: var(--gold);">0칩</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding: 4px 0;">
+                    <span>플레이어 승률:</span>
+                    <strong id="statPlayerRate">0%</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding: 4px 0;">
+                    <span>뱅커 승률:</span>
+                    <strong id="statBankerRate">0%</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ad Reward Modal -->
+    <div class="modal-overlay" id="adModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">📺 무료 칩 보상 광고</div>
+                <button class="modal-close" id="adModalClose">&times;</button>
+            </div>
+            <div class="ad-banner-box">
+                <div style="font-size: 2.2rem;">💎</div>
+                <div style="font-weight: 800; font-size: 1.1rem; color: var(--gold);">
+                    VIP 카지노 스폰서 리워드
+                </div>
+                <div style="font-size: 0.8rem; color: var(--text-sub);">
+                    광고 시청 완료 시 5,000칩이 즉시 무료 지급됩니다!
+                </div>
+                <div class="progress-bar-wrap">
+                    <div id="adProgressBar" class="progress-bar"></div>
+                </div>
+                <div id="adCountdownText" style="font-size: 0.75rem; color: var(--text-sub); margin-top: 4px;">5초 후 충전 완료...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* --- Audio Engine (Web Audio API) --- */
+        let audioCtx = null;
+        let soundEnabled = true;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        function playSound(type) {
+            if (!soundEnabled) return;
+            initAudio();
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            const now = audioCtx.currentTime;
+
+            if (type === 'chip') {
+                // Short crisp chip click
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(1400, now);
+                osc.frequency.exponentialRampToValueAtTime(800, now + 0.05);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(now);
+                osc.stop(now + 0.05);
+            } else if (type === 'cardDeal') {
+                // Card slide noise
+                const bufferSize = audioCtx.sampleRate * 0.08;
+                const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+                const data = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) {
+                    data[i] = Math.random() * 2 - 1;
+                }
+                const noise = audioCtx.createBufferSource();
+                noise.buffer = buffer;
+                const filter = audioCtx.createBiquadFilter();
+                filter.type = 'bandpass';
+                filter.frequency.setValueAtTime(2200, now);
+                const gain = audioCtx.createGain();
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+                noise.connect(filter);
+                filter.connect(gain);
+                gain.connect(audioCtx.destination);
+                noise.start(now);
+            } else if (type === 'cardFlip') {
+                // Crisp snap
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(600, now);
+                osc.frequency.exponentialRampToValueAtTime(200, now + 0.06);
+                gain.gain.setValueAtTime(0.4, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.06);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(now);
+                osc.stop(now + 0.06);
+            } else if (type === 'win') {
+                // Major arpeggio
+                const notes = [523.25, 659.25, 783.99, 1046.50];
+                notes.forEach((freq, idx) => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(freq, now + idx * 0.08);
+                    gain.gain.setValueAtTime(0.25, now + idx * 0.08);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + idx * 0.08 + 0.2);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now + idx * 0.08);
+                    osc.stop(now + idx * 0.08 + 0.2);
+                });
+            } else if (type === 'jackpot') {
+                // High fanfare
+                const fanfare = [523.25, 659.25, 783.99, 1046.50, 1318.51, 1567.98];
+                fanfare.forEach((freq, idx) => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(freq, now + idx * 0.07);
+                    gain.gain.setValueAtTime(0.2, now + idx * 0.07);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + idx * 0.07 + 0.3);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now + idx * 0.07);
+                    osc.stop(now + idx * 0.07 + 0.3);
+                });
+            } else if (type === 'lose') {
+                // Low descending tone
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(300, now);
+                osc.frequency.exponentialRampToValueAtTime(140, now + 0.25);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(now);
+                osc.stop(now + 0.25);
+            }
+        }
+
+        /* --- Game State & Data --- */
+        let currentMode = 'baccarat'; // 'baccarat' or 'dragonTiger'
+        let balance = parseInt(localStorage.getItem('baccarat_chips')) || 10000;
+        let selectedChipValue = 1000;
+        let isDealing = false;
+
+        let activeBets = {}; // e.g. { player: 5000, banker: 0, tie: 1000, ... }
+        let lastRoundBets = {};
+
+        let shoe = [];
+        let roadmapHistory = JSON.parse(localStorage.getItem('baccarat_roadmap')) || [];
+        let stats = JSON.parse(localStorage.getItem('baccarat_stats')) || {
+            rounds: 0,
+            wins: 0,
+            maxWin: 0,
+            playerCount: 0,
+            bankerCount: 0,
+            tieCount: 0
+        };
+
+        const SUITS = [
+            { symbol: '♠', name: 'spade', color: 'black' },
+            { symbol: '♥', name: 'heart', color: 'red' },
+            { symbol: '♦', name: 'diamond', color: 'red' },
+            { symbol: '♣', name: 'club', color: 'black' }
+        ];
+
+        const RANKS = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+
+        function buildShoe() {
+            shoe = [];
+            const numDecks = 8;
+            for (let d = 0; d < numDecks; d++) {
+                for (let s of SUITS) {
+                    for (let r of RANKS) {
+                        let baccaratVal = 0;
+                        if (r === 'A') baccaratVal = 1;
+                        else if (['10', 'J', 'Q', 'K'].includes(r)) baccaratVal = 0;
+                        else baccaratVal = parseInt(r);
+
+                        let rankVal = RANKS.indexOf(r) + 1; // 1 for A, 13 for K
+
+                        shoe.push({
+                            rank: r,
+                            suit: s.symbol,
+                            color: s.color,
+                            baccaratVal: baccaratVal,
+                            rankVal: rankVal
+                        });
+                    }
+                }
+            }
+            // Shuffle (Fisher-Yates)
+            for (let i = shoe.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shoe[i], shoe[j]] = [shoe[j], shoe[i]];
+            }
+        }
+
+        function drawCard() {
+            if (shoe.length < 20) {
+                buildShoe();
+            }
+            return shoe.pop();
+        }
+
+        /* --- DOM Elements --- */
+        const chipBalanceEl = document.getElementById('chipBalance');
+        const resultBannerEl = document.getElementById('resultBanner');
+        const dealBtnEl = document.getElementById('dealBtn');
+        const clearBtnEl = document.getElementById('clearBtn');
+        const doubleBtnEl = document.getElementById('doubleBtn');
+        const rebetBtnEl = document.getElementById('rebetBtn');
+
+        const tabBaccaratEl = document.getElementById('tabBaccarat');
+        const tabDragonTigerEl = document.getElementById('tabDragonTiger');
+        const baccaratBetTableEl = document.getElementById('baccaratBetTable');
+        const dragonTigerBetTableEl = document.getElementById('dragonTigerBetTable');
+        const shoeModeTitleEl = document.getElementById('shoeModeTitle');
+        const playerTitleLabelEl = document.getElementById('playerTitleLabel');
+        const bankerTitleLabelEl = document.getElementById('bankerTitleLabel');
+
+        const playerCardsRowEl = document.getElementById('playerCardsRow');
+        const bankerCardsRowEl = document.getElementById('bankerCardsRow');
+        const playerScorePillEl = document.getElementById('playerScorePill');
+        const bankerScorePillEl = document.getElementById('bankerScorePill');
+        const playerHandBoxEl = document.getElementById('playerHandBox');
+        const bankerHandBoxEl = document.getElementById('bankerHandBox');
+
+        const beadGridEl = document.getElementById('beadGrid');
+        const statPCountEl = document.getElementById('statPCount');
+        const statBCountEl = document.getElementById('statBCount');
+        const statTCountEl = document.getElementById('statTCount');
+        const streakBadgeEl = document.getElementById('streakBadge');
+
+        /* --- Initialization & UI Update --- */
+        function init() {
+            buildShoe();
+            updateUI();
+            renderRoadmap();
+            setupEventListeners();
+        }
+
+        function updateUI() {
+            chipBalanceEl.textContent = balance.toLocaleString();
+
+            // Update Bet Spots Chip Displays
+            document.querySelectorAll('.bet-spot').forEach(spot => {
+                const betType = spot.getAttribute('data-bet');
+                const betAmount = activeBets[betType] || 0;
+                let existingStack = spot.querySelector('.chip-stack');
+
+                if (betAmount > 0) {
+                    spot.classList.add('has-bet');
+                    if (!existingStack) {
+                        existingStack = document.createElement('div');
+                        existingStack.className = 'chip-stack';
+                        spot.appendChild(existingStack);
+                    }
+                    existingStack.textContent = formatChipShort(betAmount);
+                } else {
+                    spot.classList.remove('has-bet');
+                    if (existingStack) {
+                        existingStack.remove();
+                    }
+                }
+            });
+
+            // Deal button state
+            const totalBet = getTotalBet();
+            dealBtnEl.disabled = isDealing || totalBet === 0;
+
+            // Stats counts
+            statPCountEl.textContent = stats.playerCount;
+            statBCountEl.textContent = stats.bankerCount;
+            statTCountEl.textContent = stats.tieCount;
+
+            localStorage.setItem('baccarat_chips', balance);
+            localStorage.setItem('baccarat_stats', JSON.stringify(stats));
+            localStorage.setItem('baccarat_roadmap', JSON.stringify(roadmapHistory));
+        }
+
+        function formatChipShort(amount) {
+            if (amount >= 1000000) return (amount / 1000000) + 'M';
+            if (amount >= 1000) return (amount / 1000) + 'K';
+            return amount.toString();
+        }
+
+        function getTotalBet() {
+            return Object.values(activeBets).reduce((acc, v) => acc + (v || 0), 0);
+        }
+
+        /* --- Mode Switcher --- */
+        tabBaccaratEl.addEventListener('click', () => switchMode('baccarat'));
+        tabDragonTigerEl.addEventListener('click', () => switchMode('dragonTiger'));
+
+        function switchMode(mode) {
+            if (isDealing) return;
+            currentMode = mode;
+            clearBets();
+
+            if (mode === 'baccarat') {
+                tabBaccaratEl.classList.add('active');
+                tabDragonTigerEl.classList.remove('active');
+                baccaratBetTableEl.style.display = 'flex';
+                dragonTigerBetTableEl.style.display = 'none';
+                shoeModeTitleEl.textContent = '👑 8덱 바카라 슈 (Baccarat Shoe)';
+                playerTitleLabelEl.textContent = '🔵 PLAYER';
+                bankerTitleLabelEl.textContent = '🔴 BANKER';
+                resultBannerEl.textContent = '바카라 테이블에 오신 것을 환영합니다! 베팅 후 DEAL을 누르세요.';
+            } else {
+                tabDragonTigerEl.classList.add('active');
+                tabBaccaratEl.classList.remove('active');
+                baccaratBetTableEl.style.display = 'none';
+                dragonTigerBetTableEl.style.display = 'flex';
+                shoeModeTitleEl.textContent = '🐉🐯 드래곤 타이거 슈 (Dragon Tiger)';
+                playerTitleLabelEl.textContent = '🐉 DRAGON';
+                bankerTitleLabelEl.textContent = '🐯 TIGER';
+                resultBannerEl.textContent = '초고속 1장 대결! 드래곤 vs 타이거에 베팅하세요.';
+            }
+            clearCardsDisplay();
+        }
+
+        /* --- Chip Selector & Betting Controls --- */
+        document.querySelectorAll('.bet-chip').forEach(chip => {
+            chip.addEventListener('click', () => {
+                document.querySelectorAll('.bet-chip').forEach(c => c.classList.remove('active'));
+                chip.classList.add('active');
+                selectedChipValue = parseInt(chip.getAttribute('data-value'));
+                playSound('chip');
+            });
+        });
+
+        document.querySelectorAll('.bet-spot').forEach(spot => {
+            spot.addEventListener('click', () => {
+                if (isDealing) return;
+                const betType = spot.getAttribute('data-bet');
+
+                if (balance < selectedChipValue) {
+                    alert('칩 잔액이 부족합니다! 상단의 무료 충전을 이용해 보세요.');
+                    return;
+                }
+
+                balance -= selectedChipValue;
+                activeBets[betType] = (activeBets[betType] || 0) + selectedChipValue;
+                playSound('chip');
+                updateUI();
+            });
+        });
+
+        clearBtnEl.addEventListener('click', () => {
+            if (isDealing) return;
+            clearBets();
+        });
+
+        function clearBets() {
+            const refunded = getTotalBet();
+            balance += refunded;
+            activeBets = {};
+            updateUI();
+            playSound('chip');
+        }
+
+        doubleBtnEl.addEventListener('click', () => {
+            if (isDealing) return;
+            const currentTotal = getTotalBet();
+            if (currentTotal === 0) return;
+
+            if (balance < currentTotal) {
+                alert('베팅을 2배로 늘리기 위한 칩이 부족합니다!');
+                return;
+            }
+
+            balance -= currentTotal;
+            for (let k in activeBets) {
+                activeBets[k] = (activeBets[k] || 0) * 2;
+            }
+            playSound('chip');
+            updateUI();
+        });
+
+        rebetBtnEl.addEventListener('click', () => {
+            if (isDealing) return;
+            const rebetTotal = Object.values(lastRoundBets).reduce((acc, v) => acc + (v || 0), 0);
+            if (rebetTotal === 0) {
+                alert('이전 라운드 베팅 내역이 없습니다.');
+                return;
+            }
+
+            if (balance < rebetTotal) {
+                alert('리벳을 진행할 칩이 부족합니다!');
+                return;
+            }
+
+            clearBets();
+            balance -= rebetTotal;
+            activeBets = { ...lastRoundBets };
+            playSound('chip');
+            updateUI();
+        });
+
+        /* --- Card Element Creator --- */
+        function createCardElement(card, is3rd = false) {
+            const cardEl = document.createElement('div');
+            cardEl.className = `card ${card.color} ${is3rd ? 'card-3rd' : ''}`;
+
+            cardEl.innerHTML = `
+                <div class="card-top">${card.rank}</div>
+                <div class="card-suit-mid">${card.suit}</div>
+                <div class="card-bot">${card.rank}</div>
+            `;
+            return cardEl;
+        }
+
+        function clearCardsDisplay() {
+            playerCardsRowEl.innerHTML = '';
+            bankerCardsRowEl.innerHTML = '';
+            playerScorePillEl.textContent = '0';
+            bankerScorePillEl.textContent = '0';
+            playerScorePillEl.classList.remove('natural');
+            bankerScorePillEl.classList.remove('natural');
+            playerHandBoxEl.classList.remove('winner');
+            bankerHandBoxEl.classList.remove('winner');
+        }
+
+        /* --- Deal & Game Flow --- */
+        dealBtnEl.addEventListener('click', () => {
+            if (isDealing || getTotalBet() === 0) return;
+            lastRoundBets = { ...activeBets };
+
+            if (currentMode === 'baccarat') {
+                runBaccaratRound();
+            } else {
+                runDragonTigerRound();
+            }
+        });
+
+        /* --- Mode 1: Classic Baccarat Round --- */
+        async function runBaccaratRound() {
+            isDealing = true;
+            updateUI();
+            clearCardsDisplay();
+            resultBannerEl.textContent = '카드를 딜링하고 있습니다...';
+
+            const pCards = [drawCard(), drawCard()];
+            const bCards = [drawCard(), drawCard()];
+
+            // 1st Card: Player
+            await sleep(350);
+            playerCardsRowEl.appendChild(createCardElement(pCards[0]));
+            playSound('cardDeal');
+            let pScore = pCards[0].baccaratVal;
+            playerScorePillEl.textContent = pScore;
+
+            // 2nd Card: Banker
+            await sleep(350);
+            bankerCardsRowEl.appendChild(createCardElement(bCards[0]));
+            playSound('cardDeal');
+            let bScore = bCards[0].baccaratVal;
+            bankerScorePillEl.textContent = bScore;
+
+            // 3rd Card: Player
+            await sleep(350);
+            playerCardsRowEl.appendChild(createCardElement(pCards[1]));
+            playSound('cardDeal');
+            pScore = (pCards[0].baccaratVal + pCards[1].baccaratVal) % 10;
+            playerScorePillEl.textContent = pScore;
+
+            // 4th Card: Banker
+            await sleep(350);
+            bankerCardsRowEl.appendChild(createCardElement(bCards[1]));
+            playSound('cardDeal');
+            bScore = (bCards[0].baccaratVal + bCards[1].baccaratVal) % 10;
+            bankerScorePillEl.textContent = bScore;
+
+            // Check Natural 8 or 9
+            const isPNatural = (pScore === 8 || pScore === 9);
+            const isBNatural = (bScore === 8 || bScore === 9);
+
+            if (isPNatural) playerScorePillEl.classList.add('natural');
+            if (isBNatural) bankerScorePillEl.classList.add('natural');
+
+            let p3rdCard = null;
+            let b3rdCard = null;
+
+            if (isPNatural || isBNatural) {
+                // Natural Win: Stand immediately!
+                await sleep(500);
+            } else {
+                // Player Drawing Rules
+                let playerDraws = false;
+                if (pScore <= 5) {
+                    playerDraws = true;
+                    await sleep(600);
+                    p3rdCard = drawCard();
+                    pCards.push(p3rdCard);
+                    playerCardsRowEl.appendChild(createCardElement(p3rdCard, true));
+                    playSound('cardFlip');
+                    pScore = (pScore + p3rdCard.baccaratVal) % 10;
+                    playerScorePillEl.textContent = pScore;
+                }
+
+                // Banker Drawing Rules (Tableau)
+                let bankerDraws = false;
+                if (!playerDraws) {
+                    // Player stood on 6 or 7
+                    if (bScore <= 5) bankerDraws = true;
+                } else {
+                    // Player drew a 3rd card
+                    const p3Val = p3rdCard.baccaratVal;
+                    if (bScore <= 2) {
+                        bankerDraws = true;
+                    } else if (bScore === 3 && p3Val !== 8) {
+                        bankerDraws = true;
+                    } else if (bScore === 4 && (p3Val >= 2 && p3Val <= 7)) {
+                        bankerDraws = true;
+                    } else if (bScore === 5 && (p3Val >= 4 && p3Val <= 7)) {
+                        bankerDraws = true;
+                    } else if (bScore === 6 && (p3Val === 6 || p3Val === 7)) {
+                        bankerDraws = true;
+                    }
+                }
+
+                if (bankerDraws) {
+                    await sleep(600);
+                    b3rdCard = drawCard();
+                    bCards.push(b3rdCard);
+                    bankerCardsRowEl.appendChild(createCardElement(b3rdCard, true));
+                    playSound('cardFlip');
+                    bScore = (bScore + b3rdCard.baccaratVal) % 10;
+                    bankerScorePillEl.textContent = bScore;
+                }
+            }
+
+            await sleep(400);
+
+            // Determine Winner
+            let winner = 'tie';
+            if (pScore > bScore) winner = 'player';
+            else if (bScore > pScore) winner = 'banker';
+
+            // Check Pairs
+            const isPPair = (pCards[0].rank === pCards[1].rank);
+            const isBPair = (bCards[0].rank === bCards[1].rank);
+            const isSuper6 = (winner === 'banker' && bScore === 6);
+
+            // Highlight Winner
+            if (winner === 'player') playerHandBoxEl.classList.add('winner');
+            else if (winner === 'banker') bankerHandBoxEl.classList.add('winner');
+
+            // Calculate Payouts
+            let totalPayout = 0;
+            let winDetails = [];
+
+            if (winner === 'player') {
+                if (activeBets.player) {
+                    const pay = activeBets.player * 2.0;
+                    totalPayout += pay;
+                    winDetails.push(`플레이어 승리 (+${pay.toLocaleString()}칩)`);
+                }
+            } else if (winner === 'banker') {
+                if (activeBets.banker) {
+                    const pay = activeBets.banker * 1.95; // 5% commission
+                    totalPayout += pay;
+                    winDetails.push(`뱅커 승리 (+${pay.toLocaleString()}칩)`);
+                }
+            } else if (winner === 'tie') {
+                // Tie pushes Player and Banker bets!
+                if (activeBets.player) {
+                    totalPayout += activeBets.player;
+                    winDetails.push(`플레이어 베팅 원금 반환 (+${activeBets.player.toLocaleString()}칩)`);
+                }
+                if (activeBets.banker) {
+                    totalPayout += activeBets.banker;
+                    winDetails.push(`뱅커 베팅 원금 반환 (+${activeBets.banker.toLocaleString()}칩)`);
+                }
+                if (activeBets.tie) {
+                    const pay = activeBets.tie * 9.0; // 8:1 payout
+                    totalPayout += pay;
+                    winDetails.push(`🟢 타이 8배 적중! (+${pay.toLocaleString()}칩)`);
+                }
+            }
+
+            // Side Bets
+            if (isPPair && activeBets.p_pair) {
+                const pay = activeBets.p_pair * 12.0; // 11:1 payout
+                totalPayout += pay;
+                winDetails.push(`🔵 플레이어 페어 11배 적중! (+${pay.toLocaleString()}칩)`);
+            }
+            if (isBPair && activeBets.b_pair) {
+                const pay = activeBets.b_pair * 12.0; // 11:1 payout
+                totalPayout += pay;
+                winDetails.push(`🔴 뱅커 페어 11배 적중! (+${pay.toLocaleString()}칩)`);
+            }
+            if (isSuper6 && activeBets.super6) {
+                const pay = activeBets.super6 * 13.0; // 12:1 payout
+                totalPayout += pay;
+                winDetails.push(`⭐ 슈퍼 6 12배 대박 적중! (+${pay.toLocaleString()}칩)`);
+            }
+
+            balance += Math.floor(totalPayout);
+
+            // Update Stats & History
+            stats.rounds++;
+            if (totalPayout > 0) stats.wins++;
+            if (totalPayout > stats.maxWin) stats.maxWin = Math.floor(totalPayout);
+
+            if (winner === 'player') stats.playerCount++;
+            else if (winner === 'banker') stats.bankerCount++;
+            else stats.tieCount++;
+
+            roadmapHistory.push({
+                mode: 'baccarat',
+                winner: winner,
+                pScore: pScore,
+                bScore: bScore,
+                pPair: isPPair,
+                bPair: isBPair
+            });
+
+            if (roadmapHistory.length > 120) roadmapHistory.shift();
+
+            renderRoadmap();
+
+            // Display Results
+            let resultText = '';
+            if (winner === 'player') {
+                resultText = `🔵 플레이어 승리! (${pScore} vs ${bScore})`;
+            } else if (winner === 'banker') {
+                resultText = `🔴 뱅커 승리! (${bScore} vs ${pScore})`;
+            } else {
+                resultText = `🟢 타이 무승부! (${pScore} vs ${bScore})`;
+            }
+
+            if (isSuper6) resultText += ' · ⭐ 슈퍼 6 발동!';
+
+            resultBannerEl.textContent = resultText;
+            if (totalPayout > 0) {
+                resultBannerEl.classList.add('win');
+                if (isSuper6 || isPPair || isBPair || totalPayout >= 20000) {
+                    playSound('jackpot');
+                    fireConfetti();
+                } else {
+                    playSound('win');
+                }
+            } else {
+                resultBannerEl.classList.remove('win');
+                playSound('lose');
+            }
+
+            // Check Bankruptcy Rescue
+            checkRescueGrant();
+
+            activeBets = {};
+            isDealing = false;
+            updateUI();
+        }
+
+        /* --- Mode 2: Dragon Tiger Round --- */
+        async function runDragonTigerRound() {
+            isDealing = true;
+            updateUI();
+            clearCardsDisplay();
+            resultBannerEl.textContent = '용호 결투! 카드를 오픈합니다...';
+
+            const dCard = drawCard();
+            const tCard = drawCard();
+
+            // Dragon Card
+            await sleep(400);
+            playerCardsRowEl.appendChild(createCardElement(dCard));
+            playSound('cardDeal');
+            playerScorePillEl.textContent = `${dCard.rank} (${dCard.rankVal})`;
+
+            // Tiger Card
+            await sleep(400);
+            bankerCardsRowEl.appendChild(createCardElement(tCard));
+            playSound('cardDeal');
+            bankerScorePillEl.textContent = `${tCard.rank} (${tCard.rankVal})`;
+
+            await sleep(400);
+
+            // Compare: K high (13), A low (1)
+            let winner = 'tie';
+            if (dCard.rankVal > tCard.rankVal) winner = 'dragon';
+            else if (tCard.rankVal > dCard.rankVal) winner = 'tiger';
+
+            const isSuitedTie = (winner === 'tie' && dCard.suit === tCard.suit);
+
+            if (winner === 'dragon') playerHandBoxEl.classList.add('winner');
+            else if (winner === 'tiger') bankerHandBoxEl.classList.add('winner');
+
+            let totalPayout = 0;
+            let winDetails = [];
+
+            if (winner === 'dragon') {
+                if (activeBets.dragon) {
+                    const pay = activeBets.dragon * 2.0;
+                    totalPayout += pay;
+                    winDetails.push(`🐉 드래곤 승리 (+${pay.toLocaleString()}칩)`);
+                }
+            } else if (winner === 'tiger') {
+                if (activeBets.tiger) {
+                    const pay = activeBets.tiger * 2.0;
+                    totalPayout += pay;
+                    winDetails.push(`🐯 타이거 승리 (+${pay.toLocaleString()}칩)`);
+                }
+            } else if (winner === 'tie') {
+                // In Dragon Tiger, regular tie pushes 50% of main bets in casino rules, or here full push for player dopamine!
+                if (activeBets.dragon) totalPayout += activeBets.dragon;
+                if (activeBets.tiger) totalPayout += activeBets.tiger;
+
+                if (activeBets.dt_tie) {
+                    const pay = activeBets.dt_tie * 9.0; // 8:1 payout
+                    totalPayout += pay;
+                    winDetails.push(`🟢 타이 무승부 적중 (+${pay.toLocaleString()}칩)`);
+                }
+                if (isSuitedTie && activeBets.dt_suited_tie) {
+                    const pay = activeBets.dt_suited_tie * 51.0; // 50:1 jackpot!
+                    totalPayout += pay;
+                    winDetails.push(`👑 수티드 타이 50배 대박 잭팟! (+${pay.toLocaleString()}칩)`);
+                }
+            }
+
+            balance += Math.floor(totalPayout);
+
+            stats.rounds++;
+            if (totalPayout > 0) stats.wins++;
+            if (totalPayout > stats.maxWin) stats.maxWin = Math.floor(totalPayout);
+
+            if (winner === 'dragon') stats.playerCount++;
+            else if (winner === 'tiger') stats.bankerCount++;
+            else stats.tieCount++;
+
+            roadmapHistory.push({
+                mode: 'dragontiger',
+                winner: winner === 'dragon' ? 'player' : (winner === 'tiger' ? 'banker' : 'tie'),
+                pScore: dCard.rankVal,
+                bScore: tCard.rankVal,
+                pPair: false,
+                bPair: false
+            });
+
+            if (roadmapHistory.length > 120) roadmapHistory.shift();
+            renderRoadmap();
+
+            let resultText = '';
+            if (winner === 'dragon') {
+                resultText = `🐉 드래곤 승리! (${dCard.rank} vs ${tCard.rank})`;
+            } else if (winner === 'tiger') {
+                resultText = `🐯 타이거 승리! (${tCard.rank} vs ${dCard.rank})`;
+            } else {
+                resultText = isSuitedTie ? `👑 수티드 타이 50배 잭팟! (${dCard.rank}${dCard.suit})` : `🟢 타이 무승부! (${dCard.rank})`;
+            }
+
+            resultBannerEl.textContent = resultText;
+            if (totalPayout > 0) {
+                resultBannerEl.classList.add('win');
+                if (isSuitedTie || totalPayout >= 20000) {
+                    playSound('jackpot');
+                    fireConfetti();
+                } else {
+                    playSound('win');
+                }
+            } else {
+                resultBannerEl.classList.remove('win');
+                playSound('lose');
+            }
+
+            checkRescueGrant();
+
+            activeBets = {};
+            isDealing = false;
+            updateUI();
+        }
+
+        /* --- Bankruptcy Emergency Rescue --- */
+        function checkRescueGrant() {
+            if (balance <= 0 && getTotalBet() === 0) {
+                setTimeout(() => {
+                    balance += 2000;
+                    playSound('win');
+                    alert('🚨 파산 구호금 지급!\n카지노 긴급 구호 칩 +2,000칩이 지급되었습니다. 다시 승리의 길을 걸어보세요!');
+                    updateUI();
+                }, 800);
+            }
+        }
+
+        /* --- Roadmap Bead Plate Renderer --- */
+        function renderRoadmap() {
+            beadGridEl.innerHTML = '';
+            const recent = roadmapHistory.slice(-48); // Show up to 48 beads
+
+            let currentStreak = 0;
+            let lastWinner = null;
+
+            recent.forEach(item => {
+                const bead = document.createElement('div');
+                let char = 'P';
+                let cls = 'bead-p';
+
+                if (item.winner === 'banker') {
+                    char = 'B';
+                    cls = 'bead-b';
+                } else if (item.winner === 'tie') {
+                    char = 'T';
+                    cls = 'bead-t';
+                }
+
+                bead.className = `bead ${cls} ${item.pPair ? 'bead-pair-p' : ''} ${item.bPair ? 'bead-pair-b' : ''}`;
+                bead.textContent = char;
+                beadGridEl.appendChild(bead);
+
+                if (item.winner === lastWinner && item.winner !== 'tie') {
+                    currentStreak++;
+                } else if (item.winner !== 'tie') {
+                    lastWinner = item.winner;
+                    currentStreak = 1;
+                }
+            });
+
+            if (currentStreak >= 3 && lastWinner) {
+                const name = lastWinner === 'player' ? '플레이어' : '뱅커';
+                streakBadgeEl.textContent = `🔥 ${name} ${currentStreak}연승 질주 중!`;
+            } else {
+                streakBadgeEl.textContent = `최근 ${recent.length}회 기록`;
+            }
+
+            // Scroll roadmap to the right
+            const wrap = document.querySelector('.bead-plate-wrap');
+            wrap.scrollLeft = wrap.scrollWidth;
+        }
+
+        /* --- Helper: Sleep --- */
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        /* --- Modals & Event Listeners --- */
+        function setupEventListeners() {
+            // Rules
+            const rulesModal = document.getElementById('rulesModal');
+            document.getElementById('rulesBtn').addEventListener('click', () => rulesModal.classList.add('active'));
+            document.getElementById('rulesClose').addEventListener('click', () => rulesModal.classList.remove('active'));
+
+            // Stats
+            const statsModal = document.getElementById('statsModal');
+            document.getElementById('statsBtn').addEventListener('click', () => {
+                document.getElementById('statTotalRounds').textContent = `${stats.rounds}회`;
+                document.getElementById('statWins').textContent = `${stats.wins}회`;
+                document.getElementById('statMaxWin').textContent = `${stats.maxWin.toLocaleString()}칩`;
+
+                const totalJudged = stats.playerCount + stats.bankerCount + stats.tieCount;
+                const pRate = totalJudged > 0 ? ((stats.playerCount / totalJudged) * 100).toFixed(1) : 0;
+                const bRate = totalJudged > 0 ? ((stats.bankerCount / totalJudged) * 100).toFixed(1) : 0;
+
+                document.getElementById('statPlayerRate').textContent = `${pRate}%`;
+                document.getElementById('statBankerRate').textContent = `${bRate}%`;
+                statsModal.classList.add('active');
+            });
+            document.getElementById('statsClose').addEventListener('click', () => statsModal.classList.remove('active'));
+
+            // Sound Toggle
+            const soundToggleBtn = document.getElementById('soundToggle');
+            soundToggleBtn.addEventListener('click', () => {
+                soundEnabled = !soundEnabled;
+                soundToggleBtn.textContent = soundEnabled ? '🔊' : '🔇';
+            });
+
+            // Ad Reward Modal
+            const adModal = document.getElementById('adModal');
+            const adProgressBar = document.getElementById('adProgressBar');
+            const adCountdownText = document.getElementById('adCountdownText');
+
+            document.getElementById('adBtn').addEventListener('click', () => {
+                adModal.classList.add('active');
+                adProgressBar.style.width = '0%';
+                adCountdownText.textContent = '5초 후 충전 완료...';
+
+                let count = 5;
+                const timer = setInterval(() => {
+                    count--;
+                    const progressPct = ((5 - count) / 5) * 100;
+                    adProgressBar.style.width = `${progressPct}%`;
+                    adCountdownText.textContent = `${count}초 후 충전 완료...`;
+
+                    if (count <= 0) {
+                        clearInterval(timer);
+                        balance += 5000;
+                        updateUI();
+                        playSound('win');
+                        setTimeout(() => {
+                            adModal.classList.remove('active');
+                            alert('보상 광고 시청 완료! 5,000칩이 무료 충전되었습니다. 💎');
+                        }, 300);
+                    }
+                }, 1000);
+            });
+
+            document.getElementById('adModalClose').addEventListener('click', () => {
+                adModal.classList.remove('active');
+            });
+        }
+
+        /* --- Confetti Generator --- */
+        function fireConfetti() {
+            const canvas = document.getElementById('confettiCanvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            const particles = [];
+            const colors = ['#f5c518', '#ef4444', '#10b981', '#3b82f6', '#bc8cff', '#ffffff'];
+
+            for (let i = 0; i < 90; i++) {
+                particles.push({
+                    x: canvas.width / 2,
+                    y: canvas.height / 2,
+                    vx: (Math.random() - 0.5) * 14,
+                    vy: (Math.random() - 0.7) * 14,
+                    size: Math.random() * 8 + 4,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    rot: Math.random() * 360,
+                    vRot: (Math.random() - 0.5) * 10,
+                    life: 1
+                });
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                let alive = false;
+
+                particles.forEach(p => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vy += 0.25; // gravity
+                    p.rot += p.vRot;
+                    p.life -= 0.012;
+
+                    if (p.life > 0) {
+                        alive = true;
+                        ctx.save();
+                        ctx.globalAlpha = p.life;
+                        ctx.translate(p.x, p.y);
+                        ctx.rotate((p.rot * Math.PI) / 180);
+                        ctx.fillStyle = p.color;
+                        ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+                        ctx.restore();
+                    }
+                });
+
+                if (alive) {
+                    requestAnimationFrame(animate);
+                } else {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                }
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        // Run
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
