@@ -1,0 +1,1473 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>⚡ 카지노 하이로우 배당 레이스 - Casino Hi-Lo</title>
+    <style>
+        :root {
+            --bg-color: #070f1a;
+            --panel-bg: #0d1a2d;
+            --panel-sub: #13243e;
+            --card-felt: #0a1f33;
+            --gold: #f5c518;
+            --gold-glow: rgba(245, 197, 24, 0.45);
+            --high-green: #10b981;
+            --high-glow: rgba(16, 185, 129, 0.4);
+            --low-blue: #3b82f6;
+            --low-glow: rgba(59, 130, 246, 0.4);
+            --same-purple: #a855f7;
+            --same-glow: rgba(168, 85, 247, 0.4);
+            --danger-red: #ef4444;
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+            --border-color: #1e3556;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px 8px 30px 8px;
+            overflow-x: hidden;
+            background-image: radial-gradient(circle at 50% 0%, #152d4e 0%, #070f1a 80%);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 520px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        /* Top Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 8px 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .header-left, .header-right {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .lobby-btn {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 6px 10px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.2s;
+        }
+        .lobby-btn:hover { background: rgba(255, 255, 255, 0.15); }
+
+        .chip-display {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--gold);
+            border-radius: 20px;
+            padding: 4px 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 800;
+            font-size: 0.95rem;
+            color: var(--gold);
+            box-shadow: 0 0 10px var(--gold-glow);
+        }
+
+        .icon-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            border-radius: 8px;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        .icon-btn:hover { background: rgba(255, 255, 255, 0.16); }
+
+        /* Game Arena (Felt) */
+        .game-felt {
+            background: radial-gradient(circle at 50% 40%, #0d2847 0%, #061527 100%);
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            padding: 14px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            position: relative;
+            box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.6), 0 8px 24px rgba(0, 0, 0, 0.4);
+            overflow: hidden;
+        }
+
+        /* Status & Multiplier Banner */
+        .multiplier-bar {
+            background: rgba(0, 0, 0, 0.45);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 10px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .mult-badge-box {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .mult-label {
+            font-size: 0.72rem;
+            color: var(--text-sub);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        .mult-value {
+            font-size: 1.55rem;
+            font-weight: 900;
+            color: var(--gold);
+            text-shadow: 0 0 12px var(--gold-glow);
+            letter-spacing: -0.5px;
+        }
+
+        .cashout-box {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 2px;
+        }
+        .cashout-label {
+            font-size: 0.72rem;
+            color: var(--text-sub);
+            font-weight: 600;
+        }
+        .cashout-amount {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: #4ade80;
+            text-shadow: 0 0 8px rgba(74, 222, 128, 0.4);
+        }
+
+        /* Card Road History Rail */
+        .history-rail {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 8px;
+            background: rgba(0, 0, 0, 0.35);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            overflow-x: auto;
+            min-height: 48px;
+            scrollbar-width: thin;
+        }
+        .history-rail::-webkit-scrollbar { height: 4px; }
+        .history-rail::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
+
+        .rail-item {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            padding: 3px 6px;
+            border-radius: 6px;
+            font-size: 0.78rem;
+            font-weight: 800;
+            background: #1e293b;
+            border: 1px solid #334155;
+            flex-shrink: 0;
+            animation: slideIn 0.25s ease-out;
+        }
+        .rail-item.win { border-color: var(--high-green); color: #86efac; }
+        .rail-item.lose { border-color: var(--danger-red); color: #fca5a5; opacity: 0.8; }
+        .rail-item.skip { border-color: #64748b; color: #94a3b8; }
+        .rail-item.red { color: #f87171; }
+        .rail-item.black { color: #e2e8f0; }
+
+        @keyframes slideIn {
+            from { transform: translateX(15px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Main 3D Card Stage */
+        .card-stage {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 16px;
+            padding: 10px 0;
+            perspective: 900px;
+        }
+
+        .card-wrapper {
+            position: relative;
+            width: 110px;
+            height: 158px;
+        }
+
+        .card-slot {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+        }
+
+        .card-slot.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 8px 10px;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.25);
+        }
+
+        .card-front {
+            background: linear-gradient(145deg, #ffffff 0%, #f1f5f9 100%);
+            border: 2px solid #cbd5e1;
+            color: #0f172a;
+        }
+        .card-front.red { color: #dc2626; border-color: #fca5a5; }
+        .card-front.black { color: #0f172a; border-color: #cbd5e1; }
+
+        .card-back {
+            background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);
+            border: 2px solid #3b82f6;
+            transform: rotateY(180deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card-back-pattern {
+            width: 90%;
+            height: 92%;
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.2rem;
+            color: #60a5fa;
+            text-shadow: 0 0 10px rgba(96, 165, 250, 0.5);
+        }
+
+        .card-corner-top, .card-corner-bottom {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            line-height: 1;
+            font-weight: 900;
+            font-size: 1.15rem;
+        }
+        .card-corner-bottom { transform: rotate(180deg); }
+        .card-center-suit {
+            font-size: 2.5rem;
+            text-align: center;
+            line-height: 1;
+            margin-top: -4px;
+        }
+
+        /* Streak & Rank Guide */
+        .card-info-badge {
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--text-sub);
+            font-weight: 700;
+        }
+        .card-info-badge span { color: var(--gold); }
+
+        .streak-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(245, 197, 24, 0.15);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.78rem;
+            font-weight: 800;
+            margin-top: 4px;
+        }
+
+        /* Action Betting Choices Grid (Hi / Lo / Same) */
+        .action-choices-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .choice-btn {
+            background: var(--panel-sub);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 12px 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: var(--text-main);
+            cursor: pointer;
+            transition: all 0.15s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .choice-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+        }
+        .choice-btn:active:not(:disabled) {
+            transform: scale(0.97);
+        }
+        .choice-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            border-color: #334155 !important;
+            box-shadow: none !important;
+        }
+
+        .choice-btn.high {
+            border-color: rgba(16, 185, 129, 0.5);
+            background: linear-gradient(180deg, rgba(16, 185, 129, 0.12) 0%, rgba(13, 26, 45, 0.8) 100%);
+        }
+        .choice-btn.high:hover:not(:disabled) {
+            border-color: var(--high-green);
+            box-shadow: 0 0 16px var(--high-glow);
+        }
+
+        .choice-btn.low {
+            border-color: rgba(59, 130, 246, 0.5);
+            background: linear-gradient(180deg, rgba(59, 130, 246, 0.12) 0%, rgba(13, 26, 45, 0.8) 100%);
+        }
+        .choice-btn.low:hover:not(:disabled) {
+            border-color: var(--low-blue);
+            box-shadow: 0 0 16px var(--low-glow);
+        }
+
+        .choice-title {
+            font-size: 1.05rem;
+            font-weight: 900;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .choice-mult {
+            font-size: 1.35rem;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+        }
+        .choice-btn.high .choice-mult { color: #34d399; }
+        .choice-btn.low .choice-mult { color: #60a5fa; }
+
+        .choice-prob {
+            font-size: 0.72rem;
+            color: var(--text-sub);
+            font-weight: 600;
+        }
+
+        /* Same Rank Button (Span 2) */
+        .same-btn-wrap {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .choice-btn.same {
+            border-color: rgba(168, 85, 247, 0.5);
+            background: linear-gradient(180deg, rgba(168, 85, 247, 0.12) 0%, rgba(13, 26, 45, 0.8) 100%);
+            padding: 8px 6px;
+        }
+        .choice-btn.same:hover:not(:disabled) {
+            border-color: var(--same-purple);
+            box-shadow: 0 0 16px var(--same-glow);
+        }
+        .choice-btn.same .choice-mult { color: #c084fc; font-size: 1.15rem; }
+
+        .choice-btn.skip-btn {
+            border-color: rgba(148, 163, 184, 0.4);
+            background: rgba(255, 255, 255, 0.04);
+            padding: 8px 6px;
+        }
+        .choice-btn.skip-btn:hover:not(:disabled) {
+            border-color: var(--text-main);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        /* Big Cash Out Button */
+        .cashout-btn {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: #0f172a;
+            border: 2px solid #fbbf24;
+            border-radius: 12px;
+            padding: 14px 16px;
+            font-size: 1.15rem;
+            font-weight: 900;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 18px rgba(245, 158, 11, 0.4);
+            transition: all 0.2s;
+        }
+        .cashout-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(245, 158, 11, 0.6);
+        }
+        .cashout-btn:active:not(:disabled) {
+            transform: scale(0.98);
+        }
+        .cashout-btn:disabled {
+            background: #334155;
+            border-color: #475569;
+            color: #94a3b8;
+            box-shadow: none;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        /* Controls Panel (Betting) */
+        .control-panel {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .bet-info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.88rem;
+        }
+
+        .quick-chips-row {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 6px;
+        }
+
+        .chip-btn {
+            background: var(--panel-sub);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            border-radius: 8px;
+            padding: 8px 0;
+            font-size: 0.78rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .chip-btn:hover { background: rgba(255, 255, 255, 0.1); border-color: var(--gold); }
+        .chip-btn:active { transform: scale(0.95); }
+
+        .start-btn {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: #ffffff;
+            border: 1px solid #34d399;
+            border-radius: 12px;
+            padding: 14px 0;
+            font-size: 1.15rem;
+            font-weight: 900;
+            cursor: pointer;
+            box-shadow: 0 4px 16px rgba(16, 185, 129, 0.4);
+            transition: all 0.2s;
+        }
+        .start-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 22px rgba(16, 185, 129, 0.6);
+        }
+        .start-btn:disabled {
+            background: #334155;
+            border-color: #475569;
+            color: #94a3b8;
+            cursor: not-allowed;
+            opacity: 0.6;
+            box-shadow: none;
+        }
+
+        /* Status Banner */
+        .status-banner {
+            text-align: center;
+            padding: 8px 12px;
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.35);
+            font-size: 0.86rem;
+            font-weight: 700;
+            color: var(--text-main);
+            min-height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Statistics Strip */
+        .stats-strip {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 8px 6px;
+            text-align: center;
+        }
+
+        .stats-item {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            font-size: 0.7rem;
+            color: var(--text-sub);
+        }
+        .stats-item strong {
+            font-size: 0.85rem;
+            color: var(--text-main);
+        }
+
+        /* Modals */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(4px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 16px;
+        }
+        .modal-overlay.active { display: flex; }
+
+        .modal-content {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 440px;
+            padding: 20px;
+            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6);
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-title {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: var(--text-main);
+        }
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-sub);
+            font-size: 1.3rem;
+            cursor: pointer;
+        }
+
+        /* Ad Banner Box */
+        .ad-banner-box {
+            background: #000000;
+            border: 1px solid var(--gold);
+            border-radius: 12px;
+            padding: 24px 16px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        .ad-progress-bar-wrap {
+            width: 100%;
+            height: 8px;
+            background: #1e293b;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 6px;
+        }
+        .ad-progress-bar {
+            width: 0%;
+            height: 100%;
+            background: var(--gold);
+            transition: width 1s linear;
+        }
+
+        /* Confetti Canvas */
+        #confettiCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 999;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="confettiCanvas"></canvas>
+
+    <div class="container">
+        <!-- Top Header -->
+        <div class="header">
+            <div class="header-left">
+                <a href="../index.html" class="lobby-btn">🏠 로비</a>
+                <button class="icon-btn" id="rulesBtn" title="게임 설명">📖</button>
+                <button class="icon-btn" id="soundToggle" title="소리 켜기/끄기">🔊</button>
+            </div>
+            <div class="header-right">
+                <div class="chip-display">
+                    <span>🪙</span>
+                    <span id="balanceDisplay">10,000</span>
+                </div>
+                <button class="icon-btn" id="adBtn" title="무료 칩 충전" style="width: auto; padding: 0 10px; font-weight:800; font-size:0.75rem; color:var(--gold);">📺 무료 칩</button>
+                <button class="icon-btn" id="reliefBtn" title="긴급 구호금" style="display:none; color:#10b981;">🍀</button>
+            </div>
+        </div>
+
+        <!-- Game Felt Arena -->
+        <div class="game-felt">
+            <!-- Multiplier & Cashout Info Bar -->
+            <div class="multiplier-bar">
+                <div class="mult-badge-box">
+                    <span class="mult-label">누적 당첨 배수</span>
+                    <span class="mult-value" id="currentMultiplierDisplay">1.00X</span>
+                </div>
+                <div class="cashout-box">
+                    <span class="cashout-label">현재 캐시아웃 금액</span>
+                    <span class="cashout-amount" id="currentCashoutDisplay">0 🪙</span>
+                </div>
+            </div>
+
+            <!-- Card Road History Rail -->
+            <div class="history-rail" id="historyRail">
+                <div class="rail-item skip">진행 내역이 여기에 기록됩니다</div>
+            </div>
+
+            <!-- 3D Card Stage -->
+            <div class="card-stage">
+                <div class="card-wrapper">
+                    <div class="card-slot" id="mainCardSlot">
+                        <div class="card-face card-front black" id="mainCardFront">
+                            <div class="card-corner-top">
+                                <span class="corner-rank">?</span>
+                                <span class="corner-suit">♠</span>
+                            </div>
+                            <div class="card-center-suit">♠</div>
+                            <div class="card-corner-bottom">
+                                <span class="corner-rank">?</span>
+                                <span class="corner-suit">♠</span>
+                            </div>
+                        </div>
+                        <div class="card-face card-back">
+                            <div class="card-back-pattern">⚡</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card Info & Streak -->
+            <div class="card-info-badge">
+                <div id="cardRankGuide">카드 랭크: <span>A(1) ~ K(13)</span></div>
+                <div class="streak-pill" id="streakPill" style="display:none;">🔥 0연승 질주 중!</div>
+            </div>
+
+            <!-- Status Banner -->
+            <div class="status-banner" id="statusBanner">
+                배팅 금액을 정하고 <strong>게임 시작</strong>을 눌러주세요!
+            </div>
+
+            <!-- Betting Action Choices Grid -->
+            <div class="action-choices-grid" id="actionGrid">
+                <!-- Higher Button -->
+                <button class="choice-btn high" id="highBtn" disabled>
+                    <div class="choice-title">⬆️ HIGHER (높음)</div>
+                    <div class="choice-mult" id="highMult">---</div>
+                    <div class="choice-prob" id="highProb">확률: --%</div>
+                </button>
+
+                <!-- Lower Button -->
+                <button class="choice-btn low" id="lowBtn" disabled>
+                    <div class="choice-title">⬇️ LOWER (낮음)</div>
+                    <div class="choice-mult" id="lowMult">---</div>
+                    <div class="choice-prob" id="lowProb">확률: --%</div>
+                </button>
+            </div>
+
+            <!-- Same & Skip Options -->
+            <div class="same-btn-wrap" id="subActionGrid">
+                <button class="choice-btn same" id="sameBtn" disabled>
+                    <div class="choice-title" style="font-size:0.9rem;">🟰 SAME (동일 랭크 잭팟!)</div>
+                    <div class="choice-mult" id="sameMult">12.60X</div>
+                    <div class="choice-prob">확률: 7.7%</div>
+                </button>
+
+                <button class="choice-btn skip-btn" id="skipBtn" disabled>
+                    <div class="choice-title" style="font-size:0.9rem;">⏭️ SKIP (패스)</div>
+                    <div class="choice-mult" style="font-size:1.05rem; color:#94a3b8;" id="skipCountText">남은 스킵: 2회</div>
+                    <div class="choice-prob">위험 카드 1회 교체</div>
+                </button>
+            </div>
+
+            <!-- Big Cashout Button -->
+            <button class="cashout-btn" id="cashoutBtn" disabled>
+                <span>💰</span>
+                <span id="cashoutBtnText">캐시아웃 (CASH OUT)</span>
+            </button>
+        </div>
+
+        <!-- Controls Panel (Betting) -->
+        <div class="control-panel">
+            <div class="bet-info-row">
+                <div>배팅 금액: <strong id="betDisplay" style="color:var(--gold); font-size:1.05rem;">1,000</strong> 🪙</div>
+                <div style="font-size:0.75rem; color:var(--text-sub);">최소 100 / 최대 보유 전액</div>
+            </div>
+
+            <div class="quick-chips-row">
+                <button class="chip-btn" data-val="100">+100</button>
+                <button class="chip-btn" data-val="500">+500</button>
+                <button class="chip-btn" data-val="1000">+1K</button>
+                <button class="chip-btn" data-val="5000">+5K</button>
+                <button class="chip-btn" data-op="half">1/2</button>
+                <button class="chip-btn" data-op="double">2X</button>
+            </div>
+
+            <button class="start-btn" id="startBtn">🎮 게임 시작 (DEAL)</button>
+        </div>
+
+        <!-- Statistics Strip -->
+        <div class="stats-strip">
+            <div class="stats-item">게임수: <strong id="statRounds">0</strong></div>
+            <div class="stats-item">승률: <strong id="statWinRate">0%</strong></div>
+            <div class="stats-item">최고 배당: <strong id="statMaxMult">0X</strong></div>
+            <div class="stats-item">최장 연승: <strong id="statMaxStreak" style="color:var(--gold);">0회</strong></div>
+        </div>
+    </div>
+
+    <!-- Rules Modal -->
+    <div class="modal-overlay" id="rulesModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">📖 하이로우 룰 & 배당 안내</div>
+                <button class="modal-close" id="rulesClose">&times;</button>
+            </div>
+            <div style="font-size: 0.85rem; color: var(--text-sub); line-height: 1.6; display: flex; flex-direction: column; gap: 8px;">
+                <p><strong>1. 기본 룰</strong><br>
+                화면에 오픈된 기준 카드보다 <strong>다음 카드가 높을지(HIGHER), 낮을지(LOWER), 같을지(SAME)</strong>를 맞히는 글로벌 정통 카지노 게임입니다.</p>
+                <p><strong>2. 카드 랭크 순서 (총 13단계)</strong><br>
+                <code>A(1) < 2 < 3 < 4 < 5 < 6 < 7 < 8 < 9 < 10 < J(11) < Q(12) < K(13)</code><br>
+                • A는 최저 패(1)이므로 '낮음' 베팅 불가<br>
+                • K는 최고 패(13)이므로 '높음' 베팅 불가</p>
+                <p><strong>3. 동적 배당 & 복리 누적</strong><br>
+                남은 카드 확률에 따라 실시간으로 배당률이 계산됩니다. 연속으로 맞힐 때마다 <strong>배당이 복리로 곱해져 기하급수적으로 폭발</strong>합니다!</p>
+                <p><strong>4. 실시간 캐시아웃 (Cash Out)</strong><br>
+                언제든지 [캐시아웃] 버튼을 눌러 그동안 쌓인 당첨금을 안전하게 수령할 수 있습니다. 실패 시 이전 당첨금은 전액 몰수(Bust)됩니다.</p>
+                <p><strong>5. 스킵(SKIP) & 동일 랭크 잭팟</strong><br>
+                • <strong>스킵</strong>: 7, 8 같은 애매한 카드가 나오면 라운드당 최대 2회까지 패스 가능!<br>
+                • <strong>동일 랭크 잭팟</strong>: 같은 숫자가 나오면 <strong>12.60배</strong>의 대박 배당이 누적됩니다!</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rewarded Ad Modal -->
+    <div class="modal-overlay" id="adModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">📺 무료 칩 보상 광고</div>
+                <button class="modal-close" id="adModalClose">&times;</button>
+            </div>
+            <div class="ad-banner-box">
+                <div style="font-size: 2.2rem;">💎</div>
+                <div style="font-weight: 800; color: var(--gold); font-size: 1.1rem;">광고 시청 후 5,000칩 충전</div>
+                <div style="font-size: 0.8rem; color: var(--text-sub);">광고 시청이 끝나면 무료 칩이 자동으로 지급됩니다.</div>
+                <div class="ad-progress-bar-wrap">
+                    <div class="ad-progress-bar" id="adProgressBar"></div>
+                </div>
+                <div id="adCountdownText" style="font-size: 0.85rem; font-weight: bold; color: var(--gold);">5초 후 충전 완료...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* --- Web Audio API Synth Engine --- */
+        let audioCtx = null;
+        let soundEnabled = true;
+
+        function initAudio() {
+            if (!audioCtx) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioContext();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function playSound(type) {
+            if (!soundEnabled) return;
+            try {
+                initAudio();
+                const now = audioCtx.currentTime;
+
+                if (type === 'click') {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(800, now);
+                    osc.frequency.exponentialRampToValueAtTime(300, now + 0.05);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.05);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.05);
+                } else if (type === 'deal') {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(300, now);
+                    osc.frequency.exponentialRampToValueAtTime(600, now + 0.12);
+                    gain.gain.setValueAtTime(0.25, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.12);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.12);
+                } else if (type === 'correct') {
+                    // Ascending chime
+                    [523.25, 659.25, 783.99].forEach((freq, idx) => {
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(freq, now + idx * 0.07);
+                        gain.gain.setValueAtTime(0.25, now + idx * 0.07);
+                        gain.gain.linearRampToValueAtTime(0.01, now + idx * 0.07 + 0.2);
+                        osc.connect(gain);
+                        gain.connect(audioCtx.destination);
+                        osc.start(now + idx * 0.07);
+                        osc.stop(now + idx * 0.07 + 0.2);
+                    });
+                } else if (type === 'jackpot') {
+                    // Major fanfare
+                    [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        osc.type = 'triangle';
+                        osc.frequency.setValueAtTime(freq, now + idx * 0.08);
+                        gain.gain.setValueAtTime(0.35, now + idx * 0.08);
+                        gain.gain.linearRampToValueAtTime(0.01, now + idx * 0.08 + 0.4);
+                        osc.connect(gain);
+                        gain.connect(audioCtx.destination);
+                        osc.start(now + idx * 0.08);
+                        osc.stop(now + idx * 0.08 + 0.4);
+                    });
+                } else if (type === 'cashout') {
+                    // Coin cascade
+                    [659.25, 880, 1046.5, 1318.5].forEach((freq, idx) => {
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(freq, now + idx * 0.06);
+                        gain.gain.setValueAtTime(0.3, now + idx * 0.06);
+                        gain.gain.linearRampToValueAtTime(0.01, now + idx * 0.06 + 0.25);
+                        osc.connect(gain);
+                        gain.connect(audioCtx.destination);
+                        osc.start(now + idx * 0.06);
+                        osc.stop(now + idx * 0.06 + 0.25);
+                    });
+                } else if (type === 'bust') {
+                    // Low descending buzz
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(220, now);
+                    osc.frequency.exponentialRampToValueAtTime(65, now + 0.35);
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.35);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.35);
+                } else if (type === 'skip') {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(440, now);
+                    osc.frequency.exponentialRampToValueAtTime(220, now + 0.15);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.15);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.15);
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        /* --- Game State --- */
+        const SUITS = [
+            { symbol: '♠', name: 'spade', color: 'black' },
+            { symbol: '♥', name: 'heart', color: 'red' },
+            { symbol: '♦', name: 'diamond', color: 'red' },
+            { symbol: '♣', name: 'club', color: 'black' }
+        ];
+
+        const RANKS = [
+            { val: 1, label: 'A' },
+            { val: 2, label: '2' },
+            { val: 3, label: '3' },
+            { val: 4, label: '4' },
+            { val: 5, label: '5' },
+            { val: 6, label: '6' },
+            { val: 7, label: '7' },
+            { val: 8, label: '8' },
+            { val: 9, label: '9' },
+            { val: 10, label: '10' },
+            { val: 11, label: 'J' },
+            { val: 12, label: 'Q' },
+            { val: 13, label: 'K' }
+        ];
+
+        let balance = 10000;
+        let currentBet = 1000;
+        let currentMultiplier = 1.0;
+        let streak = 0;
+        let skipsRemaining = 2;
+        let currentCard = null;
+        let isGameActive = false;
+        let isProcessing = false;
+
+        let stats = {
+            rounds: 0,
+            wins: 0,
+            maxMult: 0,
+            maxStreak: 0
+        };
+
+        // Load Persistent State
+        function loadState() {
+            try {
+                const savedBal = localStorage.getItem('hilo_balance');
+                if (savedBal !== null) balance = parseInt(savedBal);
+                const savedStats = localStorage.getItem('hilo_stats');
+                if (savedStats) stats = JSON.parse(savedStats);
+            } catch (e) {}
+        }
+
+        function saveState() {
+            try {
+                localStorage.setItem('hilo_balance', balance);
+                localStorage.setItem('hilo_stats', JSON.stringify(stats));
+            } catch (e) {}
+        }
+
+        /* --- DOM Elements --- */
+        const balanceDisplayEl = document.getElementById('balanceDisplay');
+        const betDisplayEl = document.getElementById('betDisplay');
+        const startBtnEl = document.getElementById('startBtn');
+        const highBtnEl = document.getElementById('highBtn');
+        const lowBtnEl = document.getElementById('lowBtn');
+        const sameBtnEl = document.getElementById('sameBtn');
+        const skipBtnEl = document.getElementById('skipBtn');
+        const skipCountTextEl = document.getElementById('skipCountText');
+        const cashoutBtnEl = document.getElementById('cashoutBtn');
+        const cashoutBtnTextEl = document.getElementById('cashoutBtnText');
+        const currentMultiplierDisplayEl = document.getElementById('currentMultiplierDisplay');
+        const currentCashoutDisplayEl = document.getElementById('currentCashoutDisplay');
+        const statusBannerEl = document.getElementById('statusBanner');
+        const streakPillEl = document.getElementById('streakPill');
+        const historyRailEl = document.getElementById('historyRail');
+        const reliefBtnEl = document.getElementById('reliefBtn');
+        const mainCardSlotEl = document.getElementById('mainCardSlot');
+        const mainCardFrontEl = document.getElementById('mainCardFront');
+
+        const statRoundsEl = document.getElementById('statRounds');
+        const statWinRateEl = document.getElementById('statWinRate');
+        const statMaxMultEl = document.getElementById('statMaxMult');
+        const statMaxStreakEl = document.getElementById('statMaxStreak');
+
+        /* --- Deck & Randomizer --- */
+        function getRandomCard() {
+            const suit = SUITS[Math.floor(Math.random() * SUITS.length)];
+            const rank = RANKS[Math.floor(Math.random() * RANKS.length)];
+            return { suit, rank };
+        }
+
+        function renderCardFront(card, element) {
+            element.className = `card-face card-front ${card.suit.color}`;
+            element.innerHTML = `
+                <div class="card-corner-top">
+                    <span class="corner-rank">${card.rank.label}</span>
+                    <span class="corner-suit">${card.suit.symbol}</span>
+                </div>
+                <div class="card-center-suit">${card.suit.symbol}</div>
+                <div class="card-corner-bottom">
+                    <span class="corner-rank">${card.rank.label}</span>
+                    <span class="corner-suit">${card.suit.symbol}</span>
+                </div>
+            `;
+        }
+
+        /* --- Payout Calculation (RTP 97%) --- */
+        function getOdds(currentRankVal) {
+            const highRanks = 13 - currentRankVal;
+            const lowRanks = currentRankVal - 1;
+
+            const highProb = highRanks / 13;
+            const lowProb = lowRanks / 13;
+
+            // 97% RTP calculation
+            const highMult = highRanks > 0 ? Number((12.61 / highRanks).toFixed(2)) : 0;
+            const lowMult = lowRanks > 0 ? Number((12.61 / lowRanks).toFixed(2)) : 0;
+            const sameMult = 12.60;
+
+            return {
+                highMult,
+                lowMult,
+                sameMult,
+                highProb: Math.round(highProb * 100),
+                lowProb: Math.round(lowProb * 100)
+            };
+        }
+
+        function updateOddsDisplay() {
+            if (!currentCard) {
+                document.getElementById('highMult').textContent = '---';
+                document.getElementById('lowMult').textContent = '---';
+                document.getElementById('highProb').textContent = '확률: --%';
+                document.getElementById('lowProb').textContent = '확률: --%';
+                return;
+            }
+
+            const odds = getOdds(currentCard.rank.val);
+
+            // High Button
+            if (currentCard.rank.val === 13) {
+                highBtnEl.disabled = true;
+                document.getElementById('highMult').textContent = 'MAX 패';
+                document.getElementById('highProb').textContent = '최고 랭크 (불가)';
+            } else {
+                highBtnEl.disabled = false;
+                document.getElementById('highMult').textContent = `${odds.highMult.toFixed(2)}X`;
+                document.getElementById('highProb').textContent = `확률: ${odds.highProb}%`;
+            }
+
+            // Low Button
+            if (currentCard.rank.val === 1) {
+                lowBtnEl.disabled = true;
+                document.getElementById('lowMult').textContent = 'MIN 패';
+                document.getElementById('lowProb').textContent = '최저 랭크 (불가)';
+            } else {
+                lowBtnEl.disabled = false;
+                document.getElementById('lowMult').textContent = `${odds.lowMult.toFixed(2)}X`;
+                document.getElementById('lowProb').textContent = `확률: ${odds.lowProb}%`;
+            }
+
+            // Same Button
+            sameBtnEl.disabled = false;
+
+            // Skip Button
+            skipCountTextEl.textContent = `남은 스킵: ${skipsRemaining}회`;
+            skipBtnEl.disabled = skipsRemaining <= 0;
+        }
+
+        /* --- UI Refresh --- */
+        function updateUI() {
+            balanceDisplayEl.textContent = balance.toLocaleString();
+            betDisplayEl.textContent = currentBet.toLocaleString();
+
+            const cashoutVal = Math.floor(currentBet * currentMultiplier);
+            currentMultiplierDisplayEl.textContent = `${currentMultiplier.toFixed(2)}X`;
+            currentCashoutDisplayEl.textContent = `${cashoutVal.toLocaleString()} 🪙`;
+
+            if (isGameActive) {
+                startBtnEl.disabled = true;
+                cashoutBtnEl.disabled = currentMultiplier <= 1.0;
+                cashoutBtnTextEl.textContent = `캐시아웃 (+${cashoutVal.toLocaleString()} 🪙)`;
+
+                if (streak > 0) {
+                    streakPillEl.style.display = 'inline-flex';
+                    streakPillEl.textContent = `🔥 ${streak}연승 질주 중! (${currentMultiplier.toFixed(2)}X)`;
+                } else {
+                    streakPillEl.style.display = 'none';
+                }
+            } else {
+                startBtnEl.disabled = balance < 100;
+                cashoutBtnEl.disabled = true;
+                cashoutBtnTextEl.textContent = '캐시아웃 (CASH OUT)';
+                highBtnEl.disabled = true;
+                lowBtnEl.disabled = true;
+                sameBtnEl.disabled = true;
+                skipBtnEl.disabled = true;
+                streakPillEl.style.display = 'none';
+            }
+
+            // Relief Button
+            reliefBtnEl.style.display = balance < 100 ? 'flex' : 'none';
+
+            // Stats
+            statRoundsEl.textContent = stats.rounds.toLocaleString();
+            statWinRateEl.textContent = stats.rounds > 0 ? `${Math.round((stats.wins / stats.rounds) * 100)}%` : '0%';
+            statMaxMultEl.textContent = `${stats.maxMult.toFixed(2)}X`;
+            statMaxStreakEl.textContent = `${stats.maxStreak}회`;
+        }
+
+        /* --- History Rail Helper --- */
+        function addRailItem(card, outcome, multText) {
+            if (historyRailEl.children.length === 1 && historyRailEl.children[0].classList.contains('skip') && historyRailEl.children[0].textContent.includes('진행 내역')) {
+                historyRailEl.innerHTML = '';
+            }
+
+            const item = document.createElement('div');
+            item.className = `rail-item ${outcome} ${card.suit.color}`;
+            const symbol = card.suit.symbol;
+            const rankLabel = card.rank.label;
+            const outcomeIcon = outcome === 'win' ? '✓' : outcome === 'lose' ? '✕' : '⏭️';
+
+            item.innerHTML = `${symbol}${rankLabel} <span style="font-size:0.7rem; opacity:0.8;">${multText || outcomeIcon}</span>`;
+            historyRailEl.appendChild(item);
+            historyRailEl.scrollLeft = historyRailEl.scrollWidth;
+        }
+
+        /* --- Start Game (Deal) --- */
+        startBtnEl.addEventListener('click', () => {
+            if (isGameActive || balance < currentBet) return;
+
+            initAudio();
+            balance -= currentBet;
+            isGameActive = true;
+            currentMultiplier = 1.0;
+            streak = 0;
+            skipsRemaining = 2;
+            historyRailEl.innerHTML = '';
+
+            stats.rounds++;
+            saveState();
+
+            // Deal initial card
+            playSound('deal');
+            mainCardSlotEl.classList.add('flipped');
+
+            setTimeout(() => {
+                currentCard = getRandomCard();
+                renderCardFront(currentCard, mainCardFrontEl);
+                mainCardSlotEl.classList.remove('flipped');
+
+                addRailItem(currentCard, 'skip', 'START');
+                updateOddsDisplay();
+                updateUI();
+
+                statusBannerEl.innerHTML = `시작 카드: <strong style="color:var(--gold);">${currentCard.suit.symbol} ${currentCard.rank.label}</strong>! 다음 카드를 예측하세요.`;
+            }, 300);
+        });
+
+        /* --- Guess Action (Higher / Lower / Same) --- */
+        async function makeGuess(guessType) {
+            if (!isGameActive || isProcessing || !currentCard) return;
+            isProcessing = true;
+
+            const odds = getOdds(currentCard.rank.val);
+            let stepMult = 0;
+            if (guessType === 'high') stepMult = odds.highMult;
+            else if (guessType === 'low') stepMult = odds.lowMult;
+            else if (guessType === 'same') stepMult = odds.sameMult;
+
+            // Flip Animation
+            playSound('deal');
+            mainCardSlotEl.classList.add('flipped');
+
+            setTimeout(() => {
+                const nextCard = getRandomCard();
+                const prevRank = currentCard.rank.val;
+                const nextRank = nextCard.rank.val;
+
+                let isCorrect = false;
+                if (guessType === 'high' && nextRank > prevRank) isCorrect = true;
+                else if (guessType === 'low' && nextRank < prevRank) isCorrect = true;
+                else if (guessType === 'same' && nextRank === prevRank) isCorrect = true;
+
+                // Render new card
+                renderCardFront(nextCard, mainCardFrontEl);
+                mainCardSlotEl.classList.remove('flipped');
+                currentCard = nextCard;
+
+                if (isCorrect) {
+                    streak++;
+                    currentMultiplier = Number((currentMultiplier * stepMult).toFixed(2));
+                    if (currentMultiplier > stats.maxMult) stats.maxMult = currentMultiplier;
+                    if (streak > stats.maxStreak) stats.maxStreak = streak;
+
+                    addRailItem(nextCard, 'win', `${stepMult.toFixed(2)}X`);
+
+                    if (guessType === 'same') {
+                        playSound('jackpot');
+                        fireConfetti();
+                        statusBannerEl.innerHTML = `👑 <strong style="color:var(--same-purple);">SAME 잭팟 적중!</strong> ${stepMult.toFixed(2)}X 배당 폭발!`;
+                    } else if (currentMultiplier >= 10.0) {
+                        playSound('jackpot');
+                        fireConfetti();
+                        statusBannerEl.innerHTML = `🚀 <strong style="color:var(--gold);">${currentMultiplier.toFixed(2)}X 달성!</strong> 대박 연승 질주 중!`;
+                    } else {
+                        playSound('correct');
+                        statusBannerEl.innerHTML = `🎉 <strong>적중!</strong> ${stepMult.toFixed(2)}X 배당 적용 (총 ${currentMultiplier.toFixed(2)}X)`;
+                    }
+
+                    updateOddsDisplay();
+                    updateUI();
+                    isProcessing = false;
+                } else {
+                    // Bust / Lose
+                    addRailItem(nextCard, 'lose', 'BUST');
+                    playSound('bust');
+                    statusBannerEl.innerHTML = `💥 <strong>BUST!</strong> 다음 카드는 ${nextCard.suit.symbol} ${nextCard.rank.label}였습니다. 다음 기회에!`;
+
+                    isGameActive = false;
+                    currentMultiplier = 1.0;
+                    streak = 0;
+
+                    saveState();
+                    updateUI();
+                    isProcessing = false;
+                }
+            }, 350);
+        }
+
+        highBtnEl.addEventListener('click', () => makeGuess('high'));
+        lowBtnEl.addEventListener('click', () => makeGuess('low'));
+        sameBtnEl.addEventListener('click', () => makeGuess('same'));
+
+        /* --- Skip Button --- */
+        skipBtnEl.addEventListener('click', () => {
+            if (!isGameActive || isProcessing || skipsRemaining <= 0) return;
+            isProcessing = true;
+            skipsRemaining--;
+
+            playSound('skip');
+            mainCardSlotEl.classList.add('flipped');
+
+            setTimeout(() => {
+                currentCard = getRandomCard();
+                renderCardFront(currentCard, mainCardFrontEl);
+                mainCardSlotEl.classList.remove('flipped');
+
+                addRailItem(currentCard, 'skip', 'SKIP');
+                statusBannerEl.innerHTML = `⏭️ 카드 교체 완료: <strong style="color:var(--gold);">${currentCard.suit.symbol} ${currentCard.rank.label}</strong> (남은 스킵 ${skipsRemaining}회)`;
+
+                updateOddsDisplay();
+                updateUI();
+                isProcessing = false;
+            }, 300);
+        });
+
+        /* --- Cash Out --- */
+        cashoutBtnEl.addEventListener('click', () => {
+            if (!isGameActive || currentMultiplier <= 1.0 || isProcessing) return;
+
+            const winAmount = Math.floor(currentBet * currentMultiplier);
+            balance += winAmount;
+            stats.wins++;
+
+            statusBannerEl.innerHTML = `💰 <strong style="color:var(--gold);">캐시아웃 성공!</strong> +${winAmount.toLocaleString()} 🪙 (${currentMultiplier.toFixed(2)}X)`;
+            playSound('cashout');
+            fireConfetti();
+
+            isGameActive = false;
+            currentMultiplier = 1.0;
+            streak = 0;
+
+            saveState();
+            updateUI();
+        });
+
+        /* --- Quick Bet Chip Buttons --- */
+        document.querySelectorAll('.chip-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (isGameActive) return;
+                playSound('click');
+                const val = btn.dataset.val;
+                const op = btn.dataset.op;
+
+                if (val) {
+                    currentBet += parseInt(val);
+                } else if (op === 'half') {
+                    currentBet = Math.max(100, Math.floor(currentBet / 2));
+                } else if (op === 'double') {
+                    currentBet = currentBet * 2;
+                }
+                if (currentBet > balance && balance > 0) currentBet = balance;
+                if (currentBet < 100) currentBet = 100;
+                updateUI();
+            });
+        });
+
+        // Emergency Relief
+        reliefBtnEl.addEventListener('click', () => {
+            balance += 2000;
+            saveState();
+            updateUI();
+            playSound('cashout');
+            alert('긴급 구호금 2,000칩이 지급되었습니다! 🍀');
+        });
+
+        // Rules Modal
+        const rulesModal = document.getElementById('rulesModal');
+        document.getElementById('rulesBtn').addEventListener('click', () => rulesModal.classList.add('active'));
+        document.getElementById('rulesClose').addEventListener('click', () => rulesModal.classList.remove('active'));
+
+        // Sound Toggle
+        const soundToggleBtn = document.getElementById('soundToggle');
+        soundToggleBtn.addEventListener('click', () => {
+            soundEnabled = !soundEnabled;
+            soundToggleBtn.textContent = soundEnabled ? '🔊' : '🔇';
+        });
+
+        // Rewarded Ad Modal
+        const adModal = document.getElementById('adModal');
+        const adProgressBar = document.getElementById('adProgressBar');
+        const adCountdownText = document.getElementById('adCountdownText');
+
+        document.getElementById('adBtn').addEventListener('click', () => {
+            adModal.classList.add('active');
+            adProgressBar.style.width = '0%';
+            adCountdownText.textContent = '5초 후 충전 완료...';
+
+            let count = 5;
+            const timer = setInterval(() => {
+                count--;
+                const progressPct = ((5 - count) / 5) * 100;
+                adProgressBar.style.width = `${progressPct}%`;
+                adCountdownText.textContent = `${count}초 후 충전 완료...`;
+
+                if (count <= 0) {
+                    clearInterval(timer);
+                    balance += 5000;
+                    saveState();
+                    updateUI();
+                    playSound('cashout');
+                    setTimeout(() => {
+                        adModal.classList.remove('active');
+                        alert('보상 광고 시청 완료! 5,000칩이 충전되었습니다. 💎');
+                    }, 300);
+                }
+            }, 1000);
+        });
+
+        document.getElementById('adModalClose').addEventListener('click', () => {
+            adModal.classList.remove('active');
+        });
+
+        /* --- Confetti Generator --- */
+        function fireConfetti() {
+            const canvas = document.getElementById('confettiCanvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            const particles = [];
+            const colors = ['#f5c518', '#ef4444', '#10b981', '#3b82f6', '#bc8cff', '#ffffff'];
+
+            for (let i = 0; i < 70; i++) {
+                particles.push({
+                    x: canvas.width / 2,
+                    y: canvas.height * 0.45,
+                    r: Math.random() * 5 + 3,
+                    d: Math.random() * 70,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    tilt: Math.floor(Math.random() * 10) - 10,
+                    tiltAngleIncremental: (Math.random() * 0.07) + 0.05,
+                    tiltAngle: 0,
+                    vx: (Math.random() - 0.5) * 14,
+                    vy: (Math.random() - 0.7) * 16,
+                    gravity: 0.38
+                });
+            }
+
+            let animationFrame;
+            let step = 0;
+            function draw() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                step++;
+
+                particles.forEach(p => {
+                    p.tiltAngle += p.tiltAngleIncremental;
+                    p.y += (Math.cos(p.d) + 1 + p.r / 2) / 2 + p.gravity;
+                    p.x += Math.sin(p.d);
+                    p.tilt = Math.sin(p.tiltAngle - (step / 3)) * 15;
+
+                    ctx.beginPath();
+                    ctx.lineWidth = p.r;
+                    ctx.strokeStyle = p.color;
+                    ctx.moveTo(p.x + p.tilt + p.r, p.y);
+                    ctx.lineTo(p.x + p.tilt, p.y + p.tilt + p.r);
+                    ctx.stroke();
+                });
+
+                if (step < 120) {
+                    animationFrame = requestAnimationFrame(draw);
+                } else {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    cancelAnimationFrame(animationFrame);
+                }
+            }
+            draw();
+        }
+
+        // Init on Boot
+        loadState();
+        updateUI();
+    </script>
+</body>
+</html>
