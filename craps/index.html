@@ -1,0 +1,1633 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🥊 라스베이거스 크랩스 테이블 - Vegas Craps</title>
+    <style>
+        :root {
+            --bg-color: #06110b;
+            --table-felt: #0c2d1c;
+            --table-felt-dark: #071f13;
+            --felt-border: #1b4d32;
+            --gold: #f5c518;
+            --gold-bright: #ffe600;
+            --gold-glow: rgba(245, 197, 24, 0.4);
+            --red-dice: #dc2626;
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+            --border-color: #244131;
+            --puck-off: #111827;
+            --puck-on: #f8fafc;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px 6px 28px 6px;
+            overflow-x: hidden;
+            background-image: radial-gradient(circle at 50% 0%, #133a25 0%, #06110b 80%);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 520px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(12, 45, 28, 0.85);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 8px 12px;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        .header-left, .header-right {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .lobby-btn {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text-main);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            padding: 6px 10px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.2s;
+        }
+        .lobby-btn:hover { background: rgba(255, 255, 255, 0.15); }
+
+        .chip-display {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--gold);
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 0.88rem;
+            font-weight: 800;
+            color: var(--gold-bright);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            box-shadow: 0 0 10px var(--gold-glow);
+        }
+
+        .icon-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-main);
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .icon-btn:hover { background: rgba(255, 255, 255, 0.18); }
+
+        .ad-btn {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border: 1px solid #34d399;
+            color: #fff;
+            font-weight: 800;
+            font-size: 0.75rem;
+            padding: 5px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+            transition: all 0.2s;
+        }
+        .ad-btn:hover { transform: translateY(-1px); box-shadow: 0 0 14px rgba(16, 185, 129, 0.5); }
+
+        /* Game Arena */
+        .arena {
+            background: var(--table-felt);
+            border: 3px solid #b8860b;
+            border-radius: 16px;
+            padding: 12px;
+            box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.6), 0 10px 25px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            position: relative;
+        }
+
+        /* Top Status Bar: Puck & Phase */
+        .phase-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--felt-border);
+            border-radius: 10px;
+            padding: 8px 12px;
+        }
+
+        .puck-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .puck {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 900;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+            border: 2px solid #fff;
+            transition: all 0.3s;
+        }
+        .puck.off {
+            background: #111827;
+            color: #9ca3af;
+            border-color: #4b5563;
+        }
+        .puck.on {
+            background: #f8fafc;
+            color: #0f172a;
+            border-color: #fbbf24;
+            box-shadow: 0 0 12px #fbbf24;
+        }
+
+        .phase-text {
+            font-size: 0.95rem;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+        }
+
+        .point-badge {
+            background: #fbbf24;
+            color: #0f172a;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-weight: 900;
+            font-size: 0.85rem;
+            display: none;
+        }
+
+        /* Dice Display Stage */
+        .dice-stage {
+            height: 120px;
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px dashed var(--felt-border);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dice-pair {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            justify-content: center;
+            perspective: 600px;
+        }
+
+        /* 3D Casino Die */
+        .die {
+            width: 58px;
+            height: 58px;
+            background: radial-gradient(circle at 30% 30%, #ef4444, #991b1b);
+            border: 1px solid #b91c1c;
+            border-radius: 10px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.5), inset 0 2px 4px rgba(255,255,255,0.4), inset 0 -2px 4px rgba(0,0,0,0.4);
+            display: grid;
+            grid-template: repeat(3, 1fr) / repeat(3, 1fr);
+            padding: 6px;
+            transform-style: preserve-3d;
+            transition: transform 0.15s ease-out;
+        }
+
+        .pip {
+            width: 10px;
+            height: 10px;
+            background: #f8fafc;
+            border-radius: 50%;
+            justify-self: center;
+            align-self: center;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.3);
+            visibility: hidden;
+        }
+
+        /* Pip configurations */
+        .pip.visible { visibility: visible; }
+
+        .dice-roll-message {
+            margin-top: 8px;
+            font-size: 0.88rem;
+            font-weight: 800;
+            color: var(--gold-bright);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.6);
+            min-height: 20px;
+        }
+
+        /* Table Layout */
+        .felt-table {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        /* Place Numbers Row */
+        .place-row {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 4px;
+        }
+
+        .place-box {
+            background: rgba(0, 0, 0, 0.35);
+            border: 1.5px solid var(--felt-border);
+            border-radius: 8px;
+            padding: 6px 2px;
+            text-align: center;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .place-box:hover { border-color: var(--gold); background: rgba(0, 0, 0, 0.5); }
+        .place-box.active-point {
+            border-color: #fbbf24;
+            background: rgba(251, 191, 36, 0.15);
+            box-shadow: 0 0 8px rgba(251, 191, 36, 0.4);
+        }
+
+        .place-num {
+            font-size: 1.15rem;
+            font-weight: 900;
+            color: #fbbf24;
+        }
+
+        .place-odds {
+            font-size: 0.65rem;
+            color: #94a3b8;
+            font-weight: 700;
+        }
+
+        /* Field Bet Box */
+        .field-box {
+            background: rgba(20, 83, 45, 0.4);
+            border: 2px solid #22c55e;
+            border-radius: 10px;
+            padding: 8px 12px;
+            cursor: pointer;
+            text-align: center;
+            position: relative;
+            transition: all 0.2s;
+        }
+        .field-box:hover { background: rgba(20, 83, 45, 0.6); border-color: #4ade80; }
+
+        .field-title {
+            font-size: 1.1rem;
+            font-weight: 900;
+            letter-spacing: 2px;
+            color: #4ade80;
+            margin-bottom: 2px;
+        }
+
+        .field-numbers {
+            font-size: 0.8rem;
+            font-weight: 800;
+            color: #f8fafc;
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+        }
+        .field-jackpot-num { color: #facc15; font-weight: 900; }
+
+        /* Pass Line & Don't Pass Grid */
+        .pass-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 6px;
+        }
+
+        .bet-box {
+            background: rgba(0, 0, 0, 0.35);
+            border: 1.5px solid var(--felt-border);
+            border-radius: 8px;
+            padding: 10px 8px;
+            text-align: center;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 52px;
+        }
+        .bet-box:hover { border-color: var(--gold); background: rgba(0, 0, 0, 0.5); }
+
+        .bet-box-title {
+            font-size: 0.95rem;
+            font-weight: 900;
+            color: var(--text-main);
+        }
+
+        .bet-box-sub {
+            font-size: 0.65rem;
+            color: var(--text-sub);
+            font-weight: 600;
+        }
+
+        /* Proposition Bets (Center / One Roll / Hardways) */
+        .prop-section {
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid var(--felt-border);
+            border-radius: 10px;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .prop-header {
+            font-size: 0.72rem;
+            font-weight: 800;
+            color: #fbbf24;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            text-align: center;
+        }
+
+        .prop-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 4px;
+        }
+
+        .prop-box {
+            background: rgba(0, 0, 0, 0.35);
+            border: 1px solid var(--felt-border);
+            border-radius: 6px;
+            padding: 6px 2px;
+            text-align: center;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .prop-box:hover { border-color: #fbbf24; background: rgba(0,0,0,0.5); }
+
+        .prop-box-name {
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: #f8fafc;
+        }
+
+        .prop-box-odds {
+            font-size: 0.65rem;
+            font-weight: 800;
+            color: #facc15;
+        }
+
+        /* Placed Bet Chip Overlay */
+        .chip-badge {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: radial-gradient(circle, #f59e0b, #b45309);
+            color: #000;
+            font-size: 0.65rem;
+            font-weight: 900;
+            border-radius: 10px;
+            padding: 1px 6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.6);
+            border: 1px solid #fde68a;
+            pointer-events: none;
+            display: none;
+            z-index: 5;
+        }
+
+        /* Chip Tray & Controls */
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .chip-tray {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(12, 45, 28, 0.85);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 8px 10px;
+        }
+
+        .chip-group {
+            display: flex;
+            gap: 6px;
+            overflow-x: auto;
+            padding: 2px;
+        }
+
+        .chip-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: 2px dashed rgba(255, 255, 255, 0.4);
+            font-size: 0.75rem;
+            font-weight: 900;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+            transition: all 0.2s;
+            flex-shrink: 0;
+            position: relative;
+        }
+        .chip-btn:hover { transform: translateY(-2px); }
+        .chip-btn.selected {
+            transform: scale(1.12);
+            border-style: solid;
+            border-color: #fff;
+            box-shadow: 0 0 12px var(--gold-bright);
+        }
+
+        .chip-100 { background: radial-gradient(circle, #3b82f6, #1d4ed8); }
+        .chip-500 { background: radial-gradient(circle, #ef4444, #b91c1c); }
+        .chip-1000 { background: radial-gradient(circle, #10b981, #047857); }
+        .chip-5000 { background: radial-gradient(circle, #8b5cf6, #6d28d9); }
+        .chip-10000 { background: radial-gradient(circle, #f59e0b, #b45309); color: #000; }
+
+        /* Action Buttons */
+        .btn-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+        }
+
+        .sub-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-sub);
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 8px 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .sub-btn:hover { background: rgba(255, 255, 255, 0.16); color: #fff; }
+
+        .roll-btn {
+            background: linear-gradient(135deg, #eab308 0%, #ca8a04 100%);
+            border: 2px solid #fef08a;
+            color: #0f172a;
+            font-size: 1.15rem;
+            font-weight: 900;
+            padding: 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: 0 4px 16px rgba(234, 179, 8, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s;
+            letter-spacing: 0.5px;
+        }
+        .roll-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(234, 179, 8, 0.6);
+        }
+        .roll-btn:active { transform: scale(0.98); }
+        .roll-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* History Rail */
+        .history-card {
+            background: rgba(12, 45, 28, 0.7);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 8px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: var(--text-sub);
+            font-weight: 700;
+        }
+
+        .history-rail {
+            display: flex;
+            gap: 6px;
+            overflow-x: auto;
+            padding-bottom: 2px;
+        }
+
+        .history-badge {
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .hb-7 { background: #dc2626; color: #fff; }
+        .hb-point { background: #facc15; color: #000; }
+        .hb-craps { background: #64748b; color: #fff; }
+        .hb-field { background: #16a34a; color: #fff; }
+        .hb-other { background: rgba(255,255,255,0.1); color: #fff; }
+
+        /* Modals */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.75);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            z-index: 100;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-card {
+            background: #0c2d1c;
+            border: 2px solid var(--gold);
+            border-radius: 16px;
+            padding: 20px;
+            max-width: 440px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        .modal-title {
+            font-size: 1.15rem;
+            font-weight: 900;
+            color: var(--gold-bright);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--felt-border);
+            padding-bottom: 8px;
+        }
+
+        .modal-body {
+            font-size: 0.85rem;
+            color: #e2e8f0;
+            line-height: 1.5;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .modal-close {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: #fff;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 800;
+        }
+
+        .ad-timer-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .ad-timer-fill {
+            height: 100%;
+            width: 0%;
+            background: #10b981;
+            transition: width 1s linear;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Top Header -->
+        <div class="header">
+            <div class="header-left">
+                <a href="../index.html" class="lobby-btn">🏠 로비</a>
+                <div class="chip-display">
+                    <span>🪙</span>
+                    <span id="userChips">10,000</span>
+                </div>
+            </div>
+            <div class="header-right">
+                <button class="ad-btn" id="freeChargeBtn">📺 무료 칩</button>
+                <button class="icon-btn" id="rulesBtn" title="게임 룰">📖</button>
+            </div>
+        </div>
+
+        <!-- Arena -->
+        <div class="arena">
+            <!-- Phase Bar & Puck -->
+            <div class="phase-bar">
+                <div class="puck-container">
+                    <div class="puck off" id="tablePuck">OFF</div>
+                    <div class="phase-text" id="phaseText">컴 아웃 롤 (COME OUT)</div>
+                </div>
+                <div class="point-badge" id="pointBadge">POINT: -</div>
+            </div>
+
+            <!-- Dice Rolling Stage -->
+            <div class="dice-stage">
+                <div class="dice-pair" id="dicePair">
+                    <!-- Die 1 -->
+                    <div class="die" id="die1">
+                        <div class="pip" id="d1_p0"></div><div class="pip" id="d1_p1"></div><div class="pip" id="d1_p2"></div>
+                        <div class="pip" id="d1_p3"></div><div class="pip" id="d1_p4"></div><div class="pip" id="d1_p5"></div>
+                        <div class="pip" id="d1_p6"></div><div class="pip" id="d1_p7"></div><div class="pip" id="d1_p8"></div>
+                    </div>
+                    <!-- Die 2 -->
+                    <div class="die" id="die2">
+                        <div class="pip" id="d2_p0"></div><div class="pip" id="d2_p1"></div><div class="pip" id="d2_p2"></div>
+                        <div class="pip" id="d2_p3"></div><div class="pip" id="d2_p4"></div><div class="pip" id="d2_p5"></div>
+                        <div class="pip" id="d2_p6"></div><div class="pip" id="d2_p7"></div><div class="pip" id="d2_p8"></div>
+                    </div>
+                </div>
+                <div class="dice-roll-message" id="rollMessage">칩을 베팅하고 주사위를 던지세요!</div>
+            </div>
+
+            <!-- Felt Craps Betting Layout -->
+            <div class="felt-table">
+                <!-- Place Bets: 4, 5, 6, 8, 9, 10 -->
+                <div class="place-row">
+                    <div class="place-box" data-bet="place_4">
+                        <span class="chip-badge" id="badge_place_4">0</span>
+                        <div class="place-num">4</div>
+                        <div class="place-odds">9:5</div>
+                    </div>
+                    <div class="place-box" data-bet="place_5">
+                        <span class="chip-badge" id="badge_place_5">0</span>
+                        <div class="place-num">5</div>
+                        <div class="place-odds">7:5</div>
+                    </div>
+                    <div class="place-box" data-bet="place_6">
+                        <span class="chip-badge" id="badge_place_6">0</span>
+                        <div class="place-num">6</div>
+                        <div class="place-odds">7:6</div>
+                    </div>
+                    <div class="place-box" data-bet="place_8">
+                        <span class="chip-badge" id="badge_place_8">0</span>
+                        <div class="place-num">8</div>
+                        <div class="place-odds">7:6</div>
+                    </div>
+                    <div class="place-box" data-bet="place_9">
+                        <span class="chip-badge" id="badge_place_9">0</span>
+                        <div class="place-num">9</div>
+                        <div class="place-odds">7:5</div>
+                    </div>
+                    <div class="place-box" data-bet="place_10">
+                        <span class="chip-badge" id="badge_place_10">0</span>
+                        <div class="place-num">10</div>
+                        <div class="place-odds">9:5</div>
+                    </div>
+                </div>
+
+                <!-- Field Bet (One-roll thrilling bet) -->
+                <div class="field-box" data-bet="field">
+                    <span class="chip-badge" id="badge_field">0</span>
+                    <div class="field-title">F I E L D</div>
+                    <div class="field-numbers">
+                        <span class="field-jackpot-num">2(2X)</span>
+                        <span>3</span>
+                        <span>4</span>
+                        <span>9</span>
+                        <span>10</span>
+                        <span>11</span>
+                        <span class="field-jackpot-num">12(3X)</span>
+                    </div>
+                </div>
+
+                <!-- Pass Line & Don't Pass Grid -->
+                <div class="pass-grid">
+                    <div class="bet-box" data-bet="pass_line">
+                        <span class="chip-badge" id="badge_pass_line">0</span>
+                        <div class="bet-box-title">PASS LINE</div>
+                        <div class="bet-box-sub">7·11 승 / 2·3·12 패 (1:1)</div>
+                    </div>
+                    <div class="bet-box" data-bet="dont_pass">
+                        <span class="chip-badge" id="badge_dont_pass">0</span>
+                        <div class="bet-box-title">DON'T PASS</div>
+                        <div class="bet-box-sub">2·3 승 / 12 무 (1:1)</div>
+                    </div>
+                </div>
+
+                <!-- Proposition / One Roll / Jackpot Center Bets -->
+                <div class="prop-section">
+                    <div class="prop-header">★ CENTER PROPOSITIONS (1회성 고배당) ★</div>
+                    <div class="prop-grid">
+                        <div class="prop-box" data-bet="any_7">
+                            <span class="chip-badge" id="badge_any_7">0</span>
+                            <div class="prop-box-name">ANY 7</div>
+                            <div class="prop-box-odds">4:1</div>
+                        </div>
+                        <div class="prop-box" data-bet="any_craps">
+                            <span class="chip-badge" id="badge_any_craps">0</span>
+                            <div class="prop-box-name">ANY CRAPS</div>
+                            <div class="prop-box-odds">7:1</div>
+                        </div>
+                        <div class="prop-box" data-bet="snake_eyes">
+                            <span class="chip-badge" id="badge_snake_eyes">0</span>
+                            <div class="prop-box-name">⚀ ⚀ (2)</div>
+                            <div class="prop-box-odds">30:1</div>
+                        </div>
+                        <div class="prop-box" data-bet="boxcars">
+                            <span class="chip-badge" id="badge_boxcars">0</span>
+                            <div class="prop-box-name">⚅ ⚅ (12)</div>
+                            <div class="prop-box-odds">30:1</div>
+                        </div>
+                        <div class="prop-box" data-bet="hard_4">
+                            <span class="chip-badge" id="badge_hard_4">0</span>
+                            <div class="prop-box-name">HARD 4 (⚁⚁)</div>
+                            <div class="prop-box-odds">7:1</div>
+                        </div>
+                        <div class="prop-box" data-bet="hard_6">
+                            <span class="chip-badge" id="badge_hard_6">0</span>
+                            <div class="prop-box-name">HARD 6 (⚂⚂)</div>
+                            <div class="prop-box-odds">9:1</div>
+                        </div>
+                        <div class="prop-box" data-bet="hard_8">
+                            <span class="chip-badge" id="badge_hard_8">0</span>
+                            <div class="prop-box-name">HARD 8 (⚃⚃)</div>
+                            <div class="prop-box-odds">9:1</div>
+                        </div>
+                        <div class="prop-box" data-bet="hard_10">
+                            <span class="chip-badge" id="badge_hard_10">0</span>
+                            <div class="prop-box-name">HARD 10 (⚄⚄)</div>
+                            <div class="prop-box-odds">7:1</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Controls: Chips & Buttons -->
+        <div class="controls">
+            <!-- Chip Selector -->
+            <div class="chip-tray">
+                <div class="chip-group">
+                    <div class="chip-btn chip-100 selected" data-value="100">100</div>
+                    <div class="chip-btn chip-500" data-value="500">500</div>
+                    <div class="chip-btn chip-1000" data-value="1000">1K</div>
+                    <div class="chip-btn chip-5000" data-value="5000">5K</div>
+                    <div class="chip-btn chip-10000" data-value="10000">10K</div>
+                </div>
+                <div style="font-size: 0.8rem; font-weight: 800; color: #f8fafc;">
+                    베팅: <span id="totalBetAmount" style="color: var(--gold-bright);">0</span>
+                </div>
+            </div>
+
+            <!-- Sub modifiers -->
+            <div class="btn-row">
+                <button class="sub-btn" id="clearBetsBtn">비우기</button>
+                <button class="sub-btn" id="doubleBetsBtn">2X 더블</button>
+                <button class="sub-btn" id="rebetBtn">이전 베팅</button>
+                <button class="sub-btn" id="allInBtn" style="color: #f87171;">올인</button>
+            </div>
+
+            <!-- Roll Button -->
+            <button class="roll-btn" id="rollBtn">
+                <span>🎲</span>
+                <span>주사위 던지기 (ROLL)</span>
+            </button>
+        </div>
+
+        <!-- History Rail -->
+        <div class="history-card">
+            <div class="history-header">
+                <span>최근 주사위 기록 (LAST ROLLS)</span>
+                <span id="streakStats">전적: 0승 0패</span>
+            </div>
+            <div class="history-rail" id="historyRail">
+                <div class="history-badge hb-other">대기 중</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rules Modal -->
+    <div class="modal-overlay" id="rulesModal">
+        <div class="modal-card">
+            <div class="modal-title">
+                <span>📖 라스베이거스 크랩스 룰 가이드</span>
+                <button class="modal-close" id="closeRulesBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p><strong>1. 컴 아웃 롤 (Come Out Roll):</strong><br>
+                퍽(Puck)이 <strong>OFF</strong> 상태일 때 첫 투구가 시작됩니다.<br>
+                - <strong>패스 라인(Pass Line):</strong> 7 또는 11이 나오면 즉시 승리(1:1), 2·3·12가 나오면 크랩스 패배.<br>
+                - 그 외 숫자(4, 5, 6, 8, 9, 10)가 나오면 해당 숫자가 <strong>포인트(Point)</strong>로 확정되며 퍽이 <strong>ON</strong>으로 바뀝니다.</p>
+
+                <p><strong>2. 포인트 페이즈 (Point Phase):</strong><br>
+                포인트가 정해지면, 슈터는 주사위를 계속 굴립니다.<br>
+                - <strong>포인트 재달성:</strong> 7이 나오기 전에 포인트를 먼저 맞히면 패스 라인 승리!<br>
+                - <strong>세븐 아웃 (Seven Out):</strong> 포인트보다 7이 먼저 나오면 패스 라인 및 플레이스 베팅 패배.</p>
+
+                <p><strong>3. 필드 베팅 (Field Bet - 1회성):</strong><br>
+                다음 1회 굴림에서 <strong>2, 3, 4, 9, 10, 11, 12</strong>가 나오면 즉시 당첨!<br>
+                - 특히 <strong>2는 2배(2:1), 12는 3배(3:1)</strong> 지급! (5, 6, 7, 8 패배)</p>
+
+                <p><strong>4. 센터 고배당 프로포지션 (1회성):</strong><br>
+                - <strong>ANY 7:</strong> 7이 나오면 4:1<br>
+                - <strong>ANY CRAPS:</strong> 2, 3, 12가 나오면 7:1<br>
+                - <strong>스네이크 아이즈(⚀⚀):</strong> 2가 나오면 <strong>30:1</strong> 잭팟!<br>
+                - <strong>박스카(⚅⚅):</strong> 12가 나오면 <strong>30:1</strong> 잭팟!</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Free Charge / Rewarded Ad Modal -->
+    <div class="modal-overlay" id="adModal">
+        <div class="modal-card" style="text-align: center;">
+            <div class="modal-title" style="justify-content: center;">📺 보상형 광고 시청 무료 충전</div>
+            <div class="modal-body" style="align-items: center;">
+                <p>광고를 시청하고 무료 카지노 칩 <strong>+5,000 칩</strong>을 충전하세요!</p>
+                <div style="font-size: 2.8rem; margin: 8px 0;">🎁</div>
+                <div class="ad-timer-bar">
+                    <div class="ad-timer-fill" id="adTimerFill"></div>
+                </div>
+                <div id="adTimerText" style="font-size: 0.85rem; color: var(--gold); font-weight: 700;">5초 후 충전 완료...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bankrupt Modal -->
+    <div class="modal-overlay" id="bankruptModal">
+        <div class="modal-card" style="text-align: center;">
+            <div class="modal-title" style="justify-content: center; color: #ef4444;">💸 파산 구호금 지급</div>
+            <div class="modal-body" style="align-items: center;">
+                <p>칩을 모두 소진하셨습니다!<br>라스베이거스 카지노 긴급 구호금 <strong>+2,000 칩</strong>을 무료로 지급해 드립니다.</p>
+                <button class="roll-btn" id="claimReliefBtn" style="margin-top: 12px; width: 100%;">
+                    구호금 수령하고 계속하기 (+2,000)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* ========================================================
+           1. Audio Synthesizer (Web Audio API)
+        ======================================================== */
+        let audioCtx = null;
+        function getAudioContext() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            return audioCtx;
+        }
+
+        function playSound(type) {
+            try {
+                const ctx = getAudioContext();
+                const now = ctx.currentTime;
+
+                if (type === 'chip') {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(1200, now);
+                    osc.frequency.exponentialRampToValueAtTime(800, now + 0.05);
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.05);
+                } else if (type === 'dice_rattle') {
+                    // Quick wooden cup shake noise bursts
+                    for (let i = 0; i < 4; i++) {
+                        const bufferSize = ctx.sampleRate * 0.04;
+                        const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+                        const data = buffer.getChannelData(0);
+                        for (let j = 0; j < bufferSize; j++) {
+                            data[j] = Math.random() * 2 - 1;
+                        }
+                        const noise = ctx.createBufferSource();
+                        noise.buffer = buffer;
+                        const filter = ctx.createBiquadFilter();
+                        filter.type = 'bandpass';
+                        filter.frequency.value = 1600 + i * 200;
+                        const gain = ctx.createGain();
+                        gain.gain.setValueAtTime(0.2, now + i * 0.04);
+                        gain.gain.exponentialRampToValueAtTime(0.01, now + i * 0.04 + 0.03);
+                        noise.connect(filter);
+                        filter.connect(gain);
+                        gain.connect(ctx.destination);
+                        noise.start(now + i * 0.04);
+                    }
+                } else if (type === 'dice_land') {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(180, now);
+                    osc.frequency.exponentialRampToValueAtTime(60, now + 0.12);
+                    gain.gain.setValueAtTime(0.5, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.12);
+                } else if (type === 'win') {
+                    const chord = [523.25, 659.25, 783.99, 1046.50]; // C E G C
+                    chord.forEach((freq, idx) => {
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(freq, now + idx * 0.06);
+                        gain.gain.setValueAtTime(0.25, now + idx * 0.06);
+                        gain.gain.exponentialRampToValueAtTime(0.01, now + idx * 0.06 + 0.25);
+                        osc.connect(gain);
+                        gain.connect(ctx.destination);
+                        osc.start(now + idx * 0.06);
+                        osc.stop(now + idx * 0.06 + 0.28);
+                    });
+                } else if (type === 'jackpot') {
+                    const notes = [523.25, 659.25, 783.99, 1046.50, 1318.51, 1567.98];
+                    notes.forEach((freq, idx) => {
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        osc.type = 'triangle';
+                        osc.frequency.setValueAtTime(freq, now + idx * 0.07);
+                        gain.gain.setValueAtTime(0.35, now + idx * 0.07);
+                        gain.gain.exponentialRampToValueAtTime(0.01, now + idx * 0.07 + 0.35);
+                        osc.connect(gain);
+                        gain.connect(ctx.destination);
+                        osc.start(now + idx * 0.07);
+                        osc.stop(now + idx * 0.07 + 0.38);
+                    });
+                } else if (type === 'craps_loss') {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(220, now);
+                    osc.frequency.exponentialRampToValueAtTime(110, now + 0.3);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.3);
+                }
+            } catch (err) {}
+        }
+
+        /* ========================================================
+           2. State & Persistence
+        ======================================================== */
+        let userChips = 10000;
+        let selectedChipValue = 100;
+        let isRolling = false;
+
+        // Craps Game State
+        // phase: 'come_out' | 'point'
+        let tablePhase = 'come_out';
+        let currentPoint = null; // 4, 5, 6, 8, 9, 10
+
+        // Current active bets: key -> amount
+        // keys: pass_line, dont_pass, field, place_4, place_5, place_6, place_8, place_9, place_10,
+        //       any_7, any_craps, snake_eyes, boxcars, hard_4, hard_6, hard_8, hard_10
+        let currentBets = {};
+        let lastBets = {};
+
+        // Stats
+        let wins = 0;
+        let losses = 0;
+        let rollsHistory = [];
+
+        function loadChips() {
+            const saved = localStorage.getItem('casino_chips');
+            if (saved !== null) {
+                userChips = parseInt(saved, 10);
+                if (isNaN(userChips) || userChips < 0) userChips = 10000;
+            } else {
+                userChips = 10000;
+            }
+            updateChipsUI();
+        }
+
+        function saveChips() {
+            localStorage.setItem('casino_chips', userChips.toString());
+            updateChipsUI();
+        }
+
+        function updateChipsUI() {
+            document.getElementById('userChips').textContent = userChips.toLocaleString();
+            let totalBet = getTotalBet();
+            document.getElementById('totalBetAmount').textContent = totalBet.toLocaleString();
+        }
+
+        function getTotalBet() {
+            return Object.values(currentBets).reduce((acc, val) => acc + (val || 0), 0);
+        }
+
+        /* ========================================================
+           3. Dice Pip Rendering
+        ======================================================== */
+        // Die 3x3 layout indices:
+        // 0 1 2
+        // 3 4 5
+        // 6 7 8
+        const pipPatterns = {
+            1: [4],
+            2: [0, 8],
+            3: [0, 4, 8],
+            4: [0, 2, 6, 8],
+            5: [0, 2, 4, 6, 8],
+            6: [0, 2, 3, 5, 6, 8]
+        };
+
+        function renderDie(dieNum, value) {
+            const pattern = pipPatterns[value] || [];
+            for (let i = 0; i < 9; i++) {
+                const pipEl = document.getElementById(`d${dieNum}_p${i}`);
+                if (pattern.includes(i)) {
+                    pipEl.classList.add('visible');
+                } else {
+                    pipEl.classList.remove('visible');
+                }
+            }
+        }
+
+        /* ========================================================
+           4. Table Layout & Betting
+        ======================================================== */
+        function updatePuckUI() {
+            const puckEl = document.getElementById('tablePuck');
+            const phaseTextEl = document.getElementById('phaseText');
+            const pointBadgeEl = document.getElementById('pointBadge');
+
+            if (tablePhase === 'come_out') {
+                puckEl.className = 'puck off';
+                puckEl.textContent = 'OFF';
+                phaseTextEl.textContent = '컴 아웃 롤 (COME OUT)';
+                pointBadgeEl.style.display = 'none';
+
+                // Remove active-point highlight from place boxes
+                document.querySelectorAll('.place-box').forEach(el => el.classList.remove('active-point'));
+            } else {
+                puckEl.className = 'puck on';
+                puckEl.textContent = 'ON';
+                phaseTextEl.textContent = `포인트 페이즈 (${currentPoint})`;
+                pointBadgeEl.textContent = `POINT: ${currentPoint}`;
+                pointBadgeEl.style.display = 'block';
+
+                document.querySelectorAll('.place-box').forEach(el => {
+                    const betKey = el.getAttribute('data-bet');
+                    if (betKey === `place_${currentPoint}`) {
+                        el.classList.add('active-point');
+                    } else {
+                        el.classList.remove('active-point');
+                    }
+                });
+            }
+        }
+
+        function updateBetBadges() {
+            for (const key in currentBets) {
+                const badge = document.getElementById(`badge_${key}`);
+                if (badge) {
+                    const amt = currentBets[key] || 0;
+                    if (amt > 0) {
+                        badge.textContent = amt >= 1000 ? (amt / 1000) + 'K' : amt;
+                        badge.style.display = 'block';
+                    } else {
+                        badge.style.display = 'none';
+                    }
+                }
+            }
+            // Clear unbet badges
+            document.querySelectorAll('.chip-badge').forEach(badge => {
+                const id = badge.id.replace('badge_', '');
+                if (!currentBets[id] || currentBets[id] <= 0) {
+                    badge.style.display = 'none';
+                }
+            });
+            updateChipsUI();
+        }
+
+        function placeBet(key) {
+            if (isRolling) return;
+
+            // In Point phase, Come Out specific rules: Pass line can't be removed, but can be added
+            if (userChips < selectedChipValue) {
+                playSound('craps_loss');
+                alert('칩이 부족합니다! 상단의 📺 무료 칩을 충전하세요.');
+                return;
+            }
+
+            userChips -= selectedChipValue;
+            currentBets[key] = (currentBets[key] || 0) + selectedChipValue;
+            playSound('chip');
+            saveChips();
+            updateBetBadges();
+        }
+
+        // Setup click listeners for bet areas
+        document.querySelectorAll('[data-bet]').forEach(el => {
+            const betKey = el.getAttribute('data-bet');
+            el.addEventListener('click', () => placeBet(betKey));
+        });
+
+        /* ========================================================
+           5. Roll Logic & Craps Payout Resolution
+        ======================================================== */
+        const rollBtn = document.getElementById('rollBtn');
+        const rollMessageEl = document.getElementById('rollMessage');
+
+        rollBtn.addEventListener('click', rollDice);
+
+        function rollDice() {
+            if (isRolling) return;
+            const totalBet = getTotalBet();
+            if (totalBet === 0) {
+                alert('베팅 구역에 칩을 먼저 배치해 주세요!');
+                return;
+            }
+
+            isRolling = true;
+            rollBtn.disabled = true;
+            lastBets = { ...currentBets };
+
+            playSound('dice_rattle');
+
+            const die1El = document.getElementById('die1');
+            const die2El = document.getElementById('die2');
+
+            // Quick shake animation
+            let rollTicks = 0;
+            const rollInterval = setInterval(() => {
+                const temp1 = Math.floor(Math.random() * 6) + 1;
+                const temp2 = Math.floor(Math.random() * 6) + 1;
+                renderDie(1, temp1);
+                renderDie(2, temp2);
+
+                const rot1 = (Math.random() - 0.5) * 40;
+                const rot2 = (Math.random() - 0.5) * 40;
+                die1El.style.transform = `rotate(${rot1}deg) scale(1.05)`;
+                die2El.style.transform = `rotate(${rot2}deg) scale(1.05)`;
+
+                rollTicks++;
+                if (rollTicks >= 12) {
+                    clearInterval(rollInterval);
+                    finalizeRoll();
+                }
+            }, 60);
+        }
+
+        function finalizeRoll() {
+            const d1 = Math.floor(Math.random() * 6) + 1;
+            const d2 = Math.floor(Math.random() * 6) + 1;
+            const sum = d1 + d2;
+            const isHard = (d1 === d2);
+
+            renderDie(1, d1);
+            renderDie(2, d2);
+
+            const die1El = document.getElementById('die1');
+            const die2El = document.getElementById('die2');
+            die1El.style.transform = 'none';
+            die2El.style.transform = 'none';
+
+            playSound('dice_land');
+
+            // Resolve Craps Bets
+            let winnings = 0;
+            let resultMessage = `🎲 ${d1} + ${d2} = [ ${sum} ] `;
+            let badgeType = 'hb-other';
+            let outcomeText = '';
+
+            // ----------------------------------------------------
+            // A. ONE-ROLL BETS (Field & Center Propositions)
+            // ----------------------------------------------------
+            // 1. Field Bet
+            if (currentBets['field']) {
+                const bet = currentBets['field'];
+                if (sum === 2) {
+                    winnings += bet * 3; // 2:1 payout + return bet
+                    resultMessage += '★필드 2배 당첨! ';
+                } else if (sum === 12) {
+                    winnings += bet * 4; // 3:1 payout + return bet
+                    resultMessage += '★필드 3배 잭팟! ';
+                } else if ([3, 4, 9, 10, 11].includes(sum)) {
+                    winnings += bet * 2; // 1:1 payout + return bet
+                    resultMessage += '필드 당첨! ';
+                }
+                currentBets['field'] = 0; // Field is always 1-roll
+            }
+
+            // 2. Any 7
+            if (currentBets['any_7']) {
+                if (sum === 7) {
+                    winnings += currentBets['any_7'] * 5; // 4:1 + return
+                    resultMessage += '★ANY 7 적중(4:1)! ';
+                }
+                currentBets['any_7'] = 0;
+            }
+
+            // 3. Any Craps (2, 3, 12)
+            if (currentBets['any_craps']) {
+                if ([2, 3, 12].includes(sum)) {
+                    winnings += currentBets['any_craps'] * 8; // 7:1 + return
+                    resultMessage += '★ANY CRAPS 적중(7:1)! ';
+                }
+                currentBets['any_craps'] = 0;
+            }
+
+            // 4. Snake Eyes (⚀ ⚀ = 2)
+            if (currentBets['snake_eyes']) {
+                if (sum === 2) {
+                    winnings += currentBets['snake_eyes'] * 31; // 30:1 + return
+                    resultMessage += '🔥스네이크 아이즈 30배 잭팟! ';
+                }
+                currentBets['snake_eyes'] = 0;
+            }
+
+            // 5. Boxcars (⚅ ⚅ = 12)
+            if (currentBets['boxcars']) {
+                if (sum === 12) {
+                    winnings += currentBets['boxcars'] * 31; // 30:1 + return
+                    resultMessage += '🔥박스카 30배 잭팟! ';
+                }
+                currentBets['boxcars'] = 0;
+            }
+
+            // 6. Hardways (Hard 4, 6, 8, 10)
+            if (currentBets['hard_4']) {
+                if (isHard && sum === 4) winnings += currentBets['hard_4'] * 8;
+                if (sum === 7 || (sum === 4 && !isHard)) currentBets['hard_4'] = 0;
+            }
+            if (currentBets['hard_6']) {
+                if (isHard && sum === 6) winnings += currentBets['hard_6'] * 10;
+                if (sum === 7 || (sum === 6 && !isHard)) currentBets['hard_6'] = 0;
+            }
+            if (currentBets['hard_8']) {
+                if (isHard && sum === 8) winnings += currentBets['hard_8'] * 10;
+                if (sum === 7 || (sum === 8 && !isHard)) currentBets['hard_8'] = 0;
+            }
+            if (currentBets['hard_10']) {
+                if (isHard && sum === 10) winnings += currentBets['hard_10'] * 8;
+                if (sum === 7 || (sum === 10 && !isHard)) currentBets['hard_10'] = 0;
+            }
+
+            // ----------------------------------------------------
+            // B. MAIN GAME (Pass Line, Don't Pass, Place Bets)
+            // ----------------------------------------------------
+            if (tablePhase === 'come_out') {
+                if (sum === 7 || sum === 11) {
+                    // Natural Win for Pass Line
+                    badgeType = 'hb-7';
+                    outcomeText = '내추럴 7/11 승리!';
+                    if (currentBets['pass_line']) {
+                        winnings += currentBets['pass_line'] * 2;
+                        currentBets['pass_line'] = 0;
+                    }
+                    if (currentBets['dont_pass']) {
+                        currentBets['dont_pass'] = 0;
+                    }
+                } else if ([2, 3, 12].includes(sum)) {
+                    // Craps Loss for Pass Line
+                    badgeType = 'hb-craps';
+                    outcomeText = '크랩스 (패스 라인 패배)';
+                    if (currentBets['pass_line']) {
+                        currentBets['pass_line'] = 0;
+                    }
+                    if (currentBets['dont_pass']) {
+                        if (sum === 12) {
+                            winnings += currentBets['dont_pass']; // Push (Tie)
+                            outcomeText = '12 푸시 (무승부)';
+                        } else {
+                            winnings += currentBets['dont_pass'] * 2;
+                            outcomeText = '돈 패스 승리!';
+                        }
+                        currentBets['dont_pass'] = 0;
+                    }
+                } else {
+                    // Established Point
+                    currentPoint = sum;
+                    tablePhase = 'point';
+                    badgeType = 'hb-point';
+                    outcomeText = `포인트 [${currentPoint}] 설정!`;
+                }
+            } else {
+                // Point Phase
+                if (sum === currentPoint) {
+                    // Point Hit! Win!
+                    badgeType = 'hb-point';
+                    outcomeText = `★ 포인트 ${currentPoint} 적중! 승리!`;
+                    if (currentBets['pass_line']) {
+                        winnings += currentBets['pass_line'] * 2;
+                        currentBets['pass_line'] = 0;
+                    }
+                    if (currentBets['dont_pass']) {
+                        currentBets['dont_pass'] = 0;
+                    }
+                    // Place Bet on point also pays
+                    if (currentBets[`place_${sum}`]) {
+                        winnings += resolvePlacePayout(sum, currentBets[`place_${sum}`]);
+                    }
+                    tablePhase = 'come_out';
+                    currentPoint = null;
+                } else if (sum === 7) {
+                    // Seven Out! Table Clears
+                    badgeType = 'hb-7';
+                    outcomeText = '💀 세븐 아웃 (SEVEN OUT)';
+                    if (currentBets['dont_pass']) {
+                        winnings += currentBets['dont_pass'] * 2;
+                        currentBets['dont_pass'] = 0;
+                    }
+                    // Pass line and all Place bets lost
+                    currentBets['pass_line'] = 0;
+                    [4, 5, 6, 8, 9, 10].forEach(p => currentBets[`place_${p}`] = 0);
+                    currentBets['hard_4'] = 0;
+                    currentBets['hard_6'] = 0;
+                    currentBets['hard_8'] = 0;
+                    currentBets['hard_10'] = 0;
+
+                    tablePhase = 'come_out';
+                    currentPoint = null;
+                } else {
+                    // Any other number: check place bets
+                    if (currentBets[`place_${sum}`]) {
+                        const payout = resolvePlacePayout(sum, currentBets[`place_${sum}`]);
+                        winnings += payout;
+                        resultMessage += `플레이스 ${sum} 적중(+${payout.toLocaleString()})! `;
+                    }
+                    outcomeText = `롤: ${sum}`;
+                }
+            }
+
+            // Payout calculation
+            if (winnings > 0) {
+                userChips += winnings;
+                saveChips();
+                if (winnings >= 10000) {
+                    playSound('jackpot');
+                } else {
+                    playSound('win');
+                }
+                wins++;
+                rollMessageEl.innerHTML = `<span style="color: #4ade80;">🎉 +${winnings.toLocaleString()} 칩 획득! (${outcomeText})</span>`;
+            } else {
+                playSound('craps_loss');
+                losses++;
+                rollMessageEl.innerHTML = `<span style="color: #f87171;">${resultMessage} - ${outcomeText}</span>`;
+            }
+
+            // Update UI
+            updatePuckUI();
+            updateBetBadges();
+            addHistoryBadge(sum, badgeType, outcomeText);
+
+            isRolling = false;
+            rollBtn.disabled = false;
+
+            // Bankrupt Check
+            if (userChips <= 0 && getTotalBet() === 0) {
+                setTimeout(() => {
+                    document.getElementById('bankruptModal').style.display = 'flex';
+                }, 800);
+            }
+        }
+
+        function resolvePlacePayout(num, bet) {
+            // 4, 10: pays 9:5
+            // 5, 9: pays 7:5
+            // 6, 8: pays 7:6
+            let rate = 1.0;
+            if (num === 4 || num === 10) rate = 9 / 5;
+            else if (num === 5 || num === 9) rate = 7 / 5;
+            else if (num === 6 || num === 8) rate = 7 / 6;
+
+            return bet + Math.round(bet * rate);
+        }
+
+        /* ========================================================
+           6. History & Stats
+        ======================================================== */
+        function addHistoryBadge(sum, type, label) {
+            const rail = document.getElementById('historyRail');
+            const badge = document.createElement('div');
+            badge.className = `history-badge ${type}`;
+            badge.textContent = `${sum} (${label.slice(0, 4)})`;
+
+            rail.insertBefore(badge, rail.firstChild);
+            if (rail.children.length > 10) {
+                rail.removeChild(rail.lastChild);
+            }
+
+            document.getElementById('streakStats').textContent = `전적: ${wins}승 ${losses}패`;
+        }
+
+        /* ========================================================
+           7. Modifiers & Chips Selection
+        ======================================================== */
+        document.querySelectorAll('.chip-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.chip-btn').forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                selectedChipValue = parseInt(btn.getAttribute('data-value'), 10);
+                playSound('chip');
+            });
+        });
+
+        document.getElementById('clearBetsBtn').addEventListener('click', () => {
+            if (isRolling) return;
+            const refund = getTotalBet();
+            userChips += refund;
+            currentBets = {};
+            saveChips();
+            updateBetBadges();
+            playSound('chip');
+        });
+
+        document.getElementById('doubleBetsBtn').addEventListener('click', () => {
+            if (isRolling) return;
+            const currentTotal = getTotalBet();
+            if (currentTotal === 0) return;
+            if (userChips < currentTotal) {
+                alert('베팅을 2배로 늘리기 위한 칩이 부족합니다!');
+                return;
+            }
+
+            userChips -= currentTotal;
+            for (const key in currentBets) {
+                currentBets[key] = (currentBets[key] || 0) * 2;
+            }
+            saveChips();
+            updateBetBadges();
+            playSound('chip');
+        });
+
+        document.getElementById('rebetBtn').addEventListener('click', () => {
+            if (isRolling) return;
+            const rebetTotal = Object.values(lastBets).reduce((a, b) => a + (b || 0), 0);
+            if (rebetTotal === 0) {
+                alert('이전 베팅 내역이 없습니다.');
+                return;
+            }
+            if (userChips < rebetTotal) {
+                alert('이전 베팅을 복원할 칩이 부족합니다!');
+                return;
+            }
+
+            // Clear current first
+            userChips += getTotalBet();
+            userChips -= rebetTotal;
+            currentBets = { ...lastBets };
+            saveChips();
+            updateBetBadges();
+            playSound('chip');
+        });
+
+        document.getElementById('allInBtn').addEventListener('click', () => {
+            if (isRolling) return;
+            if (userChips <= 0) return;
+            // Put all remaining chips into Pass Line (or Field if already in Point)
+            const target = tablePhase === 'come_out' ? 'pass_line' : 'field';
+            currentBets[target] = (currentBets[target] || 0) + userChips;
+            userChips = 0;
+            saveChips();
+            updateBetBadges();
+            playSound('jackpot');
+        });
+
+        /* ========================================================
+           8. Modals & Rewarded Ad Flow
+        ======================================================== */
+        const rulesModal = document.getElementById('rulesModal');
+        const rulesBtn = document.getElementById('rulesBtn');
+        const closeRulesBtn = document.getElementById('closeRulesBtn');
+
+        rulesBtn.addEventListener('click', () => rulesModal.style.display = 'flex');
+        closeRulesBtn.addEventListener('click', () => rulesModal.style.display = 'none');
+        window.addEventListener('click', (e) => {
+            if (e.target === rulesModal) rulesModal.style.display = 'none';
+        });
+
+        // Rewarded Ad Modal
+        const adModal = document.getElementById('adModal');
+        const freeChargeBtn = document.getElementById('freeChargeBtn');
+        const adTimerFill = document.getElementById('adTimerFill');
+        const adTimerText = document.getElementById('adTimerText');
+
+        freeChargeBtn.addEventListener('click', () => {
+            adModal.style.display = 'flex';
+            adTimerFill.style.width = '0%';
+            adTimerText.textContent = '5초 후 충전 완료...';
+
+            let count = 5;
+            const interval = setInterval(() => {
+                count--;
+                adTimerFill.style.width = `${((5 - count) / 5) * 100}%`;
+                if (count > 0) {
+                    adTimerText.textContent = `${count}초 후 충전 완료...`;
+                } else {
+                    clearInterval(interval);
+                    adTimerText.textContent = '충전 완료!';
+                    setTimeout(() => {
+                        userChips += 5000;
+                        saveChips();
+                        adModal.style.display = 'none';
+                        playSound('jackpot');
+                        rollMessageEl.innerHTML = `<span style="color: #10b981; font-weight: 800;">🎁 무료 칩 +5,000 충전 완료!</span>`;
+                    }, 500);
+                }
+            }, 1000);
+        });
+
+        // Bankrupt Relief
+        const bankruptModal = document.getElementById('bankruptModal');
+        document.getElementById('claimReliefBtn').addEventListener('click', () => {
+            userChips = 2000;
+            saveChips();
+            bankruptModal.style.display = 'none';
+            playSound('win');
+            rollMessageEl.innerHTML = `<span style="color: #4ade80;">구호금 +2,000 칩이 지급되었습니다!</span>`;
+        });
+
+        /* ========================================================
+           9. Initialization
+        ======================================================== */
+        window.addEventListener('DOMContentLoaded', () => {
+            loadChips();
+            renderDie(1, 1);
+            renderDie(2, 1);
+            updatePuckUI();
+        });
+    </script>
+</body>
+</html>
