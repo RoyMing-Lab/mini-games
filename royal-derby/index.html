@@ -220,7 +220,7 @@
     #raceCanvas {
         display: block;
         width: 100%;
-        height: 268px;
+        height: 300px;
         border-radius: 12px;
     }
 
@@ -934,7 +934,7 @@
 
     @media (max-width: 390px) {
         .hero-title { font-size: 1.3rem; }
-        #raceCanvas { height: 236px; }
+        #raceCanvas { height: 268px; }
         .horse-name { font-size: 0.76rem; }
         .odds-cell { min-width: 42px; }
         .tab { min-width: 57px; font-size: 0.72rem; }
@@ -1942,7 +1942,7 @@ class DerbyGame {
         this.W = w;
         this.H = h;
         this.scalePx = w / VIEW_M;
-        this.trackTop = Math.round(h * 0.35);
+        this.trackTop = Math.round(h * 0.30);
         this.laneTop = this.trackTop + 3;
         this.laneH = (h - this.laneTop - 9) / 6;
         this.buildBackdrop(dpr);
@@ -2018,8 +2018,8 @@ class DerbyGame {
         }
 
         // banner strip
-        const bannerH = Math.max(17, this.W * 0.05);
-        const bannerY = top + rowH * 0.24;
+        const bannerH = Math.max(15, this.W * 0.044);
+        const bannerY = bot - bannerH - 2;
         b.fillStyle = 'rgba(6,6,10,0.62)';
         b.fillRect(0, bannerY, this.W, bannerH);
         b.strokeStyle = 'rgba(240,193,75,0.28)';
@@ -2373,6 +2373,10 @@ class DerbyGame {
             this.distanceChip.textContent = '남은 거리 1,200M';
         }
 
+        if (!this.race) {
+            this.leaderboard.innerHTML = '';
+            return;
+        }
         const idx = pos.map((p, i) => ({ p, i })).sort((a, b) => b.p - a.p);
         const top3 = idx.slice(0, 3);
         this.leaderboard.innerHTML = top3.map((o, r) => {
@@ -2490,7 +2494,7 @@ class DerbyGame {
     drawHorses(ctx, pos, dt) {
         const laneTop = this.laneTop;
         const laneH = this.laneH;
-        const k = Math.max(0.36, Math.min(0.72, laneH / 46));
+        const k = Math.max(0.3, Math.min(0.62, (laneH / 46) * 0.78));
         const moving = this.racing;
 
         for (let i = 0; i < 6; i++) {
