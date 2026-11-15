@@ -340,7 +340,7 @@
         position: absolute;
         inset: 6px;
         border-radius: 12px;
-        background: radial-gradient(circle at 50% 18%, rgba(36, 28, 10, 0.94), rgba(5, 6, 11, 0.97) 72%);
+        background: radial-gradient(circle at 50% 16%, #241c0b 0%, #0a0a10 62%, #05060b 100%);
         border: 1px solid var(--panel-border-strong);
         display: flex;
         flex-direction: column;
@@ -1374,6 +1374,7 @@ class DerbyGame {
         this.lastSingle = null;
         this.bets = [];
         this.racing = false;
+        this.settled = false;
         this.time = 0;
         this.timeScale = 1;
         this.race = null;
@@ -1549,6 +1550,7 @@ class DerbyGame {
         this.timeScale = 1;
         this.race = null;
         this.racing = false;
+        this.settled = false;
         this.camX = -25;
         this.dust = [];
         this.photoBanner.classList.remove('show');
@@ -1683,6 +1685,10 @@ class DerbyGame {
             this.toast('레이스 진행 중에는 베팅할 수 없습니다.');
             return;
         }
+        if (this.settled) {
+            this.toast('정산이 끝났습니다. [다음 레이스]를 눌러 새 배당을 확인하세요.');
+            return;
+        }
         if (this.tab === 'win' || this.tab === 'place') {
             this.lastSingle = { type: this.tab, i };
             this.placeBet(this.tab, [i], this.odds[this.tab][i]);
@@ -1702,7 +1708,7 @@ class DerbyGame {
     }
 
     confirmPick() {
-        if (this.racing) return;
+        if (this.racing || this.settled) return;
         const need = this.needCount();
         if (need === 0 || this.comboPick.length !== need) return;
         const picks = this.comboPick.slice();
@@ -1714,7 +1720,7 @@ class DerbyGame {
     }
 
     placeBet(type, picks, odds, amountOverride = null) {
-        if (this.racing) return;
+        if (this.racing || this.settled) return;
         if (this.balance <= 0) {
             this.showBankrupt();
             return;
@@ -1748,7 +1754,7 @@ class DerbyGame {
     }
 
     removeBet(idx) {
-        if (this.racing) return;
+        if (this.racing || this.settled) return;
         const bet = this.bets[idx];
         if (!bet) return;
         this.balance += bet.amount;
@@ -1759,7 +1765,7 @@ class DerbyGame {
     }
 
     clearBets() {
-        if (this.racing) return;
+        if (this.racing || this.settled) return;
         const refund = this.bets.reduce((a, b) => a + b.amount, 0);
         this.balance += refund;
         this.bets = [];
@@ -1769,7 +1775,7 @@ class DerbyGame {
     }
 
     scaleBets(factor) {
-        if (this.racing || this.bets.length === 0) return;
+        if (this.racing || this.settled || this.bets.length === 0) return;
         const total = this.bets.reduce((a, b) => a + b.amount, 0);
         if (factor === 2) {
             if (this.balance < total) {
@@ -1795,7 +1801,7 @@ class DerbyGame {
     }
 
     allIn() {
-        if (this.racing) return;
+        if (this.racing || this.settled) return;
         if (this.balance <= 0) {
             this.showBankrupt();
             return;
@@ -1840,14 +1846,14 @@ class DerbyGame {
                     <span class="slip-desc">${this.betDesc(b)}</span>
                     <span class="slip-amt">${b.amount.toLocaleString()}</span>
                     <span class="slip-odds">×${this.fmtOdds(b.odds)}</span>
-                    <button class="slip-del" data-idx="${idx}">✕</button>
+                    ${this.settled ? '' : `<button class="slip-del" data-idx="${idx}">✕</button>`}
                 </div>
             `).join('');
         }
         const total = this.bets.reduce((a, b) => a + b.amount, 0);
         this.slipTotal.textContent = total.toLocaleString();
 
-        this.startBtn.disabled = this.racing || this.bets.length === 0;
+        this.startBtn.disabled = this.racing || this.settled || this.bets.length === 0;
         if (this.racing) {
             this.startBtnLabel.textContent = '🏁 레이스 진행 중...';
         } else if (this.bets.length === 0) {
@@ -2183,6 +2189,7 @@ class DerbyGame {
         this.sound.playBell();
         this.sound.playWhoosh();
         this.racing = true;
+        this.settled = false;
         this.timeScale = 1;
         this.time = 0;
         this.photoShown = false;
@@ -2205,6 +2212,7 @@ class DerbyGame {
 
     settle() {
         this.racing = false;
+        this.settled = true;
         this.stopGallop();
         this.skipBtn.classList.remove('show');
         const order = this.race.order;
@@ -2285,6 +2293,7 @@ class DerbyGame {
         this.resultNote.innerHTML = note;
 
         this.resultOverlay.classList.add('show');
+        this.updateUI();
 
         if (trifectaHit) {
             this.sound.playJackpot();
