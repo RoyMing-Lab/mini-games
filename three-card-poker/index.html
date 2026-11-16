@@ -1128,7 +1128,7 @@ function bestSix(cards6) {
 /* ---------------- State ---------------- */
 let balance = loadBalance();
 let stats = loadStats();
-let bets = { ante: 0, pairPlus: 0, six: 0 };
+let bets = loadBets();
 let lastBets = { ante: 0, pairPlus: 0, six: 0 };
 let activeZone = 'ante';
 let selectedChip = 100;
@@ -1147,6 +1147,18 @@ function loadBalance() {
     return Number.isFinite(parsed) && parsed >= 0 ? parsed : 10000;
 }
 function saveBalance() { localStorage.setItem('casino_chips', String(Math.max(0, Math.floor(balance)))); }
+function loadBets() {
+    try {
+        const raw = localStorage.getItem('tcp_bets');
+        if (!raw) return { ante: 0, pairPlus: 0, six: 0 };
+        const b = JSON.parse(raw) || {};
+        const num = v => (Number.isFinite(v) && v > 0 ? Math.floor(v) : 0);
+        return { ante: num(b.ante), pairPlus: num(b.pairPlus), six: num(b.six) };
+    } catch (e) { return { ante: 0, pairPlus: 0, six: 0 }; }
+}
+function saveBets() {
+    try { localStorage.setItem('tcp_bets', JSON.stringify(bets)); } catch (e) { /* ignore */ }
+}
 function loadStats() {
     const def = { rounds: 0, wins: 0, pushes: 0, folds: 0, profit: 0, bestHand: '', bestCat: 0, history: [] };
     try {
@@ -1302,6 +1314,7 @@ function updateUI() {
     el('historyCount').textContent = stats.rounds + ' 라운드';
 
     saveBalance();
+    saveBets();
     saveStats();
 }
 
