@@ -1220,10 +1220,11 @@ function maybeBankrupt() {
 
 function budgetFor(zone) {
     if (zone === 'ante') {
-        // keep at least the ante amount for the PLAY match
+        // keep at least the (final) ante amount for the PLAY match
         return Math.max(0, Math.floor((balance - bets.ante) / 2));
     }
-    return balance;
+    // side bets must leave the current ANTE untouched so PLAY stays affordable
+    return Math.max(0, balance - bets.ante);
 }
 
 function addChip(zone, amount) {
@@ -1370,6 +1371,10 @@ function renderPlaceholders() {
 async function deal() {
     if (gameState !== 'betting') return;
     if (bets.ante < MIN_ANTE) { flashBox(anteBox); SoundFX.lose(); return; }
+    if (balance < bets.ante) {
+        setStatus('PLAY 매칭 잔고 부족 — 초기화 후 다시 베팅하세요', 'lose');
+        flashBox(anteBox); SoundFX.lose(); return;
+    }
 
     const myToken = ++token;
     gameState = 'dealing';
@@ -1758,6 +1763,7 @@ const AdManager = {
                 SoundFX.win();
                 confettiBurst(45);
                 updateUI();
+                if (gameState === 'dealt') showDecision();
             }
         }, 1000);
     },
@@ -1882,6 +1888,7 @@ el('bankruptClaimBtn').addEventListener('click', () => {
         applyBets(200, 0, 0);
     }
     updateUI();
+    if (gameState === 'dealt') showDecision();
 });
 
 el('soundBtn').addEventListener('click', () => {
