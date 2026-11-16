@@ -339,16 +339,18 @@
     }
     .bet-amount.zero { color: rgba(154, 148, 184, 0.65); }
     .bet-clear {
-        position: absolute; top: -5px; right: -5px;
-        width: 17px; height: 17px; border-radius: 50%;
-        background: rgba(30, 24, 48, 0.95);
-        border: 1px solid rgba(255, 255, 255, 0.22);
-        color: var(--sub);
-        font-size: 0.6rem; line-height: 1;
-        display: none; align-items: center; justify-content: center;
+        display: none;
+        font-size: 0.55rem; font-weight: 900;
+        color: #fda4af;
+        background: rgba(251, 113, 133, 0.14);
+        border: 1px solid rgba(251, 113, 133, 0.4);
+        border-radius: 4px;
+        padding: 1px 4px;
         cursor: pointer;
+        line-height: 1.1;
     }
-    .bet-box.has-bet .bet-clear { display: flex; }
+    .bet-box.has-bet .bet-clear { display: inline-block; }
+    .bet-box.has-bet .bet-mini { display: none; }
 
     /* ---------------- Controls ---------------- */
     .control-panel {
@@ -654,6 +656,7 @@
             <div class="bet-head">
                 <span class="bet-title">ANTE</span>
                 <span class="bet-mini">필수</span>
+                <span class="bet-clear" data-clear="ante">✕</span>
             </div>
             <div class="bet-odds">1:1 · 퀄리파이</div>
             <div class="bet-amount zero" id="anteAmt">0</div>
@@ -662,19 +665,19 @@
             <div class="bet-head">
                 <span class="bet-title pp">PAIR PLUS</span>
                 <span class="bet-mini">40:1</span>
+                <span class="bet-clear" data-clear="pairPlus">✕</span>
             </div>
             <div class="bet-odds">페어 1:1 ~</div>
             <div class="bet-amount zero" id="pairPlusAmt">0</div>
-            <span class="bet-clear" data-clear="pairPlus">✕</span>
         </div>
         <div class="bet-box" id="sixBox" data-zone="six">
             <div class="bet-head">
                 <span class="bet-title six">6 CARD</span>
                 <span class="bet-mini">1,000:1</span>
+                <span class="bet-clear" data-clear="six">✕</span>
             </div>
             <div class="bet-odds">6장 최고 5장</div>
             <div class="bet-amount zero" id="sixAmt">0</div>
-            <span class="bet-clear" data-clear="six">✕</span>
         </div>
     </div>
 
@@ -701,11 +704,11 @@
                 <span class="dec-sub" id="playSub">ANTE 동액 베팅</span>
             </button>
             <button class="dec-btn fold" id="foldBtn">
-                <span class="dec-main">🏳️ FOLD</span>
+                <span class="dec-main">✕ FOLD</span>
                 <span class="dec-sub">ANTE·사이드 몰수</span>
             </button>
         </div>
-        <button class="deal-btn" id="dealBtn">▶ DEAL — 카드 받기</button>
+        <button class="deal-btn" id="dealBtn">DEAL — 카드 받기</button>
     </div>
 
     <!-- Result -->
@@ -1285,7 +1288,7 @@ function updateUI() {
 
     dealBtn.disabled = !(gameState === 'betting' && bets.ante >= MIN_ANTE);
     const dealBtnLabel = gameState === 'betting' && bets.ante < MIN_ANTE && stats.rounds > 0;
-    dealBtn.textContent = dealBtnLabel ? '▶ DEAL — ANTE 베팅 필요' : '▶ DEAL — 카드 받기';
+    dealBtn.textContent = dealBtnLabel ? 'DEAL — ANTE 베팅 필요' : 'DEAL — 카드 받기';
 
     // stats
     const winRate = stats.rounds > 0 ? Math.round((stats.wins / stats.rounds) * 100) : 0;
@@ -1638,7 +1641,8 @@ async function settle(folded, myToken) {
     await sleep(700);
     if (myToken !== token) return;
     bets = { ante: 0, pairPlus: 0, six: 0 };
-    if (lastBets.ante >= MIN_ANTE && balance >= MIN_ANTE) {
+    const needForRebet = lastBets.ante * 2 + lastBets.pairPlus + lastBets.six;
+    if (lastBets.ante >= MIN_ANTE && balance >= needForRebet) {
         applyBets(lastBets.ante, lastBets.pairPlus, lastBets.six);
     }
     gameState = 'betting';
