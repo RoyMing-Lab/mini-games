@@ -1613,6 +1613,13 @@ async function settle(folded, myToken) {
     const net = Math.round(returns - wagered);
     const resOutcome = folded ? 'fold' : (net > 0 ? 'win' : net < 0 ? 'lose' : 'push');
 
+    // keep the headline honest when side bets change the money result
+    if (!folded && resOutcome === 'win' && headline.indexOf('DEALER WINS') >= 0) {
+        headline = '✕ DEALER WINS · 사이드 배당으로 만회';
+    } else if (!folded && resOutcome === 'lose' && headline.indexOf('PLAYER WINS') >= 0) {
+        headline = '✦ PLAYER WINS · 사이드 베팅 손실';
+    }
+
     // stats
     stats.rounds += 1;
     stats.profit += net;
