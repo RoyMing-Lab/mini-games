@@ -1210,6 +1210,13 @@ const sixBox = el('sixBox');
 
 /* ---------------- Betting helpers ---------------- */
 function totalWagered() { return bets.ante + bets.pairPlus + bets.six; }
+function isPlayable() {
+    if (bets.ante >= MIN_ANTE && balance >= bets.ante) return true;
+    return (balance + totalWagered()) >= MIN_ANTE * 2;
+}
+function maybeBankrupt() {
+    if (gameState === 'betting' && !isPlayable()) showBankrupt();
+}
 
 function budgetFor(zone) {
     if (zone === 'ante') {
@@ -1224,7 +1231,7 @@ function addChip(zone, amount) {
     const room = budgetFor(zone);
     const add = Math.min(amount, room);
     if (add <= 0) {
-        if (balance <= 0 && totalWagered() === 0) showBankrupt();
+        if (!isPlayable()) showBankrupt();
         else if (zone === 'ante') flashBox(anteBox);
         else flashBox(zone === 'pairPlus' ? pairPlusBox : sixBox);
         SoundFX.lose();
@@ -1630,7 +1637,7 @@ async function settle(folded, myToken) {
     const bonusHit = lines.some(l => l.cls === 'bonus');
     if (resOutcome === 'fold') {
         SoundFX.fold();
-        setStatus('FOLD — ' + net.toLocaleString() + ' 칩 손실', 'lose');
+        setStatus('FOLD — ' + Math.abs(net).toLocaleString() + ' 칩 손실', 'lose');
     } else if (resOutcome === 'win') {
         SoundFX.win();
         setStatus('WIN! ' + (net >= 0 ? '+' : '') + net.toLocaleString(), 'win');
@@ -1660,8 +1667,7 @@ async function settle(folded, myToken) {
     }
     gameState = 'betting';
     updateUI();
-
-    if (balance <= 0 && totalWagered() <= 0) showBankrupt();
+    maybeBankrupt();
 }
 
 function showResult(headline, net, outcome, lines) {
@@ -1840,7 +1846,7 @@ el('allInBtn').addEventListener('click', () => {
     if (gameState !== 'betting') return;
     const room = budgetFor(activeZone);
     if (room <= 0) {
-        if (balance <= 0 && totalWagered() === 0) showBankrupt();
+        if (!isPlayable()) showBankrupt();
         else setStatus(activeZone === 'ante' ? 'ANTE는 잔고의 절반까지만 베팅 가능합니다' : '베팅할 칩이 없습니다', '');
         SoundFX.lose();
         return;
@@ -1890,6 +1896,7 @@ renderPlaceholders();
 renderHistory();
 updateUI();
 setStatus('ANTE 베팅 후 DEAL을 눌러주세요', '');
+maybeBankrupt();
 </script>
 </body>
 </html>
