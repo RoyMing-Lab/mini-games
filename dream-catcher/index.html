@@ -1,0 +1,2189 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🎡 메가 드림 캐처 - Mega Dream Catcher</title>
+    <style>
+        :root {
+            --bg: #06060f;
+            --panel: #0b1024;
+            --panel2: #121a36;
+            --felt: #0e1630;
+            --gold: #f7c948;
+            --gold2: #ffe680;
+            --gold-glow: rgba(247, 201, 72, 0.45);
+            --cyan: #22d3ee;
+            --cyan-glow: rgba(34, 211, 238, 0.45);
+            --pink: #ec4899;
+            --pink-glow: rgba(236, 72, 153, 0.5);
+            --purple: #a855f7;
+            --text: #f6f8ff;
+            --sub: #8b9ac2;
+            --border: #1d2a4d;
+            --c-1: #eab308;
+            --c-2: #0284c7;
+            --c-5: #10b981;
+            --c-10: #f97316;
+            --c-20: #a855f7;
+            --c-40: #ef4444;
+            --c-2x: #06b6d4;
+            --c-7x: #ec4899;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px 6px 30px 6px;
+            overflow-x: hidden;
+            background-image:
+                radial-gradient(circle at 50% 0%, #1b1440 0%, #08091a 55%, #04040c 100%);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 520px;
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+        }
+
+        /* ---------- Header ---------- */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, #0d142c, #0a0f21);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 7px 9px;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+            gap: 6px;
+        }
+        .h-left, .h-right {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .lobby-btn {
+            text-decoration: none;
+            color: var(--text);
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 6px 9px;
+            font-size: 0.74rem;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+        .lobby-btn:active { transform: scale(0.95); }
+
+        .icon-btn {
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid var(--border);
+            color: var(--text);
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .icon-btn:active { transform: scale(0.93); }
+
+        .free-charge-btn {
+            background: linear-gradient(135deg, #7c3aed, #4f46e5);
+            border: 1px solid #8b5cf6;
+            color: #fff;
+            border-radius: 8px;
+            padding: 6px 8px;
+            font-size: 0.7rem;
+            font-weight: 900;
+            cursor: pointer;
+            white-space: nowrap;
+            box-shadow: 0 0 10px rgba(124, 58, 237, 0.5);
+            animation: freePulse 2.4s ease-in-out infinite;
+        }
+        @keyframes freePulse {
+            0%, 100% { box-shadow: 0 0 8px rgba(124, 58, 237, 0.4); }
+            50% { box-shadow: 0 0 16px rgba(139, 92, 246, 0.85); }
+        }
+
+        .chip-display {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(0, 0, 0, 0.45);
+            border: 1px solid rgba(247, 201, 72, 0.35);
+            border-radius: 8px;
+            padding: 5px 8px;
+            font-size: 0.82rem;
+            font-weight: 900;
+            color: var(--gold2);
+            min-width: 84px;
+            justify-content: flex-end;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* ---------- History rail ---------- */
+        .history-wrap {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 10px;
+            padding: 4px 6px;
+        }
+        .hist-label {
+            font-size: 0.62rem;
+            font-weight: 800;
+            color: var(--sub);
+            letter-spacing: 0.4px;
+            white-space: nowrap;
+        }
+        .history-rail {
+            display: flex;
+            gap: 4px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            flex: 1;
+            min-height: 26px;
+            align-items: center;
+        }
+        .history-rail::-webkit-scrollbar { display: none; }
+        .hist-pill {
+            flex-shrink: 0;
+            min-width: 24px;
+            height: 22px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 4px;
+            font-size: 0.66rem;
+            font-weight: 900;
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            animation: pillIn 0.25s ease-out;
+        }
+        @keyframes pillIn {
+            from { transform: translateX(-8px) scale(0.6); opacity: 0; }
+            to { transform: translateX(0) scale(1); opacity: 1; }
+        }
+        .hist-pill.hi { box-shadow: 0 0 8px rgba(255, 230, 128, 0.8); }
+        .hist-pill.mult {
+            border-color: rgba(255, 255, 255, 0.5);
+            box-shadow: 0 0 10px currentColor;
+        }
+        .p-1 { background: linear-gradient(180deg, #eab308, #a16207); }
+        .p-2 { background: linear-gradient(180deg, #0284c7, #075985); }
+        .p-5 { background: linear-gradient(180deg, #10b981, #047857); }
+        .p-10 { background: linear-gradient(180deg, #f97316, #c2410c); }
+        .p-20 { background: linear-gradient(180deg, #a855f7, #6b21a8); }
+        .p-40 { background: linear-gradient(180deg, #ef4444, #991b1b); color: #ffe680; }
+        .p-2X { background: linear-gradient(180deg, #22d3ee, #0e7490); color: #04121a; }
+        .p-7X { background: linear-gradient(180deg, #f472b6, #be185d); color: #fff; }
+
+        /* ---------- Chain bar ---------- */
+        .chain-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            background: linear-gradient(135deg, #0c1226, #0a0f21);
+            border: 1px solid var(--border);
+            border-radius: 11px;
+            padding: 6px 9px;
+            transition: all 0.25s;
+        }
+        .chain-bar.active {
+            border-color: rgba(236, 72, 153, 0.75);
+            box-shadow: 0 0 18px rgba(236, 72, 153, 0.35), inset 0 0 18px rgba(236, 72, 153, 0.12);
+        }
+        .chain-left {
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+        }
+        .chain-title {
+            font-size: 0.62rem;
+            font-weight: 900;
+            letter-spacing: 1px;
+            color: var(--sub);
+        }
+        .chain-title.on { color: var(--pink); }
+        .chain-note {
+            font-size: 0.6rem;
+            color: var(--sub);
+            opacity: 0.85;
+        }
+        .chain-steps {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+        .chain-chip {
+            min-width: 24px;
+            height: 21px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 5px;
+            font-size: 0.68rem;
+            font-weight: 900;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px dashed rgba(255, 255, 255, 0.18);
+            color: var(--sub);
+        }
+        .chain-chip.on {
+            background: linear-gradient(180deg, #f472b6, #be185d);
+            border: 1px solid #fda4d1;
+            color: #fff;
+            box-shadow: 0 0 10px rgba(236, 72, 153, 0.7);
+        }
+        .chain-total {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            line-height: 1.05;
+        }
+        .chain-total .lbl {
+            font-size: 0.56rem;
+            color: var(--sub);
+            font-weight: 800;
+            letter-spacing: 0.5px;
+        }
+        .chain-total .val {
+            font-size: 1.18rem;
+            font-weight: 900;
+            color: var(--sub);
+            font-variant-numeric: tabular-nums;
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.6);
+            transition: color 0.2s;
+        }
+        .chain-total .val.on {
+            color: var(--gold2);
+            text-shadow: 0 0 14px var(--gold-glow);
+        }
+
+        /* ---------- Wheel stage ---------- */
+        .stage {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .wheel-wrap {
+            position: relative;
+            width: 100%;
+            max-width: 440px;
+            margin: 0 auto;
+            aspect-ratio: 1 / 1;
+        }
+
+        #wheelCanvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+            filter: drop-shadow(0 10px 26px rgba(0, 0, 0, 0.75));
+            transition: filter 0.3s;
+        }
+        .wheel-wrap.glow2 #wheelCanvas { filter: drop-shadow(0 0 26px rgba(34, 211, 238, 0.75)); }
+        .wheel-wrap.glow7 #wheelCanvas { filter: drop-shadow(0 0 30px rgba(236, 72, 153, 0.85)); }
+
+        .wheel-pointer {
+            position: absolute;
+            top: -2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 42px;
+            transform-origin: 50% 8px;
+            z-index: 6;
+            filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.7));
+            pointer-events: none;
+        }
+
+        .center-hub {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 26%;
+            aspect-ratio: 1 / 1;
+            border-radius: 50%;
+            background: radial-gradient(circle at 35% 30%, #2b2350, #0a0d1e 70%);
+            border: 2px solid rgba(247, 201, 72, 0.55);
+            box-shadow: 0 0 18px rgba(0, 0, 0, 0.85), inset 0 0 18px rgba(124, 58, 237, 0.35);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 5;
+            pointer-events: none;
+        }
+        .hub-main {
+            font-size: 0.92rem;
+            font-weight: 900;
+            letter-spacing: 1.2px;
+            color: var(--gold2);
+            text-shadow: 0 0 10px var(--gold-glow);
+        }
+        .hub-sub {
+            font-size: 0.5rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            color: #b6a4ff;
+        }
+        .hub-chain {
+            margin-top: 2px;
+            font-size: 0.72rem;
+            font-weight: 900;
+            color: var(--pink);
+            display: none;
+            text-shadow: 0 0 10px var(--pink-glow);
+        }
+        .hub-chain.show { display: block; animation: hubPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        @keyframes hubPop {
+            from { transform: scale(0.4); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        /* Multiplier hit popup */
+        .mult-popup {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.5);
+            z-index: 20;
+            padding: 12px 20px;
+            border-radius: 16px;
+            background: rgba(6, 8, 20, 0.92);
+            border: 2px solid #fff;
+            text-align: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.28s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .mult-popup.show {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+        .mult-popup.b2 { border-color: var(--cyan); box-shadow: 0 0 34px var(--cyan-glow); }
+        .mult-popup.b7 { border-color: var(--pink); box-shadow: 0 0 40px var(--pink-glow); }
+        .mult-hit {
+            font-size: 2.4rem;
+            font-weight: 900;
+            line-height: 1;
+            letter-spacing: -1px;
+        }
+        .mult-hit.c2 { color: var(--cyan); text-shadow: 0 0 22px var(--cyan); }
+        .mult-hit.c7 { color: #ff8fc7; text-shadow: 0 0 26px var(--pink); }
+        .mult-after {
+            margin-top: 5px;
+            font-size: 0.86rem;
+            font-weight: 900;
+            color: var(--gold2);
+        }
+        .mult-respin {
+            margin-top: 3px;
+            font-size: 0.66rem;
+            font-weight: 800;
+            color: var(--sub);
+            letter-spacing: 0.5px;
+        }
+
+        /* Respin countdown ring */
+        .respin-box {
+            position: absolute;
+            bottom: 4%;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 15;
+            background: rgba(6, 8, 20, 0.9);
+            border: 1px solid var(--pink);
+            border-radius: 999px;
+            padding: 5px 14px;
+            font-size: 0.72rem;
+            font-weight: 900;
+            color: #ffb3d9;
+            white-space: nowrap;
+            display: none;
+            box-shadow: 0 0 18px var(--pink-glow);
+        }
+        .respin-box.show { display: block; animation: pulseBox 0.9s ease-in-out infinite; }
+        @keyframes pulseBox {
+            0%, 100% { transform: translateX(-50%) scale(1); }
+            50% { transform: translateX(-50%) scale(1.05); }
+        }
+        .respin-box b { color: #fff; font-size: 0.92rem; }
+
+        /* Status bar */
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0, 0, 0, 0.38);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 9px;
+            padding: 6px 9px;
+            min-height: 34px;
+        }
+        .status-msg {
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: #c3ccea;
+            flex: 1;
+            line-height: 1.25;
+        }
+        .total-bet {
+            font-size: 0.65rem;
+            color: var(--sub);
+            font-weight: 700;
+            white-space: nowrap;
+        }
+        .total-bet b {
+            color: var(--gold2);
+            font-size: 0.82rem;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* ---------- Betting table ---------- */
+        .betting-table {
+            background: linear-gradient(180deg, #0c1327, #080c1a);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        }
+
+        .bet-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+        }
+
+        .bet-spot {
+            position: relative;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 6px 4px 5px 4px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            cursor: pointer;
+            transition: all 0.14s;
+            overflow: hidden;
+        }
+        .bet-spot:active { transform: scale(0.96); }
+        .bet-spot.has-bet {
+            border-color: var(--gold);
+            box-shadow: 0 0 12px rgba(247, 201, 72, 0.35), inset 0 0 14px rgba(247, 201, 72, 0.1);
+        }
+        .bet-num {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.92rem;
+            font-weight: 900;
+            color: #fff;
+            border: 1.5px solid rgba(255, 255, 255, 0.3);
+        }
+        .bn-1 { background: radial-gradient(circle at 35% 30%, #facc15, #a16207); }
+        .bn-2 { background: radial-gradient(circle at 35% 30%, #38bdf8, #075985); }
+        .bn-5 { background: radial-gradient(circle at 35% 30%, #34d399, #047857); }
+        .bn-10 { background: radial-gradient(circle at 35% 30%, #fb923c, #c2410c); }
+        .bn-20 { background: radial-gradient(circle at 35% 30%, #c084fc, #6b21a8); }
+        .bn-40 { background: radial-gradient(circle at 35% 30%, #f87171, #991b1b); color: #ffe680; }
+
+        .bet-pay {
+            font-size: 0.62rem;
+            font-weight: 900;
+            color: var(--gold2);
+        }
+        .bet-slots {
+            font-size: 0.55rem;
+            color: var(--sub);
+            font-weight: 700;
+        }
+        .bet-chip-badge {
+            position: absolute;
+            top: 3px;
+            right: 3px;
+            min-width: 26px;
+            height: 16px;
+            border-radius: 5px;
+            padding: 0 3px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.58rem;
+            font-weight: 900;
+            background: linear-gradient(180deg, #fde68a, #f59e0b);
+            color: #3b1e00;
+            border: 1px solid #fff3c4;
+            box-shadow: 0 0 8px rgba(247, 201, 72, 0.6);
+        }
+        .bet-chip-badge.show { display: flex; }
+
+        .spot-mult-tag {
+            position: absolute;
+            bottom: 1px;
+            right: 3px;
+            font-size: 0.5rem;
+            font-weight: 900;
+            color: #ffb3d9;
+            display: none;
+        }
+
+        /* Chips bar */
+        .chips-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 5px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 5px 6px;
+            border: 1px solid rgba(255, 255, 255, 0.07);
+        }
+        .chip-buttons {
+            display: flex;
+            gap: 5px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            flex: 1;
+        }
+        .chip-buttons::-webkit-scrollbar { display: none; }
+        .chip-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.66rem;
+            font-weight: 900;
+            color: #fff;
+            cursor: pointer;
+            border: 2px dashed rgba(255, 255, 255, 0.45);
+            box-shadow: 0 3px 7px rgba(0, 0, 0, 0.45);
+            transition: all 0.14s;
+            flex-shrink: 0;
+        }
+        .chip-btn.selected {
+            transform: scale(1.12);
+            border: 2.5px solid #fff;
+            box-shadow: 0 0 12px var(--gold-glow);
+        }
+        .chip-100 { background: radial-gradient(circle at 35% 30%, #60a5fa, #1d4ed8); }
+        .chip-500 { background: radial-gradient(circle at 35% 30%, #f87171, #b91c1c); }
+        .chip-1k { background: radial-gradient(circle at 35% 30%, #34d399, #047857); }
+        .chip-5k { background: radial-gradient(circle at 35% 30%, #c084fc, #6b21a8); }
+        .chip-10k { background: radial-gradient(circle at 35% 30%, #fbbf24, #b45309); border-color: var(--gold2); }
+
+        .quick-actions {
+            display: flex;
+            gap: 3px;
+            flex-shrink: 0;
+        }
+        .qa-btn {
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid var(--border);
+            color: var(--text);
+            border-radius: 7px;
+            padding: 6px 5px;
+            font-size: 0.63rem;
+            font-weight: 800;
+            cursor: pointer;
+            min-width: 30px;
+            transition: all 0.13s;
+        }
+        .qa-btn:active { transform: scale(0.93); }
+        .qa-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+        .qa-btn.half { color: #93c5fd; }
+        .qa-btn.dbl { color: var(--gold2); }
+
+        /* Spin row */
+        .spin-row {
+            display: flex;
+            gap: 7px;
+        }
+        .spin-btn {
+            flex: 1;
+            height: 52px;
+            border-radius: 12px;
+            border: none;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b 55%, #b45309);
+            color: #241000;
+            font-size: 1.16rem;
+            font-weight: 900;
+            letter-spacing: 1px;
+            cursor: pointer;
+            box-shadow: 0 4px 18px rgba(245, 158, 11, 0.45);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            transition: all 0.15s;
+        }
+        .spin-btn:active:not(:disabled) { transform: translateY(1px); }
+        .spin-btn:disabled {
+            background: #29314a;
+            color: #66708c;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        .spin-btn.respin {
+            background: linear-gradient(135deg, #f472b6, #db2777 55%, #9d174d);
+            color: #fff;
+            box-shadow: 0 4px 20px rgba(236, 72, 153, 0.6);
+            animation: respinGlow 1s ease-in-out infinite;
+        }
+        @keyframes respinGlow {
+            0%, 100% { box-shadow: 0 4px 16px rgba(236, 72, 153, 0.45); }
+            50% { box-shadow: 0 4px 26px rgba(236, 72, 153, 0.95); }
+        }
+
+        .allin-btn {
+            width: 88px;
+            height: 52px;
+            border-radius: 12px;
+            border: 1.5px solid #dc2626;
+            background: linear-gradient(135deg, #ef4444, #991b1b);
+            color: #fff;
+            font-size: 0.82rem;
+            font-weight: 900;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1px;
+            box-shadow: 0 4px 14px rgba(239, 68, 68, 0.4);
+            transition: all 0.15s;
+        }
+        .allin-btn span:last-child { font-size: 0.56rem; font-weight: 700; opacity: 0.9; }
+        .allin-btn:active:not(:disabled) { transform: translateY(1px); }
+        .allin-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+        /* ---------- Stats ---------- */
+        .stats-panel {
+            background: linear-gradient(180deg, #0c1327, #080c1a);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 7px 6px;
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 3px;
+        }
+        .stat-cell {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1px;
+            padding: 2px 0;
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .stat-cell:last-child { border-right: none; }
+        .stat-label {
+            font-size: 0.54rem;
+            font-weight: 800;
+            color: var(--sub);
+            letter-spacing: 0.2px;
+            white-space: nowrap;
+        }
+        .stat-value {
+            font-size: 0.78rem;
+            font-weight: 900;
+            color: var(--text);
+            font-variant-numeric: tabular-nums;
+        }
+        .stat-value.gold { color: var(--gold2); }
+        .stat-value.plus { color: #4ade80; }
+        .stat-value.minus { color: #f87171; }
+        .stat-value.pink { color: #ff9ed2; }
+
+        .hint-row {
+            text-align: center;
+            font-size: 0.6rem;
+            color: var(--sub);
+            opacity: 0.85;
+            line-height: 1.4;
+            padding: 0 4px;
+        }
+        .hint-row b { color: var(--gold2); }
+        .hint-row i { color: #ff9ed2; font-style: normal; }
+
+        /* ---------- Modals ---------- */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(2, 3, 10, 0.85);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 16px;
+        }
+        .modal-overlay.show { display: flex; }
+
+        .modal-card {
+            background: linear-gradient(180deg, #10182f, #0a0e1e);
+            border: 1.5px solid var(--border);
+            border-radius: 18px;
+            width: 100%;
+            max-width: 440px;
+            padding: 18px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.75);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            position: relative;
+            animation: modalPop 0.22s ease-out;
+            max-height: 86vh;
+            overflow-y: auto;
+        }
+        @keyframes modalPop {
+            from { transform: scale(0.92); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .modal-title {
+            font-size: 1.08rem;
+            font-weight: 900;
+            color: var(--gold);
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+        .modal-close-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: #fff;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1rem;
+            line-height: 1;
+        }
+        .modal-body {
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+            font-size: 0.76rem;
+            line-height: 1.55;
+            color: #cbd5f5;
+        }
+        .modal-body strong { color: var(--gold2); }
+        .rule-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.68rem;
+            margin: 3px 0;
+        }
+        .rule-table th, .rule-table td {
+            border: 1px solid var(--border);
+            padding: 4px 5px;
+            text-align: center;
+        }
+        .rule-table th {
+            background: rgba(247, 201, 72, 0.12);
+            color: var(--gold2);
+            font-weight: 900;
+        }
+        .rule-table td { color: #dbe4ff; }
+
+        /* Result overlay */
+        .result-overlay {
+            position: fixed;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 900;
+            background: rgba(2, 3, 10, 0.7);
+            backdrop-filter: blur(2px);
+            padding: 18px;
+        }
+        .result-overlay.show { display: flex; }
+        .result-card {
+            width: 100%;
+            max-width: 340px;
+            border-radius: 18px;
+            padding: 20px 18px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            background: linear-gradient(180deg, #141c38, #090d1c);
+            border: 2px solid var(--gold);
+            box-shadow: 0 0 40px var(--gold-glow);
+            animation: modalPop 0.26s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .result-card.lose {
+            border-color: #33415c;
+            box-shadow: 0 0 24px rgba(0, 0, 0, 0.6);
+        }
+        .result-card.super {
+            border-color: var(--pink);
+            box-shadow: 0 0 46px var(--pink-glow);
+        }
+        .res-headline {
+            font-size: 1.4rem;
+            font-weight: 900;
+            color: var(--gold2);
+            text-shadow: 0 0 16px var(--gold-glow);
+            letter-spacing: 0.5px;
+        }
+        .result-card.super .res-headline { color: #ffb3d9; text-shadow: 0 0 20px var(--pink); }
+        .res-amount {
+            font-size: 2.1rem;
+            font-weight: 900;
+            color: #fff;
+            font-variant-numeric: tabular-nums;
+            line-height: 1.1;
+        }
+        .res-amount.minus { color: #f87171; }
+        .res-detail {
+            font-size: 0.76rem;
+            font-weight: 800;
+            color: #a5b4d8;
+            line-height: 1.5;
+        }
+        .res-detail b { color: var(--gold2); }
+        .res-detail .chainline {
+            display: inline-block;
+            margin-top: 3px;
+            padding: 2px 8px;
+            border-radius: 6px;
+            background: rgba(236, 72, 153, 0.16);
+            border: 1px solid rgba(236, 72, 153, 0.5);
+            color: #ffb3d9;
+        }
+        .res-close {
+            margin-top: 6px;
+            height: 44px;
+            border-radius: 11px;
+            border: none;
+            background: linear-gradient(135deg, #fbbf24, #d97706);
+            color: #241000;
+            font-size: 0.95rem;
+            font-weight: 900;
+            cursor: pointer;
+        }
+        .res-close:active { transform: translateY(1px); }
+
+        /* Ad modal */
+        .ad-timer-bar {
+            width: 100%;
+            height: 8px;
+            background: #1b2440;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .ad-timer-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #10b981, #06b6d4);
+            transition: width 0.1s linear;
+        }
+
+        /* Confetti */
+        #confettiCanvas {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 950;
+        }
+
+        @media (max-width: 360px) {
+            .chip-btn { width: 32px; height: 32px; font-size: 0.6rem; }
+            .bet-num { width: 26px; height: 26px; font-size: 0.82rem; }
+            .spin-btn { font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="confettiCanvas"></canvas>
+
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="h-left">
+                <a href="../index.html" class="lobby-btn">🏠 로비</a>
+                <button class="icon-btn" id="soundToggleBtn" title="사운드">🔊</button>
+                <button class="icon-btn" id="rulesBtn" title="게임 규칙">📖</button>
+            </div>
+            <div class="h-right">
+                <button class="free-charge-btn" id="freeChargeBtn">📺 무료 칩</button>
+                <div class="chip-display"><span>🪙</span><span id="userChips">10,000</span></div>
+            </div>
+        </header>
+
+        <!-- History rail -->
+        <div class="history-wrap">
+            <span class="hist-label">최근 결과</span>
+            <div class="history-rail" id="historyRail"></div>
+        </div>
+
+        <!-- Multiplier chain bar -->
+        <div class="chain-bar" id="chainBar">
+            <div class="chain-left">
+                <div class="chain-title" id="chainTitle">🎯 MULTIPLIER CHAIN</div>
+                <div class="chain-note" id="chainNote">2X·7X 적중 시 베팅 유지 + 자동 리스핀</div>
+            </div>
+            <div class="chain-steps" id="chainSteps"></div>
+            <div class="chain-total">
+                <span class="lbl">누적 승수</span>
+                <span class="val" id="chainTotal">×1</span>
+            </div>
+        </div>
+
+        <!-- Wheel stage -->
+        <div class="stage">
+            <div class="wheel-wrap" id="wheelWrap">
+                <svg class="wheel-pointer" id="wheelPointer" viewBox="0 0 36 48">
+                    <polygon points="18,44 3,6 33,6" fill="#ffd700" stroke="#b45309" stroke-width="2"></polygon>
+                    <circle cx="18" cy="12" r="6" fill="#ef4444" stroke="#ffffff" stroke-width="1.6"></circle>
+                </svg>
+
+                <canvas id="wheelCanvas" width="760" height="760"></canvas>
+
+                <div class="center-hub">
+                    <div class="hub-main">DREAM</div>
+                    <div class="hub-sub">CATCHER</div>
+                    <div class="hub-chain" id="hubChain">×2</div>
+                </div>
+
+                <div class="mult-popup" id="multPopup">
+                    <div class="mult-hit" id="multHit">×2</div>
+                    <div class="mult-after" id="multAfter">누적 ×2</div>
+                    <div class="mult-respin">베팅 유지 · 자동 리스핀</div>
+                </div>
+
+                <div class="respin-box" id="respinBox">🔄 리스핀 준비 <b id="respinCount">3</b></div>
+            </div>
+
+            <div class="status-bar">
+                <div class="status-msg" id="statusMessage">💡 번호에 칩을 걸고 SPIN! 2X·7X가 뜨면 배당이 배로 폭발합니다</div>
+                <div class="total-bet">총 베팅 <b id="totalBetAmount">0</b></div>
+            </div>
+        </div>
+
+        <!-- Betting table -->
+        <div class="betting-table">
+            <div class="bet-grid" id="betGrid">
+                <div class="bet-spot" data-num="1">
+                    <div class="bet-chip-badge" id="badge-1">0</div>
+                    <div class="bet-num bn-1">1</div>
+                    <div class="bet-pay">1 : 1</div>
+                    <div class="bet-slots">23칸</div>
+                    <div class="spot-mult-tag" id="tag-1"></div>
+                </div>
+                <div class="bet-spot" data-num="2">
+                    <div class="bet-chip-badge" id="badge-2">0</div>
+                    <div class="bet-num bn-2">2</div>
+                    <div class="bet-pay">2 : 1</div>
+                    <div class="bet-slots">15칸</div>
+                    <div class="spot-mult-tag" id="tag-2"></div>
+                </div>
+                <div class="bet-spot" data-num="5">
+                    <div class="bet-chip-badge" id="badge-5">0</div>
+                    <div class="bet-num bn-5">5</div>
+                    <div class="bet-pay">5 : 1</div>
+                    <div class="bet-slots">7칸</div>
+                    <div class="spot-mult-tag" id="tag-5"></div>
+                </div>
+                <div class="bet-spot" data-num="10">
+                    <div class="bet-chip-badge" id="badge-10">0</div>
+                    <div class="bet-num bn-10">10</div>
+                    <div class="bet-pay">10 : 1</div>
+                    <div class="bet-slots">4칸</div>
+                    <div class="spot-mult-tag" id="tag-10"></div>
+                </div>
+                <div class="bet-spot" data-num="20">
+                    <div class="bet-chip-badge" id="badge-20">0</div>
+                    <div class="bet-num bn-20">20</div>
+                    <div class="bet-pay">20 : 1</div>
+                    <div class="bet-slots">2칸</div>
+                    <div class="spot-mult-tag" id="tag-20"></div>
+                </div>
+                <div class="bet-spot" data-num="40">
+                    <div class="bet-chip-badge" id="badge-40">0</div>
+                    <div class="bet-num bn-40">40</div>
+                    <div class="bet-pay">40 : 1</div>
+                    <div class="bet-slots">1칸 · 잭팟</div>
+                    <div class="spot-mult-tag" id="tag-40"></div>
+                </div>
+            </div>
+
+            <div class="chips-bar">
+                <div class="chip-buttons">
+                    <div class="chip-btn chip-100" data-value="100">100</div>
+                    <div class="chip-btn chip-500 selected" data-value="500">500</div>
+                    <div class="chip-btn chip-1k" data-value="1000">1K</div>
+                    <div class="chip-btn chip-5k" data-value="5000">5K</div>
+                    <div class="chip-btn chip-10k" data-value="10000">10K</div>
+                </div>
+                <div class="quick-actions">
+                    <button class="qa-btn half" id="halfBtn" title="베팅 절반">½</button>
+                    <button class="qa-btn dbl" id="doubleBtn" title="베팅 2배">2X</button>
+                    <button class="qa-btn" id="rebetBtn" title="직전 베팅 재배치">RE</button>
+                    <button class="qa-btn" id="clearBtn" title="베팅 초기화">CLR</button>
+                </div>
+            </div>
+
+            <div class="spin-row">
+                <button class="spin-btn" id="spinBtn"><span>🎡 SPIN</span></button>
+                <button class="allin-btn" id="allInBtn">
+                    <span>🔥 ALL IN</span>
+                    <span>전체 분산</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-panel">
+            <div class="stat-cell">
+                <span class="stat-label">스핀</span>
+                <span class="stat-value" id="statSpins">0</span>
+            </div>
+            <div class="stat-cell">
+                <span class="stat-label">적중</span>
+                <span class="stat-value gold" id="statHits">0</span>
+            </div>
+            <div class="stat-cell">
+                <span class="stat-label">승률</span>
+                <span class="stat-value" id="statRate">-</span>
+            </div>
+            <div class="stat-cell">
+                <span class="stat-label">최고 배수</span>
+                <span class="stat-value pink" id="statBest">-</span>
+            </div>
+            <div class="stat-cell">
+                <span class="stat-label">순손익</span>
+                <span class="stat-value" id="statNet">0</span>
+            </div>
+        </div>
+
+        <div class="hint-row">
+            <b>1·2·5·10·20·40</b> 멀티 베팅 &nbsp;·&nbsp; <i>2X·7X</i> 적중 시 베팅 유지 + 승수 누적 리스핀<br>
+            파산 시 긴급 구호금 <b>+2,000</b> / 무료 칩 <b>+5,000</b> 지급
+        </div>
+    </div>
+
+    <!-- Result overlay -->
+    <div class="result-overlay" id="resultOverlay">
+        <div class="result-card" id="resultCard">
+            <div class="res-headline" id="resHeadline">🎉 WINNER!</div>
+            <div class="res-amount" id="resAmount">+0</div>
+            <div class="res-detail" id="resDetail">당첨 번호: 40 (41X)</div>
+            <button class="res-close" id="resCloseBtn">확인 (다음 라운드)</button>
+        </div>
+    </div>
+
+    <!-- Rules modal -->
+    <div class="modal-overlay" id="rulesModal">
+        <div class="modal-card">
+            <button class="modal-close-btn" id="closeRulesBtn">&times;</button>
+            <div class="modal-title">📖 메가 드림 캐처 규칙</div>
+            <div class="modal-body">
+                <p><strong>🎡 메가 드림 캐처</strong>는 Evolution Dream Catcher 스타일의 정통 54슬롯 머니 휠 쇼입니다. 휠이 멈춘 칸의 숫자에 칩을 걸어 두면 배당이 지급됩니다.</p>
+
+                <p><strong>1. 54슬롯 구성 & 기본 배당</strong></p>
+                <table class="rule-table">
+                    <thead>
+                        <tr><th>칸</th><th>슬롯</th><th>배당</th><th>회수율</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>1</td><td>23칸</td><td>1 : 1</td><td>×2</td></tr>
+                        <tr><td>2</td><td>15칸</td><td>2 : 1</td><td>×3</td></tr>
+                        <tr><td>5</td><td>7칸</td><td>5 : 1</td><td>×6</td></tr>
+                        <tr><td>10</td><td>4칸</td><td>10 : 1</td><td>×11</td></tr>
+                        <tr><td>20</td><td>2칸</td><td>20 : 1</td><td>×21</td></tr>
+                        <tr><td>40</td><td>1칸</td><td>40 : 1</td><td>×41</td></tr>
+                        <tr style="color:#ffb3d9; font-weight:900;"><td>2X</td><td>1칸</td><td colspan="2">배당 승수 ×2</td></tr>
+                        <tr style="color:#ffb3d9; font-weight:900;"><td>7X</td><td>1칸</td><td colspan="2">배당 승수 ×7</td></tr>
+                    </tbody>
+                </table>
+
+                <p><strong>2. 🔥 연속 승수 (Multiplier Chain)</strong><br>
+                휠이 <strong>2X</strong> 또는 <strong>7X</strong>에 멈추면 <u>베팅은 그대로 유지</u>된 채 승수가 곱연산으로 누적되고 <strong>무료 리스핀</strong>이 자동으로 이어집니다.<br>
+                2X → 2X → 7X 라면 누적 승수는 <strong>×28</strong>! 이어서 숫자 칸에 멈추면 <code>(기본 배당 × 누적 승수) + 원금</code>으로 정산됩니다.<br>
+                예) 40에 베팅 후 7X → 40 적중 = 40 × 7 + 1 = <strong>281배</strong> (베팅 500칩 → 140,500칩)</p>
+
+                <p><strong>3. 지갑 및 경제</strong><br>
+                - 모든 미니게임과 칩 잔액이 연동됩니다 (<code>casino_chips</code>).<br>
+                - 파산 시 긴급 구호금 <strong>+2,000칩</strong>을 즉시 지원받을 수 있습니다.<br>
+                - 무료 칩 버튼으로 5초 보상형 광고 시청 후 <strong>+5,000칩</strong>을 충전할 수 있습니다.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ad modal -->
+    <div class="modal-overlay" id="adModal">
+        <div class="modal-card" style="text-align:center;">
+            <div class="modal-title" style="justify-content:center;">📺 보상형 광고 시청</div>
+            <div class="modal-body" style="align-items:center;">
+                <p>광고를 시청하고 무료 카지노 칩 <strong>+5,000 칩</strong>을 충전하세요!</p>
+                <div style="font-size:2.6rem; margin:6px 0;">🎁</div>
+                <div class="ad-timer-bar"><div class="ad-timer-fill" id="adTimerFill"></div></div>
+                <div id="adTimerText" style="font-weight:900; color:var(--gold2); margin-top:6px;">5초 후 충전 완료...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Relief modal -->
+    <div class="modal-overlay" id="bankruptModal">
+        <div class="modal-card" style="text-align:center;">
+            <div class="modal-title" style="justify-content:center; color:#f87171;">🚨 긴급 구호금 지원</div>
+            <div class="modal-body" style="align-items:center;">
+                <p>칩을 모두 소진하셨군요. 카지노 본부가 복귀 자금을 지급합니다.</p>
+                <div style="font-size:2.6rem; margin:4px 0;">💰</div>
+                <div style="font-size:1.35rem; font-weight:900; color:var(--gold2);">+2,000 CHIPS</div>
+                <button class="spin-btn" id="claimReliefBtn" style="width:100%; height:44px; font-size:0.95rem; margin-top:8px; background:linear-gradient(135deg,#fbbf24,#d97706); color:#241000;">구호금 수령하고 계속하기</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+/* =========================================================
+   🎡 메가 드림 캐처 (Mega Dream Catcher) — Game Logic
+   54-slot money wheel · 2X/7X multiplier chain respin
+   ========================================================= */
+'use strict';
+
+/* ---------------- 1. Wheel Model (54 slots) ---------------- */
+const SLOT_LABELS = [
+    '40', '1', '2', '10', '1', '2', '1', '5', '1', '2',
+    '20', '1', '2', '1', '5', '1', '2', '5', '1', '2',
+    '10', '1', '1', '2', '5', '1', '2', '2X', '1', '1',
+    '20', '2', '1', '1', '10', '2', '1', '5', '2', '1',
+    '1', '7X', '2', '1', '10', '2', '1', '5', '1', '2',
+    '1', '5', '2', '1'
+];
+const TOTAL_SLOTS = SLOT_LABELS.length;              // 54
+const ARC = (Math.PI * 2) / TOTAL_SLOTS;             // 6.666deg per slice
+const TOP_ANGLE = -Math.PI / 2;                      // pointer position
+const BASE_PAY = { '1': 1, '2': 2, '5': 5, '10': 10, '20': 20, '40': 40 };
+const NUMBERS = [1, 2, 5, 10, 20, 40];
+const SLOT_COUNTS = { '1': 23, '2': 15, '5': 7, '10': 4, '20': 2, '40': 1 };
+const NUMBER_WEIGHT = 52;                            // 23+15+7+4+2+1
+
+const SLOT_STYLE = {
+    '1': { a: '#ffd94a', b: '#8a5b06', text: '#2c1a00' },
+    '2': { a: '#4cc9f0', b: '#075985', text: '#03202c' },
+    '5': { a: '#3ee0a0', b: '#046747', text: '#02241a' },
+    '10': { a: '#ff9f45', b: '#a83c05', text: '#2b1000' },
+    '20': { a: '#c084fc', b: '#5b1b91', text: '#1d0630' },
+    '40': { a: '#f87171', b: '#8f1616', text: '#fffbe8' },
+    '2X': { a: '#22d3ee', b: '#0c6377', text: '#032028' },
+    '7X': { a: '#f472b6', b: '#9d174d', text: '#ffffff' }
+};
+
+const STORE_CHIPS = 'casino_chips';
+const STORE_BETS = 'dream_catcher_bets';
+const STORE_STATS = 'dream_catcher_stats';
+const STORE_SOUND = 'dc_sound';
+const START_CHIPS = 10000;
+
+const $ = id => document.getElementById(id);
+const mod = (v, m) => ((v % m) + m) % m;
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+/* ---------------- 2. Sound Engine (Web Audio, no assets) ---------------- */
+const SoundFX = (() => {
+    let ctx = null;
+    let muted = localStorage.getItem(STORE_SOUND) === 'off';
+
+    function ensure() {
+        if (!ctx) {
+            const AC = window.AudioContext || window.webkitAudioContext;
+            if (!AC) return null;
+            try { ctx = new AC(); } catch (e) { return null; }
+        }
+        if (ctx.state === 'suspended') { try { ctx.resume(); } catch (e) { /* ignore */ } }
+        return ctx;
+    }
+
+    function tone(o) {
+        const c = ensure();
+        if (!c || muted) return;
+        const t0 = c.currentTime + (o.delay || 0);
+        const dur = o.dur || 0.15;
+        const vol = o.vol == null ? 0.12 : o.vol;
+        try {
+            const osc = c.createOscillator();
+            const g = c.createGain();
+            osc.type = o.type || 'sine';
+            osc.frequency.setValueAtTime(o.freq, t0);
+            if (o.slide) osc.frequency.exponentialRampToValueAtTime(Math.max(24, o.slide), t0 + dur);
+            g.gain.setValueAtTime(0.0001, t0);
+            g.gain.exponentialRampToValueAtTime(Math.max(0.0002, vol), t0 + (o.attack || 0.008));
+            g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+            osc.connect(g).connect(c.destination);
+            osc.start(t0);
+            osc.stop(t0 + dur + 0.03);
+        } catch (e) { /* ignore */ }
+    }
+
+    function noise(o) {
+        const c = ensure();
+        if (!c || muted) return;
+        const dur = o.dur || 0.25;
+        const t0 = c.currentTime + (o.delay || 0);
+        const vol = o.vol == null ? 0.06 : o.vol;
+        try {
+            const frames = Math.max(1, Math.floor(c.sampleRate * dur));
+            const buf = c.createBuffer(1, frames, c.sampleRate);
+            const data = buf.getChannelData(0);
+            for (let i = 0; i < frames; i++) data[i] = Math.random() * 2 - 1;
+            const src = c.createBufferSource();
+            src.buffer = buf;
+            const bp = c.createBiquadFilter();
+            bp.type = 'bandpass';
+            bp.Q.value = o.q || 1.2;
+            bp.frequency.setValueAtTime(o.from || 400, t0);
+            bp.frequency.exponentialRampToValueAtTime(Math.max(60, o.to || 3200), t0 + dur);
+            const g = c.createGain();
+            g.gain.setValueAtTime(0.0001, t0);
+            g.gain.exponentialRampToValueAtTime(vol, t0 + dur * 0.25);
+            g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+            src.connect(bp).connect(g).connect(c.destination);
+            src.start(t0);
+            src.stop(t0 + dur + 0.02);
+        } catch (e) { /* ignore */ }
+    }
+
+    function seq(list, opts) {
+        const base = opts || {};
+        list.forEach((f, i) => {
+            tone({ freq: f, type: base.type || 'triangle', dur: base.dur || 0.16, vol: base.vol || 0.11, delay: (base.delay || 0) + i * (base.gap || 0.09) });
+        });
+    }
+
+    return {
+        ensure,
+        isMuted: () => muted,
+        toggle() { muted = !muted; localStorage.setItem(STORE_SOUND, muted ? 'off' : 'on'); if (!muted) this.chip(); return muted; },
+        chip() { tone({ freq: 900, slide: 620, type: 'triangle', dur: 0.07, vol: 0.09 }); },
+        tick(power) { tone({ freq: 1500 - 500 * (power || 0.5), slide: 900, type: 'square', dur: 0.022, vol: 0.012 + 0.028 * (power || 0.5) }); },
+        whoosh() { noise({ dur: 0.55, vol: 0.07, from: 260, to: 2600, q: 0.9 }); },
+        land() { tone({ freq: 180, slide: 90, type: 'sine', dur: 0.18, vol: 0.16 }); noise({ dur: 0.12, vol: 0.05, from: 1800, to: 400 }); },
+        win() { seq([523.25, 659.25, 783.99, 1046.5], { gap: 0.08, dur: 0.18, vol: 0.1 }); },
+        jackpot() {
+            seq([523.25, 659.25, 783.99, 1046.5, 1318.5, 1567.98, 2093], { gap: 0.07, dur: 0.22, vol: 0.11 });
+            tone({ freq: 1046.5, type: 'sine', dur: 0.5, vol: 0.05, delay: 0.5 });
+        },
+        lose() { tone({ freq: 240, slide: 130, type: 'sawtooth', dur: 0.3, vol: 0.07 }); },
+        mult(is7) {
+            seq(is7 ? [880, 1174.7, 1567.98] : [660, 880], { gap: 0.07, dur: 0.15, vol: 0.1, type: 'sine' });
+            tone({ freq: is7 ? 2093 : 1318.5, type: 'sine', dur: 0.4, vol: 0.05, delay: 0.12 });
+            noise({ dur: 0.3, vol: 0.04, from: 2400, to: 6000 });
+        },
+        respin() { tone({ freq: 720, slide: 1100, type: 'triangle', dur: 0.08, vol: 0.07 }); },
+        reward() { seq([783.99, 1046.5, 1318.5], { gap: 0.09, dur: 0.2, vol: 0.09 }); }
+    };
+})();
+
+/* ---------------- 3. State & Persistence ---------------- */
+function loadBalance() {
+    const raw = localStorage.getItem(STORE_CHIPS);
+    const parsed = raw !== null ? parseInt(raw, 10) : NaN;
+    return Number.isFinite(parsed) && parsed >= 0 ? parsed : START_CHIPS;
+}
+function saveBalance() {
+    localStorage.setItem(STORE_CHIPS, String(Math.max(0, Math.floor(balance))));
+}
+function emptyBets() { return { 1: 0, 2: 0, 5: 0, 10: 0, 20: 0, 40: 0 }; }
+function loadBets() {
+    const b = emptyBets();
+    try {
+        const raw = localStorage.getItem(STORE_BETS);
+        if (!raw) return b;
+        const saved = JSON.parse(raw) || {};
+        NUMBERS.forEach(n => {
+            const v = saved[n];
+            b[n] = Number.isFinite(v) && v > 0 ? Math.floor(v) : 0;
+        });
+    } catch (e) { /* ignore */ }
+    return b;
+}
+function saveBets() {
+    try { localStorage.setItem(STORE_BETS, JSON.stringify(bets)); } catch (e) { /* ignore */ }
+}
+function loadStats() {
+    const def = { spins: 0, hits: 0, profit: 0, best: 0, history: [] };
+    try {
+        const raw = localStorage.getItem(STORE_STATS);
+        if (!raw) return def;
+        const s = JSON.parse(raw) || {};
+        return {
+            spins: s.spins || 0,
+            hits: s.hits || 0,
+            profit: s.profit || 0,
+            best: s.best || 0,
+            history: Array.isArray(s.history) ? s.history.filter(v => typeof v === 'string').slice(0, 16) : []
+        };
+    } catch (e) { return def; }
+}
+function saveStats() {
+    try {
+        stats.history = stats.history.slice(0, 16);
+        localStorage.setItem(STORE_STATS, JSON.stringify(stats));
+    } catch (e) { /* ignore */ }
+    saveBets();
+}
+
+let balance = loadBalance();
+let bets = loadBets();
+let stats = loadStats();
+let lastBets = null;
+let selectedChip = 500;
+let busy = false;
+let chain = 1;
+let chainHits = [];
+let roundStake = 0;
+
+/* ---------------- 4. DOM refs ---------------- */
+const chipsEl = $('userChips');
+const historyRail = $('historyRail');
+const chainBar = $('chainBar');
+const chainTitle = $('chainTitle');
+const chainNote = $('chainNote');
+const chainSteps = $('chainSteps');
+const chainTotalEl = $('chainTotal');
+const hubChain = $('hubChain');
+const wheelWrap = $('wheelWrap');
+const wheelPointer = $('wheelPointer');
+const multPopup = $('multPopup');
+const multHit = $('multHit');
+const multAfter = $('multAfter');
+const respinBox = $('respinBox');
+const respinCount = $('respinCount');
+const statusMessage = $('statusMessage');
+const totalBetEl = $('totalBetAmount');
+const spinBtn = $('spinBtn');
+const allInBtn = $('allInBtn');
+const halfBtn = $('halfBtn');
+const doubleBtn = $('doubleBtn');
+const rebetBtn = $('rebetBtn');
+const clearBtn = $('clearBtn');
+const statSpinsEl = $('statSpins');
+const statHitsEl = $('statHits');
+const statRateEl = $('statRate');
+const statBestEl = $('statBest');
+const statNetEl = $('statNet');
+const soundToggleBtn = $('soundToggleBtn');
+const rulesBtn = $('rulesBtn');
+const closeRulesBtn = $('closeRulesBtn');
+const rulesModal = $('rulesModal');
+const freeChargeBtn = $('freeChargeBtn');
+const adModal = $('adModal');
+const adTimerFill = $('adTimerFill');
+const adTimerText = $('adTimerText');
+const bankruptModal = $('bankruptModal');
+const claimReliefBtn = $('claimReliefBtn');
+const resultOverlay = $('resultOverlay');
+const resultCard = $('resultCard');
+const resHeadline = $('resHeadline');
+const resAmount = $('resAmount');
+const resDetail = $('resDetail');
+const resCloseBtn = $('resCloseBtn');
+const confettiCanvas = $('confettiCanvas');
+const cctx = confettiCanvas.getContext('2d');
+
+const spotEls = {}, badgeEls = {}, tagEls = {}, chipEls = [];
+NUMBERS.forEach(n => {
+    spotEls[n] = document.querySelector('.bet-spot[data-num="' + n + '"]');
+    badgeEls[n] = $('badge-' + n);
+    tagEls[n] = $('tag-' + n);
+});
+document.querySelectorAll('.chip-btn').forEach(el => chipEls.push(el));
+
+/* ---------------- 5. Wallet / Betting Table ---------------- */
+function totalBet() { return NUMBERS.reduce((s, n) => s + bets[n], 0); }
+function renderWallet() { chipsEl.textContent = Math.max(0, Math.floor(balance)).toLocaleString(); }
+function fmtBet(v) { return v >= 1000 ? (v / 1000).toFixed(v % 1000 === 0 ? 0 : 1) + 'K' : String(v); }
+
+function setStatus(html, tone) {
+    const color = tone === 'gold' ? 'var(--gold2)'
+        : tone === 'chain' ? '#ffb3d9'
+            : tone === 'warn' ? '#fbbf24'
+                : tone === 'lose' ? '#94a3b8'
+                    : '#c3ccea';
+    statusMessage.innerHTML = '<span style="color:' + color + '">' + html + '</span>';
+}
+
+function renderBets() {
+    NUMBERS.forEach(n => {
+        const bet = bets[n] || 0;
+        spotEls[n].classList.toggle('has-bet', bet > 0);
+        if (bet > 0) {
+            badgeEls[n].classList.add('show');
+            badgeEls[n].textContent = fmtBet(bet);
+        } else {
+            badgeEls[n].classList.remove('show');
+        }
+        if (chain > 1) {
+            tagEls[n].style.display = 'block';
+            tagEls[n].textContent = '×' + chain;
+        } else {
+            tagEls[n].style.display = 'none';
+        }
+    });
+    totalBetEl.textContent = totalBet().toLocaleString();
+    renderButtons();
+}
+
+function renderButtons() {
+    const total = totalBet();
+    spinBtn.disabled = busy || total <= 0;
+    allInBtn.disabled = busy || balance <= 0;
+    halfBtn.disabled = busy || total <= 0;
+    doubleBtn.disabled = busy || total <= 0 || balance <= 0;
+    clearBtn.disabled = busy || total <= 0;
+    rebetBtn.disabled = busy || (lastBets ? NUMBERS.reduce((s, n) => s + lastBets[n], 0) <= 0 : true);
+    chipEls.forEach(el => el.classList.toggle('selected', Number(el.dataset.value) === selectedChip));
+}
+
+function addChip(num, amount) {
+    if (busy) return;
+    const add = Math.min(amount, Math.floor(balance));
+    if (add <= 0) {
+        setStatus('💡 칩이 부족합니다 — 📺 무료 칩(+5,000) 또는 긴급 구호금을 사용하세요', 'warn');
+        maybeShowRelief();
+        return;
+    }
+    bets[num] += add;
+    balance -= add;
+    saveBalance();
+    saveBets();
+    SoundFX.chip();
+    renderWallet();
+    renderBets();
+    setStatus('🎯 ' + num + '번에 ' + add.toLocaleString() + '칩 베팅 · 총 베팅 ' + totalBet().toLocaleString(), 'gold');
+}
+
+function clearBets(silent) {
+    if (busy) return;
+    const refund = totalBet();
+    if (refund <= 0) return;
+    balance += refund;
+    bets = emptyBets();
+    saveBalance();
+    saveBets();
+    if (!silent) {
+        SoundFX.chip();
+        setStatus('↩️ 베팅 초기화 · ' + refund.toLocaleString() + '칩 반환');
+    }
+    renderWallet();
+    renderBets();
+}
+
+function halveBets() {
+    if (busy || totalBet() <= 0) return;
+    let refund = 0;
+    NUMBERS.forEach(n => {
+        const back = Math.floor(bets[n] / 2);
+        bets[n] -= back;
+        refund += back;
+    });
+    balance += refund;
+    saveBalance(); saveBets();
+    SoundFX.chip();
+    renderWallet(); renderBets();
+    setStatus('½ 베팅 절반 · ' + refund.toLocaleString() + '칩 반환');
+}
+
+function doubleBets() {
+    if (busy || totalBet() <= 0) return;
+    const total = totalBet();
+    if (balance < total) {
+        setStatus('💡 베팅 2배에 필요한 칩이 부족합니다', 'warn');
+        SoundFX.lose();
+        return;
+    }
+    NUMBERS.forEach(n => { if (bets[n] > 0) bets[n] *= 2; });
+    balance -= total;
+    saveBalance(); saveBets();
+    SoundFX.chip();
+    renderWallet(); renderBets();
+    setStatus('2X 베팅 2배 · 총 베팅 ' + totalBet().toLocaleString());
+}
+
+function rebet() {
+    if (busy || !lastBets) return;
+    const need = NUMBERS.reduce((s, n) => s + lastBets[n], 0);
+    if (need <= 0) return;
+    clearBets(true);
+    if (balance < need) {
+        setStatus('💡 재베팅에 필요한 칩이 부족합니다', 'warn');
+        SoundFX.lose();
+        renderWallet(); renderBets();
+        return;
+    }
+    NUMBERS.forEach(n => { bets[n] = lastBets[n] || 0; });
+    balance -= need;
+    saveBalance(); saveBets();
+    SoundFX.chip();
+    renderWallet(); renderBets();
+    setStatus('🔁 직전 베팅 재배치 · 총 베팅 ' + need.toLocaleString());
+}
+
+function allIn() {
+    if (busy) return;
+    clearBets(true);
+    const total = Math.floor(balance);
+    if (total < 60) {
+        setStatus('💡 분산 베팅에 필요한 칩이 부족합니다', 'warn');
+        maybeShowRelief();
+        return;
+    }
+    const plan = {};
+    let allocated = 0;
+    NUMBERS.forEach(n => {
+        plan[n] = Math.floor((total * SLOT_COUNTS[String(n)] / NUMBER_WEIGHT) / 10) * 10;
+        allocated += plan[n];
+    });
+    plan[1] += total - allocated;
+    NUMBERS.forEach(n => {
+        if (plan[n] > 0) {
+            bets[n] += plan[n];
+            balance -= plan[n];
+        }
+    });
+    saveBalance(); saveBets();
+    SoundFX.chip();
+    renderWallet(); renderBets();
+    setStatus('🔥 ALL IN — 54칸 출현 비율로 ' + total.toLocaleString() + '칩 분산 베팅!', 'gold');
+}
+
+/* ---------------- 6. Wheel Canvas (pre-rendered sprite @60fps) ---------------- */
+const wheelCanvas = $('wheelCanvas');
+const wctx = wheelCanvas.getContext('2d');
+const WHEEL_SIZE = wheelCanvas.width;                 // 760
+const WHEEL_R = WHEEL_SIZE / 2 - 30;
+let wheelSprite = null;
+let wheelAngle = 0;
+let motion = null;
+let motionResolve = null;
+let flapperAngle = 0;
+let lastTickAt = 0;
+let lastTopIdx = -1;
+let lastFrameTime = 0;
+
+function buildWheelSprite() {
+    const size = WHEEL_SIZE;
+    const c = document.createElement('canvas');
+    c.width = size; c.height = size;
+    const g = c.getContext('2d');
+    g.translate(size / 2, size / 2);
+    const R = WHEEL_R;
+
+    g.beginPath(); g.arc(0, 0, R, 0, Math.PI * 2);
+    g.fillStyle = '#080b16'; g.fill();
+
+    const seen = {};
+    for (let i = 0; i < TOTAL_SLOTS; i++) {
+        const label = SLOT_LABELS[i];
+        const st = SLOT_STYLE[label];
+        const start = i * ARC;
+        const end = start + ARC;
+
+        g.beginPath();
+        g.moveTo(0, 0);
+        g.arc(0, 0, R, start, end);
+        g.closePath();
+        const grad = g.createRadialGradient(0, 0, R * 0.10, 0, 0, R);
+        grad.addColorStop(0, '#05070f');
+        grad.addColorStop(0.34, st.b);
+        grad.addColorStop(0.88, st.a);
+        grad.addColorStop(1, st.a);
+        g.fillStyle = grad;
+        g.fill();
+
+        seen[label] = (seen[label] || 0) + 1;
+        if (seen[label] % 2 === 0) {
+            g.fillStyle = 'rgba(0,0,0,0.17)';
+            g.fill();
+        }
+
+        g.lineWidth = 1.4;
+        g.strokeStyle = 'rgba(3,5,12,0.8)';
+        g.stroke();
+
+        if (label === '40' || label === '2X' || label === '7X') {
+            g.beginPath();
+            g.arc(0, 0, R - 2, start + 0.004, end - 0.004);
+            g.strokeStyle = label === '40' ? '#ffe680' : (label === '2X' ? '#a5f3fc' : '#fbcfe8');
+            g.lineWidth = 4;
+            g.stroke();
+        }
+
+        g.save();
+        g.rotate(start + ARC / 2);
+        g.textAlign = 'right';
+        g.textBaseline = 'middle';
+        const isMult = (label === '2X' || label === '7X');
+        g.font = '900 ' + (isMult ? 23 : 26) + 'px "Noto Sans KR", "Segoe UI", sans-serif';
+        g.fillStyle = st.text;
+        g.shadowColor = 'rgba(0,0,0,0.55)';
+        g.shadowBlur = 5;
+        g.fillText(label, R - 15, 0);
+        g.restore();
+    }
+
+    for (let i = 0; i < TOTAL_SLOTS; i++) {
+        const a = i * ARC;
+        const px = Math.cos(a) * (R - 1);
+        const py = Math.sin(a) * (R - 1);
+        g.beginPath();
+        g.arc(px, py, 3.1, 0, Math.PI * 2);
+        g.fillStyle = (i % 2 === 0) ? '#ffe9a3' : '#ffd24a';
+        g.fill();
+        g.strokeStyle = 'rgba(80,44,0,0.7)';
+        g.lineWidth = 1;
+        g.stroke();
+    }
+
+    g.beginPath(); g.arc(0, 0, R * 0.305, 0, Math.PI * 2);
+    const inner = g.createRadialGradient(0, 0, 0, 0, 0, R * 0.32);
+    inner.addColorStop(0, '#111830');
+    inner.addColorStop(1, '#04060d');
+    g.fillStyle = inner;
+    g.fill();
+    g.strokeStyle = 'rgba(247,201,72,0.4)';
+    g.lineWidth = 2.5;
+    g.stroke();
+
+    g.beginPath(); g.arc(0, 0, R, 0, Math.PI * 2);
+    g.strokeStyle = 'rgba(0,0,0,0.6)';
+    g.lineWidth = 7;
+    g.stroke();
+
+    wheelSprite = c;
+}
+
+function drawRim(now) {
+    const cx = WHEEL_SIZE / 2;
+    const R = WHEEL_R;
+    wctx.save();
+    wctx.translate(cx, cx);
+
+    wctx.beginPath(); wctx.arc(0, 0, R + 13, 0, Math.PI * 2);
+    wctx.strokeStyle = '#231a3d'; wctx.lineWidth = 24; wctx.stroke();
+    wctx.beginPath(); wctx.arc(0, 0, R + 25, 0, Math.PI * 2);
+    wctx.strokeStyle = '#0c0918'; wctx.lineWidth = 5; wctx.stroke();
+    wctx.beginPath(); wctx.arc(0, 0, R + 3, 0, Math.PI * 2);
+    wctx.strokeStyle = 'rgba(247,201,72,0.45)'; wctx.lineWidth = 3; wctx.stroke();
+
+    const bulbs = 40;
+    const spinPhase = motion ? now * 0.016 : now * 0.0035;
+    for (let b = 0; b < bulbs; b++) {
+        const ang = (b / bulbs) * Math.PI * 2;
+        const bx = Math.cos(ang) * (R + 13);
+        const by = Math.sin(ang) * (R + 13);
+        const on = motion
+            ? Math.sin(b * 1.7 - spinPhase * 3.2) > -0.1
+            : Math.sin(b * 0.75 + spinPhase) > 0.15;
+        wctx.beginPath();
+        wctx.arc(bx, by, 4.4, 0, Math.PI * 2);
+        if (on) {
+            wctx.fillStyle = (b % 2 === 0) ? '#fde68a' : '#67e8f9';
+            wctx.shadowColor = (b % 2 === 0) ? '#f59e0b' : '#22d3ee';
+            wctx.shadowBlur = 12;
+        } else {
+            wctx.fillStyle = '#2a2f47';
+            wctx.shadowBlur = 0;
+        }
+        wctx.fill();
+    }
+    wctx.restore();
+}
+
+function drawWheel(now) {
+    wctx.clearRect(0, 0, WHEEL_SIZE, WHEEL_SIZE);
+    if (wheelSprite) {
+        wctx.save();
+        wctx.translate(WHEEL_SIZE / 2, WHEEL_SIZE / 2);
+        wctx.rotate(wheelAngle);
+        wctx.drawImage(wheelSprite, -WHEEL_SIZE / 2, -WHEEL_SIZE / 2);
+        wctx.restore();
+    }
+    drawRim(now);
+}
+
+function slotProgressAtTop() {
+    return mod((TOP_ANGLE - wheelAngle) / ARC, TOTAL_SLOTS);
+}
+function landedSlotIndex() {
+    return Math.floor(slotProgressAtTop()) % TOTAL_SLOTS;
+}
+
+function frame(now) {
+    requestAnimationFrame(frame);
+    const dt = Math.max(8, now - (lastFrameTime || now));
+    lastFrameTime = now;
+
+    if (motion) {
+        const p = Math.min((now - motion.t0) / motion.dur, 1);
+        const ease = 1 - Math.pow(1 - p, 4.6);
+        const prev = wheelAngle;
+        wheelAngle = motion.from + motion.delta * ease;
+        const step = wheelAngle - prev;
+        const speed = Math.abs(step) / (ARC * dt / 1000);   // slots per second
+
+        const k = slotProgressAtTop();
+        const idx = Math.floor(k);
+        if (idx !== lastTopIdx) {
+            lastTopIdx = idx;
+            if (now - lastTickAt > 24) {
+                lastTickAt = now;
+                SoundFX.tick(Math.min(1, speed / 24));
+            }
+        }
+        flapperAngle += ((0.5 - (k - idx)) * 26 - flapperAngle) * 0.4;
+
+        if (p >= 1) {
+            wheelAngle = motion.from + motion.delta;
+            motion = null;
+            const done = motionResolve;
+            motionResolve = null;
+            if (done) done();
+        }
+    } else {
+        flapperAngle *= 0.82;
+        if (Math.abs(flapperAngle) < 0.05) flapperAngle = 0;
+    }
+
+    wheelPointer.style.transform = 'translateX(-50%) rotate(' + flapperAngle.toFixed(2) + 'deg)';
+    drawWheel(now);
+}
+
+function spinTo(slotIndex, spins, dur) {
+    const jitter = (Math.random() - 0.5) * ARC * 0.46;
+    const target = TOP_ANGLE - (slotIndex + 0.5) * ARC + jitter;
+    const delta = mod(target - wheelAngle, Math.PI * 2) + spins * Math.PI * 2;
+    lastTopIdx = -1;
+    motion = { from: wheelAngle, delta: delta, t0: performance.now(), dur: dur };
+    return new Promise(res => { motionResolve = res; });
+}
+
+/* ---------------- 7. Chain Bar ---------------- */
+function renderChain() {
+    chainTotalEl.textContent = '×' + chain;
+    chainTotalEl.classList.toggle('on', chain > 1);
+    chainBar.classList.toggle('active', chain > 1);
+    chainTitle.classList.toggle('on', chain > 1);
+    chainNote.textContent = chain > 1
+        ? '베팅 잠금 · 누적 ×' + chain + ' · 무료 리스핀'
+        : '2X·7X 적중 시 베팅 유지 + 자동 리스핀';
+    hubChain.textContent = '×' + chain;
+    hubChain.classList.toggle('show', chain > 1);
+
+    chainSteps.innerHTML = '';
+    if (chainHits.length === 0) {
+        ['2X', '7X'].forEach(t => {
+            const d = document.createElement('div');
+            d.className = 'chain-chip';
+            d.textContent = t;
+            chainSteps.appendChild(d);
+        });
+    } else {
+        chainHits.slice(-4).forEach(t => {
+            const d = document.createElement('div');
+            d.className = 'chain-chip on';
+            d.textContent = t;
+            chainSteps.appendChild(d);
+        });
+    }
+    NUMBERS.forEach(n => {
+        if (chain > 1) {
+            tagEls[n].style.display = 'block';
+            tagEls[n].textContent = '×' + chain;
+        } else {
+            tagEls[n].style.display = 'none';
+        }
+    });
+}
+
+function playMultFX(m) {
+    const is7 = (m === 7);
+    multHit.textContent = '×' + m;
+    multHit.className = 'mult-hit ' + (is7 ? 'c7' : 'c2');
+    multAfter.textContent = '누적 승수 ×' + chain;
+    multPopup.className = 'mult-popup show ' + (is7 ? 'b7' : 'b2');
+    wheelWrap.classList.toggle('glow7', is7);
+    wheelWrap.classList.toggle('glow2', !is7);
+    SoundFX.mult(is7);
+    triggerConfetti(is7 ? 70 : 34);
+}
+function hideMultFX() {
+    multPopup.className = 'mult-popup';
+    wheelWrap.classList.remove('glow2', 'glow7');
+}
+
+async function countdownRespin() {
+    respinBox.classList.add('show');
+    for (let n = 3; n >= 1; n--) {
+        respinCount.textContent = n;
+        SoundFX.respin();
+        await sleep(620);
+    }
+    respinBox.classList.remove('show');
+    await sleep(140);
+}
+
+/* ---------------- 8. Stats & History ---------------- */
+function renderStats() {
+    const rate = stats.spins > 0 ? (stats.hits / stats.spins) * 100 : 0;
+    statSpinsEl.textContent = stats.spins.toLocaleString();
+    statHitsEl.textContent = stats.hits.toLocaleString();
+    statRateEl.textContent = stats.spins > 0 ? rate.toFixed(1) + '%' : '-';
+    statBestEl.textContent = stats.best > 0 ? stats.best + 'X' : '-';
+    statNetEl.textContent = (stats.profit >= 0 ? '+' : '−') + Math.abs(stats.profit).toLocaleString();
+    statNetEl.classList.toggle('plus', stats.profit > 0);
+    statNetEl.classList.toggle('minus', stats.profit < 0);
+}
+
+function renderHistory() {
+    historyRail.innerHTML = '';
+    stats.history.forEach(label => {
+        const pill = document.createElement('div');
+        pill.className = 'hist-pill p-' + label;
+        if (label === '20' || label === '40') pill.classList.add('hi');
+        if (label === '2X' || label === '7X') pill.classList.add('mult');
+        pill.textContent = label;
+        historyRail.appendChild(pill);
+    });
+    historyRail.scrollLeft = 0;
+}
+
+function pushHistory(label) {
+    stats.history.unshift(label);
+    if (stats.history.length > 16) stats.history.pop();
+    renderHistory();
+}
+
+/* ---------------- 9. Confetti ---------------- */
+let confettiParticles = [];
+let confettiRunning = false;
+
+function resizeConfetti() {
+    confettiCanvas.width = window.innerWidth;
+    confettiCanvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resizeConfetti);
+resizeConfetti();
+
+function triggerConfetti(count) {
+    const colors = ['#f7c948', '#ffe680', '#22d3ee', '#ec4899', '#a855f7', '#ffffff', '#34d399'];
+    for (let i = 0; i < count; i++) {
+        confettiParticles.push({
+            x: confettiCanvas.width / 2 + (Math.random() - 0.5) * 220,
+            y: confettiCanvas.height * 0.42 + (Math.random() - 0.5) * 60,
+            vx: (Math.random() - 0.5) * 12,
+            vy: -Math.random() * 13 - 3,
+            g: 0.3 + Math.random() * 0.16,
+            size: 4 + Math.random() * 7,
+            rot: Math.random() * Math.PI,
+            vr: (Math.random() - 0.5) * 0.35,
+            color: colors[Math.floor(Math.random() * colors.length)]
+        });
+    }
+    if (!confettiRunning) runConfetti();
+}
+
+function runConfetti() {
+    confettiRunning = true;
+    const step = () => {
+        cctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+        confettiParticles = confettiParticles.filter(p => p.y < confettiCanvas.height + 60 && p.x > -80 && p.x < confettiCanvas.width + 80);
+        confettiParticles.forEach(p => {
+            p.vy += p.g;
+            p.x += p.vx;
+            p.y += p.vy;
+            p.vx *= 0.995;
+            p.rot += p.vr;
+            cctx.save();
+            cctx.translate(p.x, p.y);
+            cctx.rotate(p.rot);
+            cctx.fillStyle = p.color;
+            cctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.62);
+            cctx.restore();
+        });
+        if (confettiParticles.length > 0) {
+            requestAnimationFrame(step);
+        } else {
+            confettiRunning = false;
+            cctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+        }
+    };
+    requestAnimationFrame(step);
+}
+
+/* ---------------- 10. Spin & Settlement ---------------- */
+async function spin(isRespin) {
+    if (busy) return;
+    const stake = totalBet();
+    if (!isRespin) {
+        if (stake <= 0) {
+            setStatus('💡 번호에 칩을 걸고 SPIN을 눌러주세요', 'warn');
+            SoundFX.lose();
+            return;
+        }
+        roundStake = stake;
+        lastBets = { 1: bets[1], 2: bets[2], 5: bets[5], 10: bets[10], 20: bets[20], 40: bets[40] };
+        saveBets();
+    }
+    busy = true;
+    SoundFX.ensure();
+    renderButtons();
+    hideResult();
+
+    setStatus(isRespin
+        ? '🔄 무료 리스핀! 누적 승수 ×' + chain + ' · 베팅 잠금'
+        : '🎡 54칸 행운의 휠이 돌아갑니다...', isRespin ? 'chain' : null);
+
+    const winIdx = Math.floor(Math.random() * TOTAL_SLOTS);
+    SoundFX.whoosh();
+    await spinTo(winIdx, isRespin ? 3 : 6, isRespin ? 3900 : 6300);
+    SoundFX.land();
+
+    const landed = SLOT_LABELS[landedSlotIndex()];
+    await sleep(420);
+    await settle(landed);
+}
+
+async function settle(label) {
+    pushHistory(label);
+    stats.spins++;
+
+    if (label === '2X' || label === '7X') {
+        const m = (label === '2X') ? 2 : 7;
+        chain *= m;
+        chainHits.push(label);
+        playMultFX(m);
+        renderChain();
+        renderBets();
+        setStatus('🔥 ' + label + ' 적중! 이번 승수 ×' + m + ' → 누적 ×' + chain + ' · 베팅 유지 & 자동 리스핀', 'chain');
+        saveStats();
+        renderStats();
+        await sleep(1650);
+        hideMultFX();
+        await countdownRespin();
+        busy = false;
+        renderButtons();
+        spin(true);
+        return;
+    }
+
+    const pay = BASE_PAY[label];
+    const betOn = bets[label] || 0;
+    const chainUsed = chain;
+    const hadChain = chainUsed > 1;
+    const returnMult = pay * chainUsed + 1;
+    const won = betOn > 0 ? betOn * returnMult : 0;
+    const net = won - roundStake;
+
+    stats.profit += net;
+    if (won > 0) {
+        stats.hits++;
+        if (returnMult > stats.best) stats.best = returnMult;
+    }
+    balance += won;
+    saveBalance();
+
+    bets = emptyBets();
+    chain = 1;
+    chainHits = [];
+    saveBets();
+    saveStats();
+
+    busy = false;
+    renderWallet();
+    renderStats();
+    renderChain();
+    renderBets();
+
+    if (won > 0) {
+        const tier = (hadChain && returnMult >= 100) ? 'super' : (won >= roundStake * 10 ? 'super' : '');
+        resultCard.className = 'result-card' + (tier === 'super' ? ' super' : '');
+        resHeadline.textContent = returnMult >= 100 ? '💎 DREAM JACKPOT!' : (won >= roundStake * 5 ? '🔥 BIG WIN!' : '🎉 WINNER!');
+        resAmount.textContent = '+' + won.toLocaleString();
+        resAmount.className = 'res-amount';
+        resDetail.innerHTML = '당첨 번호 <b>' + label + '</b> · ' + pay + ' : 1 배당 (회수 ' + returnMult + '배)'
+            + (hadChain ? '<br><span class="chainline">×' + chainUsed + ' 체인 → ' + pay + ' × ' + chainUsed + ' + 1 = ' + returnMult + '배 폭발!</span>' : '');
+        setStatus('🎉 ' + label + '번 당첨! +' + won.toLocaleString() + '칩 획득', 'gold');
+        if (returnMult >= 100) { SoundFX.jackpot(); triggerConfetti(150); }
+        else if (won >= roundStake * 5) { SoundFX.jackpot(); triggerConfetti(90); }
+        else { SoundFX.win(); triggerConfetti(55); }
+        showResult();
+    } else {
+        setStatus('🎯 당첨 번호 <b>' + label + '</b> — 아쉽습니다. 다음 스핀에 도전!', 'lose');
+        SoundFX.lose();
+        if (balance <= 0) setTimeout(maybeShowRelief, 700);
+    }
+}
+
+/* ---------------- 11. Result & Bankrupt modals ---------------- */
+function showResult() { resultOverlay.classList.add('show'); }
+function hideResult() { resultOverlay.classList.remove('show'); }
+
+let reliefShown = false;
+function maybeShowRelief() {
+    if (busy) return;
+    if (balance > 0 || totalBet() > 0) return;
+    if (reliefShown) return;
+    reliefShown = true;
+    bankruptModal.classList.add('show');
+}
+function claimRelief() {
+    balance += 2000;
+    saveBalance();
+    renderWallet();
+    renderBets();
+    bankruptModal.classList.remove('show');
+    reliefShown = false;
+    SoundFX.reward();
+    triggerConfetti(45);
+    setStatus('🚨 긴급 구호금 +2,000칩 지급 완료 — 다시 도전하세요!', 'gold');
+}
+
+/* ---------------- 12. Rewarded Ad ---------------- */
+let adRunning = false;
+function openAd() {
+    if (adRunning) return;
+    adRunning = true;
+    SoundFX.ensure();
+    adTimerFill.style.width = '0%';
+    adTimerText.textContent = '5초 후 충전 완료...';
+    adModal.classList.add('show');
+    const t0 = performance.now();
+    const tick = () => {
+        const elapsed = performance.now() - t0;
+        const p = Math.min(elapsed / 5000, 1);
+        adTimerFill.style.width = (p * 100).toFixed(1) + '%';
+        const left = Math.ceil((5000 - elapsed) / 1000);
+        adTimerText.textContent = left > 0 ? left + '초 후 충전 완료...' : '충전 중...';
+        if (p < 1) {
+            setTimeout(tick, 100);
+        } else {
+            adRunning = false;
+            adModal.classList.remove('show');
+            balance += 5000;
+            saveBalance();
+            renderWallet();
+            reliefShown = false;
+            SoundFX.reward();
+            triggerConfetti(45);
+            setStatus('📺 광고 시청 완료! 무료 칩 +5,000 충전되었습니다', 'gold');
+        }
+    };
+    setTimeout(tick, 100);
+}
+
+/* ---------------- 13. Events ---------------- */
+NUMBERS.forEach(n => {
+    spotEls[n].addEventListener('click', () => addChip(n, selectedChip));
+});
+
+chipEls.forEach(el => {
+    el.addEventListener('click', () => {
+        selectedChip = Number(el.dataset.value);
+        SoundFX.chip();
+        renderButtons();
+        setStatus('🪙 ' + selectedChip.toLocaleString() + '칩 선택 — 번호를 눌러 베팅하세요');
+    });
+});
+
+spinBtn.addEventListener('click', () => spin(false));
+allInBtn.addEventListener('click', allIn);
+halfBtn.addEventListener('click', halveBets);
+doubleBtn.addEventListener('click', doubleBets);
+rebetBtn.addEventListener('click', rebet);
+clearBtn.addEventListener('click', () => clearBets(false));
+
+resCloseBtn.addEventListener('click', hideResult);
+resultOverlay.addEventListener('click', e => { if (e.target === resultOverlay) hideResult(); });
+
+soundToggleBtn.addEventListener('click', () => {
+    const muted = SoundFX.toggle();
+    soundToggleBtn.textContent = muted ? '🔇' : '🔊';
+    setStatus(muted ? '🔇 사운드 꺼짐' : '🔊 사운드 켜짐');
+});
+
+rulesBtn.addEventListener('click', () => rulesModal.classList.add('show'));
+closeRulesBtn.addEventListener('click', () => rulesModal.classList.remove('show'));
+rulesModal.addEventListener('click', e => { if (e.target === rulesModal) rulesModal.classList.remove('show'); });
+
+freeChargeBtn.addEventListener('click', openAd);
+claimReliefBtn.addEventListener('click', claimRelief);
+
+adModal.addEventListener('click', e => {
+    if (e.target === adModal && !adRunning) adModal.classList.remove('show');
+});
+
+document.addEventListener('keydown', e => {
+    if (e.code === 'Space' || e.code === 'Enter') {
+        if (resultOverlay.classList.contains('show')) { hideResult(); e.preventDefault(); return; }
+        if (document.activeElement && document.activeElement.tagName === 'BUTTON') return;
+        if (!rulesModal.classList.contains('show')) { e.preventDefault(); spin(false); }
+    }
+    if (e.code === 'Escape') {
+        rulesModal.classList.remove('show');
+        hideResult();
+    }
+});
+
+/* ---------------- 14. Boot ---------------- */
+buildWheelSprite();
+renderWallet();
+renderChain();
+renderBets();
+renderStats();
+renderHistory();
+soundToggleBtn.textContent = SoundFX.isMuted() ? '🔇' : '🔊';
+if (totalBet() > 0) {
+    setStatus('🪙 이전 베팅 ' + totalBet().toLocaleString() + '칩이 유지되어 있습니다 — SPIN!', 'gold');
+}
+requestAnimationFrame(frame);
+
+    </script>
+</body>
+</html>
