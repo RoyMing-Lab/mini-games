@@ -490,6 +490,11 @@
             gap: 2px;
             min-height: 100px;
         }
+        .bead-grid.empty {
+            display: flex;
+            align-items: center;
+            min-height: 44px;
+        }
         .bead {
             width: 15px;
             height: 15px;
@@ -728,11 +733,16 @@
 
         .sq-panel {
             width: 100%;
-            max-width: 360px;
+            max-width: 340px;
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 10px;
+            padding: 16px 14px 18px;
+            border-radius: 20px;
+            background: linear-gradient(165deg, rgba(9, 40, 33, 0.97), rgba(4, 16, 13, 0.98));
+            border: 1px solid rgba(246, 207, 92, 0.4);
+            box-shadow: 0 22px 50px rgba(0, 0, 0, 0.75), inset 0 0 30px rgba(246, 207, 92, 0.06);
         }
         .sq-head { text-align: center; }
         .sq-tag {
@@ -1141,7 +1151,7 @@
             <div class="stat-row"><span>적중 라운드</span><b id="stWins">0회</b></div>
             <div class="stat-row"><span>적중률</span><b id="stRate">0%</b></div>
             <div class="stat-row"><span>누적 순손익</span><b id="stNet">0칩</b></div>
-            <div class="stat-row"><span>최고 단일 당첨</span><b id="stBest">0칩</b></div>
+            <div class="stat-row"><span>최고 순수익 라운드</span><b id="stBest">0칩</b></div>
             <div class="stat-row"><span>직접 쪼기 / 바로 오픈</span><b id="stSqueeze">0 / 0</b></div>
             <div class="stat-row" style="border:none;"><span>플레이어 / 뱅커 / 타이</span><b id="stBeads">0 / 0 / 0</b></div>
         </div>
@@ -1631,12 +1641,14 @@
     /* ============ 9. Round flow ============ */
     let pCards = [], bCards = [];
     let pRevealed = [], bRevealed = [];
+    let pShown = 0, bShown = 0;
 
     function resetTable() {
         pRow.innerHTML = '';
         bRow.innerHTML = '';
         pCards = []; bCards = [];
         pRevealed = []; bRevealed = [];
+        pShown = 0; bShown = 0;
         pBox.classList.remove('winner');
         bBox.classList.remove('winner');
         pScoreEl.className = 'score-pill';
@@ -1646,17 +1658,15 @@
     }
 
     function renderScores() {
-        const calc = (cards, rev) => {
-            if (!cards.length) return { text: '-', hidden: false, score: 0, all: true };
-            let sum = 0, hidden = false, shown = 0;
-            cards.forEach((c, i) => {
-                if (rev[i]) { sum += c.val; shown++; } else hidden = true;
-            });
-            if (!shown) return { text: '-', hidden: true, score: sum % 10, all: false };
+        const calc = (cards, shown) => {
+            if (!shown) return { text: '-', hidden: cards.length > 0, score: 0, all: false };
+            let sum = 0;
+            for (let i = 0; i < shown; i++) sum += cards[i].val;
+            const hidden = shown < cards.length;
             return { text: hidden ? (sum % 10) + '+?' : String(sum % 10), hidden, score: sum % 10, all: !hidden };
         };
-        const ps = calc(pCards, pRevealed);
-        const bs = calc(bCards, bRevealed);
+        const ps = calc(pCards, pShown);
+        const bs = calc(bCards, bShown);
         pScoreEl.textContent = ps.text;
         bScoreEl.textContent = bs.text;
         pScoreEl.classList.toggle('hidden-score', ps.hidden && !ps.all);
@@ -1695,7 +1705,8 @@
             if (isThird) el.classList.add('pop');
             else el.classList.add('pop');
             Sfx.flip();
-            if (side === 'p') pRevealed[idx] = true; else bRevealed[idx] = true;
+            if (side === 'p') { pRevealed[idx] = true; pShown = Math.max(pShown, idx + 1); }
+            else { bRevealed[idx] = true; bShown = Math.max(bShown, idx + 1); }
             renderScores();
             await sleep(190);
         };
@@ -1738,7 +1749,8 @@
         const landEl = makeCardEl(target.card, target.third);
         landEl.classList.add('pop');
         (target.side === 'p' ? pRow : bRow).appendChild(landEl);
-        if (target.side === 'p') pRevealed[target.idx] = true; else bRevealed[target.idx] = true;
+        if (target.side === 'p') { pRevealed[target.idx] = true; pShown = Math.max(pShown, target.idx + 1); }
+        else { bRevealed[target.idx] = true; bShown = Math.max(bShown, target.idx + 1); }
         renderScores();
 
         resolveRound(r, sqResult);
@@ -1861,7 +1873,7 @@
         if (sqCard.setPointerCapture) { try { sqCard.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ } }
         e.preventDefault();
     });
-    sqCard.addEventListener('pointermove', e => {
+    window.addEventListener('pointermove', e => {
         if (!sqDragging || !sqActive) return;
         const dx = e.clientX - sqStart.x;
         const dy = e.clientY - sqStart.y;
@@ -1879,8 +1891,7 @@
             sqCard.classList.remove('dragging');
             finishSqueeze(true);
         }
-        e.preventDefault();
-    });
+    }, { passive: false });
     const endDrag = () => {
         if (!sqDragging) return;
         sqDragging = false;
@@ -1901,8 +1912,8 @@
         if (from > 0.25) Sfx.friction(0.4);
     };
     sqCard.addEventListener('pointerup', endDrag);
-    sqCard.addEventListener('pointercancel', endDrag);
-    sqCard.addEventListener('pointerleave', () => { if (sqDragging) endDrag(); });
+    window.addEventListener('pointerup', endDrag);
+    window.addEventListener('pointercancel', endDrag);
 
     /* ============ 11. Resolution ============ */
     function fmtSigned(v) {
@@ -2039,9 +2050,12 @@
     function renderBeads() {
         beadGrid.innerHTML = '';
         if (!beads.length) {
+            beadGrid.className = 'bead-grid empty';
             beadGrid.innerHTML = '<div class="roadmap-empty">아직 기록이 없습니다. 첫 라운드를 시작해 보세요.</div>';
+            streakBadge.textContent = '기록 없음';
             return;
         }
+        beadGrid.className = 'bead-grid';
         beads.forEach(b => {
             const el = document.createElement('div');
             const cls = b.w === 'p' ? 'p' : b.w === 'b' ? 'b' : 't';
