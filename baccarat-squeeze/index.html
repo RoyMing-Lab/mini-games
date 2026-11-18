@@ -641,7 +641,7 @@
             align-items: center;
             justify-content: center;
             padding: 14px;
-            z-index: 120;
+            z-index: 300;
         }
         .modal-overlay.show { display: flex; }
         .modal-card {
@@ -1646,6 +1646,7 @@
     let pCards = [], bCards = [];
     let pRevealed = [], bRevealed = [];
     let pShown = 0, bShown = 0;
+    let pendingRelief = false;
 
     function resetTable() {
         pRow.innerHTML = '';
@@ -2036,7 +2037,7 @@
 
         renderAll();
         salonNote.textContent = '카드 쪼기 완료 · 다음 라운드를 준비하세요';
-        if (balance <= 0) setTimeout(showRelief, 900);
+        if (balance <= 0) pendingRelief = true;
     }
 
     function betsOf(obj, key) { return (obj[key] || 0) > 0; }
@@ -2049,6 +2050,10 @@
         setBanner('베팅 구역을 눌러 칩을 올리고 DEAL을 누르세요.');
         salonNote.textContent = '마지막 결정 카드를 직접 쪼세요';
         window.scrollTo({ top: 0, behavior: 'smooth' });
+        if (pendingRelief) {
+            pendingRelief = false;
+            setTimeout(showRelief, 420);
+        }
     });
 
     /* ============ 12. Bead plate ============ */
