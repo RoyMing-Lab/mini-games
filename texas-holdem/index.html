@@ -1725,7 +1725,7 @@ async function startHand() {
     handStartBalance = balance;
     let bonus = bonusBet;
     if (bonus > 0) {
-        if (balance < bonus) bonus = 0;
+        if (balance - bonus < BB) bonus = 0;
         else balance -= bonus;
     }
 
@@ -1947,6 +1947,9 @@ async function resolveHand() {
     setSeatWinner(winner === 'tie' ? null : winner);
     setSeatActive(null);
     setStreetLabel(g.folded ? '핸드 종료' : '쇼다운');
+    btnInfo.innerHTML = g.folded === 'p'
+        ? '폴드 · <b>다음 핸드</b>를 시작하세요'
+        : (winner === 'p' ? '승리 · <b>다음 핸드</b>를 시작하세요' : (winner === 'tie' ? '타이 · <b>다음 핸드</b>를 시작하세요' : '패배 · <b>다음 핸드</b>를 시작하세요'));
 
     resTitle.className = 'res-title ' + (winner === 'p' ? 'win' : winner === 'tie' ? 'tie' : 'lose');
     resTitle.innerHTML = resultText;
@@ -2046,6 +2049,7 @@ function enablePlayerControls(on) {
     const { need, maxTo, minTo } = betTargets();
     const canRaise = maxTo > minTo;
     raiseBtn.disabled = !canRaise;
+    raiseBtn.innerHTML = (need > 0 ? 'RAISE' : 'BET') + '<span class="sub">' + (need > 0 ? '레이즈' : '벳') + '</span>';
     callBtn.innerHTML = need > 0
         ? 'CALL<span class="sub">콜 ' + fmt(need) + '</span>'
         : 'CHECK<span class="sub">체크</span>';
@@ -2060,12 +2064,7 @@ function enablePlayerControls(on) {
     raiseSlider.value = String(startVal);
     paintRaise();
 
-    raiseSubSet(need);
     $('allinSub').textContent = maxTo > 0 ? '올인 ' + fmt(maxTo) : '올인';
-}
-
-function raiseSubSet(need) {
-    $('raiseSub').textContent = '레이즈';
 }
 
 function paintRaise() {
