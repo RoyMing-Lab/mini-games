@@ -1693,7 +1693,7 @@ async function spinOnce(isAuto) {
     addHistory(renderWays(curRows), win, stake);
 
     if (win > 0 && fsw <= 0) showWinOverlay(win, 0, 'SPIN');
-    else if (win <= 0 && balance <= 0) { SFX.bad(); showRelief(); }
+    if (balance < 100) { SFX.bad(); showRelief(); }
 
     busy = false;
     setBusyUI(false);
