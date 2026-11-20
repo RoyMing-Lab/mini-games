@@ -1495,6 +1495,10 @@ async function runRound(isFree, stake) {
     }
 
     if (isFree) fsTotalWin += totalWin;
+    if (!isFree) {
+        setMultBadge(1);
+        if (totalWin > 0) setStatus('✅ 당첨 +' + fmt(totalWin) + '칩 (텀블 ' + tumble + '회)', true);
+    }
     return totalWin;
 }
 
