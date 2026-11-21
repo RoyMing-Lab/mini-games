@@ -1528,6 +1528,7 @@ const CC_ENGINE = (() => {
             renderStats();
             saveStats();
             if (autoLeft > 0) scheduleAuto();
+            else if (autoRunning) stopAuto();
         }
     }
 
@@ -1740,13 +1741,8 @@ const CC_ENGINE = (() => {
     renderStats();
     if (Sound.muted) soundBtn.textContent = '🔇';
 
-    const demo = [];
-    for (let r = 0; r < E.ROWS; r++) {
-        const row = [];
-        for (let c = 0; c < E.COLS; c++) row.push(E.CLUSTER_KEYS[(r * 3 + c * 2) % E.CLUSTER_KEYS.length]);
-        demo.push(row);
-    }
-    paint(demo, null, {});
+    const demo = E.makeGrid();
+    paint(demo, E.spawnLights(demo, false, null), {});
     renderStats();
 
     window.CC_DEBUG = { E: E, stats: stats, get balance() { return balance; }, get bet() { return bet; }, doSpin: doSpin, maxWin: E.MAX_WIN_CAP };
