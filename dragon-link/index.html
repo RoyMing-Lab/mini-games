@@ -309,14 +309,14 @@
     /* ---------- bonus hud ---------- */
     .bonus-hud {
         display: none;
-        position: absolute;
-        top: -6px; left: 50%;
-        transform: translateX(-50%);
+        position: relative;
         z-index: 6;
+        margin: 0 auto 6px;
+        width: fit-content;
         background: linear-gradient(135deg, #c81e2b, #6b0810 70%);
         border: 1px solid #ffd04d;
         border-radius: 10px;
-        padding: 3px 10px;
+        padding: 3px 12px;
         text-align: center;
         box-shadow: 0 4px 16px rgba(0, 0, 0, 0.7), 0 0 18px rgba(255, 150, 40, 0.55);
         white-space: nowrap;
@@ -1537,7 +1537,6 @@ const DL = (() => {
         stats.links += 1;
         if (holds.size > stats.maxLink) stats.maxLink = holds.size;
         maxLink = Math.max(maxLink, holds.size);
-
         showBonusHud(true);
         paintBonusBoard(holds);
         setBonusHud(holds, respins);
@@ -1593,6 +1592,8 @@ const DL = (() => {
         /* resolve */
         const total = DL.bonusTotal(holds);
         const winChips = Math.round(total.mult * bet);
+        if (holds.size > stats.maxLink) stats.maxLink = holds.size;
+        maxLink = Math.max(maxLink, holds.size);
         setBonusHud(holds, Math.max(0, respins));
         setStatus('드래곤 링크 정산 · 머니 오브 ' + holds.size + '개');
         await T(500);
