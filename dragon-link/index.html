@@ -1838,16 +1838,6 @@ const DL = (() => {
 
     /* expose a simulation helper for verification (does not affect play) */
     window.dragonLinkSim = function (n) { return DL.simulate(n || 50000); };
-    /* TEMP verification hook: fires the hold & spin bonus with a fixed orb set */
-    window.__dlTestBonus = async function (n) {
-        const vals = [0.5, 1, 0.8, 2, 1.5, 3, 0.3, 1];
-        const orbs = new Map();
-        const count = Math.min(15, n || 6);
-        for (let i = 0; i < count; i++) orbs.set(allKeys[i], { jp: null, v: vals[i % vals.length] });
-        const r = await runBonus(orbs);
-        finishRound(r.win, bet, true, r);
-        return r;
-    };
 
     console.log('[Dragon Link] boot ok · paylines=' + DL.PAYLINES.length + ' · RTP sim helper: dragonLinkSim(100000)');
 })();
