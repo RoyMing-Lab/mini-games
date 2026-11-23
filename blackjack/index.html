@@ -1742,11 +1742,12 @@
             stats.profit += delta;
             stats.history.push({ result, delta, time: Date.now() });
 
-            // Restore current bet for next round if enough chips
+            // Restore current bet for next round if enough chips (다음 판 베팅도 칩에서 다시 차감)
             if (chips >= activeBet) {
                 currentBet = activeBet;
+                chips -= activeBet;
             } else {
-                currentBet = chips;
+                currentBet = 0;
             }
 
             saveStorage();
