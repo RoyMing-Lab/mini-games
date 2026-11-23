@@ -1096,6 +1096,7 @@
     </div>
 </div>
 
+<script src="../shared/wallet.js"></script>
 <script>
 /* =========================================================
    ROYAL DERBY 24K — single file game logic
@@ -1411,12 +1412,10 @@ class DerbyGame {
 
     /* ----- wallet & stats ----- */
     loadBalance() {
-        const raw = localStorage.getItem('casino_chips');
-        const parsed = raw !== null ? parseInt(raw, 10) : NaN;
-        return Number.isFinite(parsed) && parsed >= 0 ? parsed : 10000;
+        return Wallet.getBalance();
     }
     saveBalance() {
-        localStorage.setItem('casino_chips', String(this.balance));
+        Wallet.setBalance(this.balance);
     }
     addChips(amount) {
         this.balance += amount;
@@ -2716,6 +2715,14 @@ window.addEventListener('DOMContentLoaded', () => {
     window.derby = new DerbyGame();
 });
 
+
+    /* ===== 공용 코인 지갑 동기화 (다른 게임·탭·뒤로가기) ===== */
+    Wallet.subscribe(function (shared) {
+        if (!window.derby || window.derby.racing) return;
+        if (shared === window.derby.balance) return;
+        window.derby.balance = shared;
+        window.derby.updateUI();
+    });
 
 </script>
 </body>

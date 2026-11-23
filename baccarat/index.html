@@ -1016,6 +1016,7 @@
         </div>
     </div>
 
+    <script src="../shared/wallet.js"></script>
     <script>
         /* --- Audio Engine (Web Audio API) --- */
         let audioCtx = null;
@@ -1130,7 +1131,7 @@
 
         /* --- Game State & Data --- */
         let currentMode = 'baccarat'; // 'baccarat' or 'dragonTiger'
-        let balance = parseInt(localStorage.getItem('baccarat_chips')) || 10000;
+        let balance = Wallet.getBalance();
         let selectedChipValue = 1000;
         let isDealing = false;
 
@@ -1265,7 +1266,7 @@
             statBCountEl.textContent = stats.bankerCount;
             statTCountEl.textContent = stats.tieCount;
 
-            localStorage.setItem('baccarat_chips', balance);
+            Wallet.setBalance(balance);
             localStorage.setItem('baccarat_stats', JSON.stringify(stats));
             localStorage.setItem('baccarat_roadmap', JSON.stringify(roadmapHistory));
         }
@@ -1951,6 +1952,14 @@
 
         // Run
         window.addEventListener('DOMContentLoaded', init);
-    </script>
+        /* ===== 공용 코인 지갑 동기화 (다른 게임·탭·뒤로가기) ===== */
+        Wallet.subscribe(function (shared) {
+            if (isDealing) return;
+            if (shared === balance) return;
+            balance = shared;
+            updateUI();
+        });
+
+</script>
 </body>
 </html>

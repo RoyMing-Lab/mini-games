@@ -902,6 +902,7 @@
         </div>
     </div>
 
+    <script src="../shared/wallet.js"></script>
     <script>
         /* ============================================================
            Audio Synthesizer (Web Audio API)
@@ -1132,11 +1133,7 @@
 
         // Load storage
         function loadStorage() {
-            const savedChips = localStorage.getItem("pixel_derby_chips");
-            if (savedChips !== null) {
-                chips = parseInt(savedChips, 10);
-                if (isNaN(chips) || chips < 0) chips = 10000;
-            }
+            chips = Wallet.getBalance();
 
             const savedStats = localStorage.getItem("pixel_derby_stats");
             if (savedStats) {
@@ -1149,7 +1146,7 @@
         }
 
         function saveStorage() {
-            localStorage.setItem("pixel_derby_chips", chips);
+            Wallet.setBalance(chips);
             localStorage.setItem("pixel_derby_stats", JSON.stringify(stats));
         }
 
@@ -2060,6 +2057,14 @@
         initRaceHorses();
         drawTrack();
         updateUI();
-    </script>
+        /* ===== 공용 코인 지갑 동기화 (다른 게임·탭·뒤로가기) ===== */
+        Wallet.subscribe(function (shared) {
+            if (isRacing) return;
+            if (shared === chips) return;
+            chips = shared;
+            updateUI();
+        });
+
+</script>
 </body>
 </html>

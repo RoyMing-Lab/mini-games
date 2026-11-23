@@ -523,6 +523,7 @@
   </div>
 </div>
 
+<script src="../shared/wallet.js"></script>
 <script>
   // Web Audio Synthesizer
   const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -581,10 +582,12 @@
   }
 
   let state = loadSavedState();
+  state.chips = Wallet.getBalance();
   let isPlaying = false;
 
   function saveState() {
     try {
+      Wallet.setBalance(state.chips);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     } catch(e) {}
   }
@@ -788,6 +791,14 @@
   }
 
   render();
+  /* ===== 공용 코인 지갑 동기화 (다른 게임·탭·뒤로가기) ===== */
+  Wallet.subscribe(function (shared) {
+      if (isPlaying) return;
+      if (shared === state.chips) return;
+      state.chips = shared;
+      render();
+  });
+
 </script>
 </body>
 </html>

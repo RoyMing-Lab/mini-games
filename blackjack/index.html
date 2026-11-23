@@ -1057,6 +1057,7 @@
         </div>
     </div>
 
+    <script src="../shared/wallet.js"></script>
     <script>
         /* ============================================================
            Web Audio API Synthesizer (Realistic Casino Sounds)
@@ -1341,8 +1342,7 @@
         /* Storage load */
         function loadStorage() {
             try {
-                const savedChips = localStorage.getItem('casino21_chips');
-                if (savedChips !== null) chips = parseInt(savedChips, 10);
+                chips = Wallet.getBalance();
                 const savedStats = localStorage.getItem('casino21_stats');
                 if (savedStats) stats = JSON.parse(savedStats);
             } catch (e) {
@@ -1352,7 +1352,7 @@
 
         function saveStorage() {
             try {
-                localStorage.setItem('casino21_chips', chips);
+                Wallet.setBalance(chips);
                 localStorage.setItem('casino21_stats', JSON.stringify(stats));
             } catch (e) {}
         }
@@ -1941,6 +1941,14 @@
         // Initialize on load
         loadStorage();
         updateUI();
-    </script>
+        /* ===== 공용 코인 지갑 동기화 (다른 게임·탭·뒤로가기) ===== */
+        Wallet.subscribe(function (shared) {
+            if (isHandInProgress) return;
+            if (shared === chips) return;
+            chips = shared;
+            updateUI();
+        });
+
+</script>
 </body>
 </html>

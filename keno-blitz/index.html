@@ -835,6 +835,7 @@
     </div>
 </div>
 
+<script src="../shared/wallet.js"></script>
 <script>
 /* ================= ENGINE-START ================= */
 /* 케노 잭팟 블리츠 — 순수 로직 엔진 (DOM 의존 없음) */
@@ -1123,13 +1124,10 @@ const KB = (function () {
 
     /* ---------------- balance ---------------- */
     function loadBalance() {
-        const raw = localStorage.getItem(STORE_CHIPS);
-        if (raw === null) return 10000;
-        const v = parseInt(raw, 10);
-        return isFinite(v) ? Math.max(0, v) : 10000;
+        return Wallet.getBalance();
     }
     function saveBalance() {
-        try { localStorage.setItem(STORE_CHIPS, String(Math.max(0, Math.floor(balance)))); } catch (e) {}
+        Wallet.setBalance(balance);
     }
     function addChips(n) { balance += n; saveBalance(); renderBalance(); }
     function renderBalance() { $('balance').textContent = Math.floor(balance).toLocaleString('en-US'); }
@@ -1830,6 +1828,13 @@ const KB = (function () {
     window.kenoBlitzSim = function (n, p, seed) { return KB.simulate(n || 100000, p || 10, seed); };
 
     console.log('[Keno Blitz] boot ok · 80 balls / 20 drawn · RTP sim: kenoBlitzSim(200000, 10)');
+    /* ===== 공용 코인 지갑 동기화 (다른 게임·탭·뒤로가기) ===== */
+    Wallet.subscribe(function (shared) {
+        if (spinning || pendingOverlay) return;
+        if (shared === balance) return;
+        balance = shared;
+        renderBalance();
+    });
 })();
 </script>
 </body>

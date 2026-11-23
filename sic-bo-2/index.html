@@ -954,6 +954,7 @@
         </div>
     </div>
 
+    <script src="../shared/wallet.js"></script>
     <script>
         class SoundFX {
             constructor() {
@@ -1148,13 +1149,11 @@
             }
 
             loadBalance() {
-                const raw = localStorage.getItem('casino_chips');
-                const parsed = raw !== null ? parseInt(raw, 10) : NaN;
-                return Number.isFinite(parsed) && parsed >= 0 ? parsed : 10000;
+                return Wallet.getBalance();
             }
 
             saveBalance() {
-                localStorage.setItem('casino_chips', String(this.balance));
+                Wallet.setBalance(this.balance);
             }
 
             addChips(amount) {
@@ -1622,6 +1621,14 @@
         window.addEventListener('DOMContentLoaded', () => {
             window.game = new SicBo2Game();
         });
-    </script>
+            /* ===== 공용 코인 지갑 동기화 (다른 게임·탭·뒤로가기) ===== */
+            Wallet.subscribe(function (shared) {
+                if (!window.game || window.game.isRolling) return;
+                if (shared === window.game.balance) return;
+                window.game.balance = shared;
+                window.game.updateUI();
+            });
+
+</script>
 </body>
 </html>

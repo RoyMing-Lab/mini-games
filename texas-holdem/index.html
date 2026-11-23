@@ -970,6 +970,7 @@
         </div>
     </div>
 
+<script src="../shared/wallet.js"></script>
 <script>
 /* ============================================================
    1. Constants & storage
@@ -1232,9 +1233,7 @@ function handName(h, cards) {
    4. State & storage
    ============================================================ */
 function loadChips() {
-    const raw = localStorage.getItem(STORE_CHIPS);
-    const p = raw !== null ? parseInt(raw, 10) : NaN;
-    return Number.isFinite(p) && p >= 0 ? p : START_CHIPS;
+    return Wallet.getBalance();
 }
 function loadDealer() {
     const raw = localStorage.getItem(STORE_DEALER);
@@ -1277,7 +1276,7 @@ let lastResult = null;
 function saveAll() {
     const liveP = g && !g.over ? g.stacks.p : balance;
     const liveD = g && !g.over ? g.stacks.d : dealerStack;
-    localStorage.setItem(STORE_CHIPS, String(Math.max(0, Math.floor(liveP))));
+    Wallet.setBalance(liveP);
     localStorage.setItem(STORE_DEALER, String(Math.max(0, Math.floor(liveD))));
     localStorage.setItem(STORE_BONUS, String(bonusBet));
 }
@@ -2287,6 +2286,14 @@ function init() {
     }
 }
 init();
+/* ===== 공용 코인 지갑 동기화 (다른 게임·탭·뒤로가기) ===== */
+Wallet.subscribe(function (shared) {
+    if (busy || (g && !g.over)) return;
+    if (shared === balance) return;
+    balance = shared;
+    renderWallet();
+});
+
 </script>
 </body>
 </html>

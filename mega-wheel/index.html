@@ -1060,6 +1060,7 @@
         </div>
     </div>
 
+    <script src="../shared/wallet.js"></script>
     <script>
         /* ========================================================
            1. Web Audio API Procedural Sound Engine
@@ -1316,18 +1317,12 @@
            5. Storage & Persistence
         ======================================================== */
         function loadChips() {
-            const saved = localStorage.getItem('casino_chips');
-            if (saved !== null) {
-                userChips = parseInt(saved, 10);
-                if (isNaN(userChips) || userChips < 0) userChips = 10000;
-            } else {
-                userChips = 10000;
-            }
+            userChips = Wallet.getBalance();
             updateChipsUI();
         }
 
         function saveChips() {
-            localStorage.setItem('casino_chips', userChips.toString());
+            Wallet.setBalance(userChips);
             updateChipsUI();
         }
 
@@ -1988,6 +1983,14 @@
         renderHistoryRail();
         updateBetSummary();
         animateWheel();
-    </script>
+        /* ===== 공용 코인 지갑 동기화 (다른 게임·탭·뒤로가기) ===== */
+        Wallet.subscribe(function (shared) {
+            if (isSpinning) return;
+            if (shared === userChips) return;
+            userChips = shared;
+            updateChipsUI();
+        });
+
+</script>
 </body>
 </html>

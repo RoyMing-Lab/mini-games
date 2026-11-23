@@ -1194,6 +1194,7 @@
         </div>
     </div>
 
+    <script src="../shared/wallet.js"></script>
     <script>
     /* ============ 1. Constants & storage keys ============ */
     const STORE_CHIPS = 'casino_chips';
@@ -1299,11 +1300,9 @@
 
     /* ============ 3. State ============ */
     function loadBalance() {
-        const raw = localStorage.getItem(STORE_CHIPS);
-        const p = raw !== null ? parseInt(raw, 10) : NaN;
-        return Number.isFinite(p) && p >= 0 ? p : START_CHIPS;
+        return Wallet.getBalance();
     }
-    function saveBalance() { localStorage.setItem(STORE_CHIPS, String(Math.max(0, Math.floor(balance)))); }
+    function saveBalance() { Wallet.setBalance(balance); }
 
     function emptyBets() { const o = {}; BETS.forEach(k => o[k] = 0); return o; }
     function loadBets() {
@@ -2236,6 +2235,14 @@
 
     window.addEventListener('DOMContentLoaded', init);
     if (document.readyState !== 'loading') init();
-    </script>
+    /* ===== 공용 코인 지갑 동기화 (다른 게임·탭·뒤로가기) ===== */
+    Wallet.subscribe(function (shared) {
+        if (busy) return;
+        if (shared === balance) return;
+        balance = shared;
+        renderAll();
+    });
+
+</script>
 </body>
 </html>

@@ -799,6 +799,7 @@
     </div>
 </div>
 
+<script src="../shared/wallet.js"></script>
 <script>
 /* ===== ENGINE START ===== */
 'use strict';
@@ -1226,13 +1227,10 @@ const CC_ENGINE = (() => {
 
     /* ---------- balance ---------- */
     function loadBalance() {
-        const raw = localStorage.getItem(STORE_CHIPS);
-        if (raw === null) return 10000;
-        const v = parseInt(raw, 10);
-        return isFinite(v) ? Math.max(0, v) : 10000;
+        return Wallet.getBalance();
     }
     function saveBalance() {
-        try { localStorage.setItem(STORE_CHIPS, String(Math.max(0, Math.floor(balance)))); } catch (e) {}
+        Wallet.setBalance(balance);
     }
     function renderBalance() { balanceText.textContent = Math.floor(balance).toLocaleString('en-US'); }
     function addChips(n) { balance += n; saveBalance(); renderBalance(); }
@@ -1748,6 +1746,13 @@ const CC_ENGINE = (() => {
     renderStats();
 
     window.CC_DEBUG = { E: E, stats: stats, get balance() { return balance; }, get bet() { return bet; }, doSpin: doSpin, maxWin: E.MAX_WIN_CAP };
+    /* ===== 공용 코인 지갑 동기화 (다른 게임·탭·뒤로가기) ===== */
+    Wallet.subscribe(function (shared) {
+        if (spinning || fs.active) return;
+        if (shared === balance) return;
+        balance = shared;
+        renderBalance();
+    });
 })();
 </script>
 </body>

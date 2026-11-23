@@ -372,9 +372,10 @@
         </div>
     </div>
 
+    <script src="../shared/wallet.js"></script>
     <script>
         // Game State
-        let balance = 10000;
+        let balance = Wallet.getBalance();
         let bet = 1000;
         let isBetPlaced = false;
         let gameState = 'IDLE'; // IDLE, COUNTDOWN, RUNNING, CRASHED, CASHED_OUT
@@ -677,6 +678,7 @@
         }
 
         function updateBalance() {
+            Wallet.setBalance(balance);
             balanceEl.textContent = balance.toLocaleString();
             checkRelief();
         }
@@ -707,6 +709,14 @@
 
         // Initialize empty chart
         drawChart();
-    </script>
+        /* ===== 공용 코인 지갑 동기화 (다른 게임·탭·뒤로가기) ===== */
+        Wallet.subscribe(function (shared) {
+            if (gameState === 'RUNNING' || gameState === 'COUNTDOWN' || isBetPlaced) return;
+            if (shared === balance) return;
+            balance = shared;
+            updateBalance();
+        });
+
+</script>
 </body>
 </html>

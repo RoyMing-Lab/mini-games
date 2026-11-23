@@ -966,6 +966,7 @@
         </div>
     </div>
 
+    <script src="../shared/wallet.js"></script>
     <script>
         /* --- Web Audio Sound System --- */
         let audioCtx = null;
@@ -1115,10 +1116,10 @@
 
         function loadSavedState() {
             try {
+                balance = Wallet.getBalance();
                 const saved = localStorage.getItem('arcade_coin_flip_state');
                 if (saved) {
                     const data = JSON.parse(saved);
-                    balance = typeof data.balance === 'number' ? data.balance : 10000;
                     bestStreak = data.bestStreak || 0;
                 }
             } catch (e) {}
@@ -1127,6 +1128,7 @@
 
         function saveState() {
             try {
+                Wallet.setBalance(balance);
                 localStorage.setItem('arcade_coin_flip_state', JSON.stringify({
                     balance,
                     bestStreak
@@ -1475,6 +1477,14 @@
         window.addEventListener('DOMContentLoaded', () => {
             loadSavedState();
         });
-    </script>
+        /* ===== 공용 코인 지갑 동기화 (다른 게임·탭·뒤로가기) ===== */
+        Wallet.subscribe(function (shared) {
+            if (isFlipping || currentStreak > 0) return;
+            if (shared === balance) return;
+            balance = shared;
+            updateUI();
+        });
+
+</script>
 </body>
 </html>

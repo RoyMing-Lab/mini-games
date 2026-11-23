@@ -839,6 +839,7 @@
         </div>
     </div>
 
+    <script src="../shared/wallet.js"></script>
     <script>
         /* --- Web Audio API Synth Engine --- */
         let audioCtx = null;
@@ -1000,8 +1001,7 @@
         // Load Persistent State
         function loadState() {
             try {
-                const savedBal = localStorage.getItem('hilo_balance');
-                if (savedBal !== null) balance = parseInt(savedBal);
+                balance = Wallet.getBalance();
                 const savedStats = localStorage.getItem('hilo_stats');
                 if (savedStats) stats = JSON.parse(savedStats);
             } catch (e) {}
@@ -1009,7 +1009,7 @@
 
         function saveState() {
             try {
-                localStorage.setItem('hilo_balance', balance);
+                Wallet.setBalance(balance);
                 localStorage.setItem('hilo_stats', JSON.stringify(stats));
             } catch (e) {}
         }
@@ -1468,6 +1468,14 @@
         // Init on Boot
         loadState();
         updateUI();
-    </script>
+        /* ===== 공용 코인 지갑 동기화 (다른 게임·탭·뒤로가기) ===== */
+        Wallet.subscribe(function (shared) {
+            if (isGameActive || isProcessing) return;
+            if (shared === balance) return;
+            balance = shared;
+            updateUI();
+        });
+
+</script>
 </body>
 </html>

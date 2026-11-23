@@ -176,6 +176,55 @@
             box-shadow: none;
         }
 
+        /* Shared Wallet Badge */
+        .wallet-bar {
+            position: sticky;
+            top: 8px;
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 12px 16px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, rgba(241, 224, 90, 0.14) 0%, rgba(22, 27, 34, 0.92) 60%);
+            border: 1px solid rgba(241, 224, 90, 0.35);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+        .wallet-bar .wallet-label {
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--text-sub);
+            letter-spacing: 0.2px;
+        }
+
+        .wallet-bar .wallet-amount {
+            font-size: 1.02rem;
+            font-weight: 900;
+            color: var(--gold);
+            font-variant-numeric: tabular-nums;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .wallet-bar .wallet-amount span {
+            color: #fff8c5;
+        }
+
+        .wallet-bar.flash {
+            animation: walletFlash 0.7s ease-out;
+        }
+
+        @keyframes walletFlash {
+            0% { transform: scale(1); box-shadow: 0 0 0 rgba(241, 224, 90, 0); }
+            30% { transform: scale(1.02); box-shadow: 0 0 22px rgba(241, 224, 90, 0.55); }
+            100% { transform: scale(1); box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35); }
+        }
+
         /* Footer */
         .footer {
             text-align: center;
@@ -187,6 +236,12 @@
 </head>
 <body>
     <div class="container">
+        <!-- Shared Coin Wallet -->
+        <div class="wallet-bar" id="walletBar" title="모든 미니게임이 이 코인을 함께 사용합니다">
+            <span class="wallet-label">🪙 공용 코인 지갑 · 28개 게임 공통</span>
+            <span class="wallet-amount">🪙 <span id="walletBalance">10,000</span></span>
+        </div>
+
         <!-- Hero Header -->
         <div class="header">
             <h1>🕹️ MINI GAMES</h1>
@@ -523,5 +578,27 @@
             Powered by RoyMing-Lab · Deployed with Vercel
         </div>
     </div>
+
+    <script src="./shared/wallet.js"></script>
+    <script>
+        (function () {
+            var balanceEl = document.getElementById('walletBalance');
+            var barEl = document.getElementById('walletBar');
+            var shown = null;
+
+            function render(balance) {
+                balanceEl.textContent = Wallet.format(balance);
+                if (shown !== null && shown !== balance) {
+                    barEl.classList.remove('flash');
+                    void barEl.offsetWidth;
+                    barEl.classList.add('flash');
+                }
+                shown = balance;
+            }
+
+            render(Wallet.getBalance());
+            Wallet.subscribe(render);
+        })();
+    </script>
 </body>
 </html>

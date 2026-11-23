@@ -1180,6 +1180,7 @@
         </div>
     </div>
 
+    <script src="../shared/wallet.js"></script>
     <script>
 /* =========================================================
    🎡 메가 드림 캐처 (Mega Dream Catcher) — Game Logic
@@ -1322,12 +1323,10 @@ const SoundFX = (() => {
 
 /* ---------------- 3. State & Persistence ---------------- */
 function loadBalance() {
-    const raw = localStorage.getItem(STORE_CHIPS);
-    const parsed = raw !== null ? parseInt(raw, 10) : NaN;
-    return Number.isFinite(parsed) && parsed >= 0 ? parsed : START_CHIPS;
+    return Wallet.getBalance();
 }
 function saveBalance() {
-    localStorage.setItem(STORE_CHIPS, String(Math.max(0, Math.floor(balance))));
+    Wallet.setBalance(balance);
 }
 function emptyBets() { return { 1: 0, 2: 0, 5: 0, 10: 0, 20: 0, 40: 0 }; }
 function loadBets() {
@@ -2184,6 +2183,14 @@ if (totalBet() > 0) {
 }
 requestAnimationFrame(frame);
 
-    </script>
+/* ===== 공용 코인 지갑 동기화 (다른 게임·탭·뒤로가기) ===== */
+Wallet.subscribe(function (shared) {
+    if (busy) return;
+    if (shared === balance) return;
+    balance = shared;
+    renderWallet();
+});
+
+</script>
 </body>
 </html>

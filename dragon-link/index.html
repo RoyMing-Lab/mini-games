@@ -851,6 +851,7 @@
     </div>
 </div>
 
+<script src="../shared/wallet.js"></script>
 <script>
 /* ================= ENGINE-START ================= */
 const DL = (() => {
@@ -1164,13 +1165,10 @@ const DL = (() => {
 
     /* ---------------- balance ---------------- */
     function loadBalance() {
-        const raw = localStorage.getItem(STORE_CHIPS);
-        if (raw === null) return 10000;
-        const v = parseInt(raw, 10);
-        return isFinite(v) ? Math.max(0, v) : 10000;
+        return Wallet.getBalance();
     }
     function saveBalance() {
-        try { localStorage.setItem(STORE_CHIPS, String(Math.max(0, Math.floor(balance)))); } catch (e) {}
+        Wallet.setBalance(balance);
     }
     function addChips(n) { balance += n; saveBalance(); renderBalance(); }
     function renderBalance() { $('balance').textContent = Math.floor(balance).toLocaleString('en-US'); }
@@ -1840,6 +1838,13 @@ const DL = (() => {
     window.dragonLinkSim = function (n) { return DL.simulate(n || 50000); };
 
     console.log('[Dragon Link] boot ok · paylines=' + DL.PAYLINES.length + ' · RTP sim helper: dragonLinkSim(100000)');
+    /* ===== 공용 코인 지갑 동기화 (다른 게임·탭·뒤로가기) ===== */
+    Wallet.subscribe(function (shared) {
+        if (spinning || bonusRunning || pendingOverlay) return;
+        if (shared === balance) return;
+        balance = shared;
+        renderBalance();
+    });
 })();
 </script>
 </body>

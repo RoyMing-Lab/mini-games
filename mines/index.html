@@ -815,6 +815,7 @@
         </div>
     </div>
 
+    <script src="../shared/wallet.js"></script>
     <script>
         /* --- Audio Engine (Web Audio API) --- */
         let audioCtx = null;
@@ -953,7 +954,7 @@
         }
 
         /* --- State --- */
-        let balance = parseInt(localStorage.getItem('mines_balance')) || 10000;
+        let balance = Wallet.getBalance();
         let selectedMines = 3;
         let currentBet = 1000;
         let isGameActive = false;
@@ -1048,7 +1049,7 @@
         }
 
         function saveState() {
-            localStorage.setItem('mines_balance', balance);
+            Wallet.setBalance(balance);
             localStorage.setItem('mines_stats', JSON.stringify(stats));
         }
 
@@ -1369,6 +1370,14 @@
         // Init
         initGrid();
         updateUI();
-    </script>
+        /* ===== 공용 코인 지갑 동기화 (다른 게임·탭·뒤로가기) ===== */
+        Wallet.subscribe(function (shared) {
+            if (isGameActive) return;
+            if (shared === balance) return;
+            balance = shared;
+            updateUI();
+        });
+
+</script>
 </body>
 </html>

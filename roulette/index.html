@@ -835,6 +835,7 @@
         </div>
     </div>
 
+    <script src="../shared/wallet.js"></script>
     <script>
         /* --- European Roulette Constants & Order --- */
         // Clockwise European wheel sequence
@@ -945,7 +946,7 @@
         }
 
         /* --- Game State & Data --- */
-        let balance = parseInt(localStorage.getItem('roulette_balance')) || 10000;
+        let balance = Wallet.getBalance();
         let selectedChip = 100;
         let currentBets = {}; // { 'num-7': 1000, 'red': 5000, ... }
         let previousBets = {};
@@ -1023,7 +1024,7 @@
 
         function updateUI() {
             balanceVal.textContent = `🪙 ${formatNumber(balance)}`;
-            localStorage.setItem('roulette_balance', balance);
+            Wallet.setBalance(balance);
 
             let total = 0;
             for (let key in currentBets) {
@@ -1528,6 +1529,14 @@
         initNumbersTable();
         renderHistory();
         updateUI();
-    </script>
+        /* ===== 공용 코인 지갑 동기화 (다른 게임·탭·뒤로가기) ===== */
+        Wallet.subscribe(function (shared) {
+            if (isSpinning) return;
+            if (shared === balance) return;
+            balance = shared;
+            updateUI();
+        });
+
+</script>
 </body>
 </html>

@@ -245,6 +245,39 @@
 
 ---
 
+## 🪙 공용 코인 지갑 (shared/wallet.js)
+
+모든 미니게임과 포털이 **하나의 코인 잔액**을 함께 사용합니다.
+
+- 저장 위치: `localStorage['casino_chips']` (기본 잔액 10,000)
+- 포털 상단 배지에 현재 공용 잔액이 실시간으로 표시됩니다.
+- 다른 게임에서 베팅·당첨·무료 충전·구호금이 발생하면 이 게임으로 돌아왔을 때(뒤로가기·새로고침·탭 전환 포함) 잔액이 즉시 반영됩니다.
+- 최초 1회, 예전 게임별 키(`baccarat_chips`, `casino21_chips`, `arcade_coin_flip_state`, `hilo_balance`, `pixel_derby_chips`, `mahjong_balance`, `mines_balance`, `plinko_balance`, `roulette_balance`, `sicbo_balance`, `video_poker_chips` 등)에 남아 있던 잔액 중 가장 큰 값을 안전하게 이관합니다(`casino_chips_migrated_v1` 플래그).
+
+### 새 게임에 적용하는 방법
+
+```html
+<!-- 본문 하단 게임 스크립트보다 먼저 -->
+<script src="../shared/wallet.js"></script>
+<script>
+  let balance = Wallet.getBalance();          // 시작 잔액 = 공용 잔액
+  function renderBalance() { /* UI 갱신 */ }
+  function saveBalance() { Wallet.setBalance(balance); }   // 잔액이 바뀔 때마다 즉시 저장
+
+  /* 다른 게임/탭에서 잔액이 바뀌거나 bfcache로 복원됐을 때 */
+  Wallet.subscribe(function (shared) {
+      balance = shared;
+      renderBalance();
+  });
+</script>
+```
+
+- 베팅 차감, 당첨 지급, 무료 충전(+5,000), 구호금(+2,000) 등 **잔액이 바뀌는 모든 지점**에서 `Wallet.setBalance(balance)`를 호출하세요.
+- 전적·통계 키(`*_stats` 등)는 그대로 두면 됩니다. 잔액만 공용으로 바뀝니다.
+- 라운드 진행 중(스핀·딜링·레이스 등)에는 `Wallet.subscribe` 콜백에서 잔액을 덮어쓰지 않도록 진행 상태를 확인하는 가드를 두는 것이 좋습니다.
+
+---
+
 ## 🚀 배포 및 실행 방법
 
 1. **로컬 실행**: 루트 디렉터리의 `index.html`을 브라우저로 열면 게임 허브 포털이 실행됩니다.

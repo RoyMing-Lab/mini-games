@@ -803,6 +803,7 @@
         </div>
     </div>
 
+    <script src="../shared/wallet.js"></script>
     <script>
         // --- Game Config & Symbols ---
         const SYMBOLS = [
@@ -830,8 +831,8 @@
         }
 
         // --- State Variables ---
-        let balance = 10000;
-        let startingBalance = 10000;
+        let balance = Wallet.getBalance();
+        let startingBalance = balance;
         let currentBet = 500;
         let isSpinning = false;
         let isAutoSpin = false;
@@ -1005,6 +1006,7 @@
         // --- Bet Controls ---
         function updateBalance(newBal) {
             balance = newBal;
+            Wallet.setBalance(balance);
             balanceText.textContent = balance.toLocaleString();
             if (balance <= 0 && freeSpins <= 0) {
                 reliefBox.style.display = 'flex';
@@ -1382,6 +1384,14 @@
             if (particles.length > 0) requestAnimationFrame(animateConfetti);
             else cCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
         }
-    </script>
+        /* ===== 공용 코인 지갑 동기화 (다른 게임·탭·뒤로가기) ===== */
+        Wallet.subscribe(function (shared) {
+            if (isSpinning) return;
+            if (shared === balance) return;
+            balance = shared;
+            updateBalance(balance);
+        });
+
+</script>
 </body>
 </html>

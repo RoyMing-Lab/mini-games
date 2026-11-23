@@ -814,6 +814,7 @@
         </div>
     </div>
 
+    <script src="../shared/wallet.js"></script>
     <script>
         /* ============================================================
            1. Audio Synthesizer (Web Audio API)
@@ -1019,8 +1020,7 @@
         /* ============================================================
            3. Game State & Balance
            ============================================================ */
-        let balance = parseInt(localStorage.getItem('plinko_balance') || '10000', 10);
-        if (isNaN(balance) || balance < 0) balance = 10000;
+        let balance = Wallet.getBalance();
 
         let totalDrops = parseInt(localStorage.getItem('plinko_total_drops') || '0', 10);
         let totalBet = parseInt(localStorage.getItem('plinko_total_bet') || '0', 10);
@@ -1029,7 +1029,7 @@
 
         function updateBalanceUI() {
             document.getElementById('balanceText').textContent = balance.toLocaleString();
-            localStorage.setItem('plinko_balance', balance.toString());
+            Wallet.setBalance(balance);
 
             const reliefBanner = document.getElementById('reliefBanner');
             if (balance < 100) {
@@ -1813,6 +1813,14 @@
         updateBalanceUI();
         updateStatsUI();
         gameLoop();
-    </script>
+        /* ===== 공용 코인 지갑 동기화 (다른 게임·탭·뒤로가기) ===== */
+        Wallet.subscribe(function (shared) {
+            if (balls.length > 0) return;
+            if (shared === balance) return;
+            balance = shared;
+            updateBalanceUI();
+        });
+
+</script>
 </body>
 </html>
