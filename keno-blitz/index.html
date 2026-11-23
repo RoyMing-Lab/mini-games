@@ -254,15 +254,14 @@
         box-shadow: 0 0 15px rgba(55, 217, 138, 0.85);
         animation: hitPop 0.42s ease-out;
     }
+    /* 내 픽 + 추첨 = 적중이 최우선 색상 */
+    .cell.picked.drawn { background: linear-gradient(180deg, #a9ffd2, #2fd083); border-color: #e6fff2; color: #04301a; }
+    .cell.picked.drawn.hit { background: linear-gradient(180deg, #a9ffd2, #2fd083); }
+    .cell.picked.hit, .cell.hit.hitlight { background: linear-gradient(180deg, #a9ffd2, #2fd083); }
     @keyframes hitPop {
         0% { transform: scale(1); }
         40% { transform: scale(1.18); }
         100% { transform: scale(1); }
-    }
-    .cell.picked.drawn {
-        background: linear-gradient(180deg, #ffe998, #e0ac2b);
-        border-color: #fff9cf;
-        color: #3a1f00;
     }
     .cell.hitlight {
         background: linear-gradient(180deg, #fff3b8, #ff9d2b);
@@ -272,6 +271,15 @@
     }
     .cell.lightning { border-color: #c9a8ff; box-shadow: 0 0 12px rgba(160, 107, 255, 0.8), inset 0 0 10px rgba(160, 107, 255, 0.35); }
     .cell.dim { opacity: 0.28; }
+    /* 추첨되지 않은 내 픽: 금색 점선으로 남겨 "아쉬운 미적중"을 구분 */
+    .cell.picked.dim {
+        opacity: 1;
+        background: linear-gradient(180deg, #1a2338, #0b1526);
+        border: 1px dashed rgba(255, 208, 77, 0.55);
+        color: #b99b52;
+        box-shadow: none;
+    }
+    .cell.hit.dim, .cell.hitlight.dim { opacity: 1; }
 
     .bolt {
         position: absolute;
@@ -1220,7 +1228,7 @@ const KB = (function () {
         let top = 0;
         Object.keys(table).forEach((k) => { if (table[k] > top) top = table[k]; });
         if (!top) return '-';
-        return fmt(top * bet * KB.MULT_CAP) + '칩';
+        return fmtMult(top * KB.MULT_CAP);
     }
 
     /* ---------------- board ---------------- */
