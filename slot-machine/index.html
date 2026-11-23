@@ -1384,6 +1384,9 @@
             if (particles.length > 0) requestAnimationFrame(animateConfetti);
             else cCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
         }
+        /* 공용 잔액을 화면에 먼저 반영 */
+        updateBalance(balance);
+
         /* ===== 공용 코인 지갑 동기화 (다른 게임·탭·뒤로가기) ===== */
         Wallet.subscribe(function (shared) {
             if (isSpinning) return;

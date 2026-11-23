@@ -709,6 +709,7 @@
 
         // Initialize empty chart
         drawChart();
+        updateBalance();
         /* ===== 공용 코인 지갑 동기화 (다른 게임·탭·뒤로가기) ===== */
         Wallet.subscribe(function (shared) {
             if (gameState === 'RUNNING' || gameState === 'COUNTDOWN' || isBetPlaced) return;
