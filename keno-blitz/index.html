@@ -269,6 +269,13 @@
         color: #331200;
         box-shadow: 0 0 20px rgba(255, 175, 50, 0.95), 0 0 34px rgba(160, 107, 255, 0.55);
     }
+    /* ⚡ 라이트닝 적중은 가장 강한 특이도로 금빛 번개색 유지 */
+    .cell.picked.drawn.hitlight {
+        background: linear-gradient(180deg, #fff3b8, #ff9d2b);
+        border-color: #fffbe0;
+        color: #331200;
+        box-shadow: 0 0 20px rgba(255, 175, 50, 0.95), 0 0 34px rgba(160, 107, 255, 0.55);
+    }
     .cell.lightning { border-color: #c9a8ff; box-shadow: 0 0 12px rgba(160, 107, 255, 0.8), inset 0 0 10px rgba(160, 107, 255, 0.35); }
     .cell.dim { opacity: 0.28; }
     /* 추첨되지 않은 내 픽: 금색 점선으로 남겨 "아쉬운 미적중"을 구분 */
