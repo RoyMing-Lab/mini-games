@@ -906,7 +906,7 @@
             <div class="bet-info-box">
                 <span class="chips-label">현재 베팅</span>
                 <div class="chips-value-row" style="justify-content: flex-end;">
-                    <span class="current-bet-val" id="currentBetDisplay">500</span>
+                    <span class="current-bet-val" id="currentBetDisplay">0</span>
                     <span style="font-size: 0.8rem; color: var(--blue); font-weight: 800;">칩</span>
                 </div>
             </div>
@@ -1295,7 +1295,7 @@
            ============================================================ */
         let shoe = new Shoe(4);
         let chips = 10000;
-        let currentBet = 500;
+        let currentBet = 0;
         let activeBet = 0; // Actual locked bet during hand
 
         let playerHand = [];
@@ -1343,6 +1343,7 @@
         function loadStorage() {
             try {
                 chips = Wallet.getBalance();
+                currentBet = 0;   // 테이블 위 베팅은 항상 칩을 내고 시작한다(미차감 기본 베팅으로 칩이 늘어나던 문제 방지)
                 const savedStats = localStorage.getItem('casino21_stats');
                 if (savedStats) stats = JSON.parse(savedStats);
             } catch (e) {

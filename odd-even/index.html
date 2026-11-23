@@ -726,9 +726,11 @@
   }
 
   function restartGame() {
-    if (!confirm("게임을 초기화하시겠습니까? 칩이 1,000개로 리셋됩니다.")) return;
+    if (!confirm("게임을 초기화하시겠습니까? 연승·전적이 초기화됩니다. (공용 코인 잔액은 그대로 유지돼요)")) return;
     soundClick();
+    const keepChips = Wallet.getBalance();
     state = defaultState();
+    state.chips = keepChips;   // 공용 지갑 잔액은 건드리지 않는다
     render();
     saveState();
     document.getElementById('statusText').textContent = "베팅 금액을 정하고 [홀] 또는 [짝]을 고르세요!";
