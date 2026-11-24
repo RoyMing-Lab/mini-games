@@ -1490,7 +1490,6 @@
     }
 
     function wait(ms) { return new Promise(function (res) { setTimeout(res, Math.max(0, ms)); }); }
-    function T(ms) { return wait(turbo ? Math.round(ms * 0.42) : ms); }
 
     function totalCost() { return bet + (pbOn ? bet : 0); }
 
@@ -1665,8 +1664,7 @@
         $('drawBtn').disabled = false;
         $('drawBtn').textContent = 'DRAW';
 
-        var cost = mainStake + sideStake;
-        var statusTail = pbWin > 0 ? ' · ⚡+' + fmt(pbWin) : '';
+        var statusTail = pbWin > 0 ? ' (⚡파워볼 +' + fmt(pbWin) + ' 포함)' : '';
 
         if (jp) {
             banner('🎱 JACKPOT ' + lines + '줄!');
