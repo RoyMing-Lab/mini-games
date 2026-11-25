@@ -1,0 +1,2299 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>🎡 라이트닝 룰렛 익스트림 - Lightning Roulette Extreme</title>
+<style>
+    :root {
+        --bg: #06030f;
+        --panel: #120a24;
+        --panel2: #1a0f31;
+        --line: #33195c;
+        --gold: #ffcf4d;
+        --gold2: #fff4c9;
+        --violet: #a855f7;
+        --violet2: #d3a8ff;
+        --cyan: #35e0ff;
+        --red: #e11d48;
+        --redp: #7f1030;
+        --blackp: #191232;
+        --text: #f4ecff;
+        --sub: #9d86c4;
+    }
+
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+        background: #06030f;
+        background-image:
+            radial-gradient(ellipse at 50% -10%, #2a0b52 0%, #12052a 42%, #06030f 82%),
+            repeating-linear-gradient(90deg, rgba(168, 85, 247, 0.035) 0 2px, transparent 2px 30px);
+        color: var(--text);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 7px 7px 26px;
+        overflow-x: hidden;
+    }
+
+    #fx {
+        position: fixed;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 80;
+    }
+
+    .app {
+        width: 100%;
+        max-width: 980px;
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+        position: relative;
+        z-index: 2;
+    }
+
+    /* ---------------- header ---------------- */
+    .top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 7px;
+        background: linear-gradient(135deg, #1b0b36 0%, #0a0418 100%);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 6px 8px;
+        box-shadow: 0 6px 22px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(211, 168, 255, 0.18);
+    }
+    .lobby {
+        text-decoration: none;
+        color: var(--violet2);
+        background: rgba(168, 85, 247, 0.14);
+        border: 1px solid rgba(168, 85, 247, 0.45);
+        border-radius: 10px;
+        padding: 7px 10px;
+        font-size: 0.73rem;
+        font-weight: 800;
+        white-space: nowrap;
+    }
+    .lobby:active { transform: scale(0.95); }
+
+    .brand { text-align: center; line-height: 1.08; flex: 1; min-width: 0; }
+    .brand b {
+        display: block;
+        font-size: clamp(0.72rem, 3.3vw, 0.98rem);
+        font-weight: 900;
+        letter-spacing: 1.1px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        background: linear-gradient(100deg, #ffffff 0%, var(--gold) 38%, var(--violet2) 72%, var(--cyan) 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    .brand span {
+        font-size: 0.47rem;
+        letter-spacing: 1.6px;
+        color: var(--sub);
+        font-weight: 800;
+    }
+
+    .hbtns { display: flex; align-items: center; gap: 5px; }
+    .ic {
+        background: rgba(168, 85, 247, 0.14);
+        border: 1px solid rgba(168, 85, 247, 0.4);
+        color: var(--text);
+        border-radius: 10px;
+        width: 30px;
+        height: 30px;
+        font-size: 0.8rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .ic:active { transform: scale(0.92); }
+
+    .wallet {
+        display: flex;
+        align-items: center;
+        gap: 3px;
+        background: linear-gradient(135deg, rgba(255, 207, 77, 0.22), rgba(255, 207, 77, 0.05));
+        border: 1px solid rgba(255, 207, 77, 0.55);
+        border-radius: 10px;
+        padding: 5px 8px;
+        font-size: 0.78rem;
+        font-weight: 900;
+        color: var(--gold2);
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+    }
+    .wallet.flash { animation: wflash 0.7s ease-out; }
+    @keyframes wflash {
+        0% { transform: scale(1); }
+        30% { transform: scale(1.07); box-shadow: 0 0 18px rgba(255, 207, 77, 0.7); }
+        100% { transform: scale(1); }
+    }
+
+    /* ---------------- stage ---------------- */
+    .stage {
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+    }
+
+    .wheelcol {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        background:
+            radial-gradient(ellipse at 50% 4%, rgba(168, 85, 247, 0.16), transparent 62%),
+            linear-gradient(180deg, #150a2a, #0a0418);
+        border: 1px solid rgba(168, 85, 247, 0.35);
+        border-radius: 16px;
+        padding: 8px;
+        box-shadow: 0 12px 34px rgba(0, 0, 0, 0.7), inset 0 0 50px rgba(90, 30, 160, 0.2);
+    }
+
+    .wheelbox {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 1 / 1;
+        max-height: 52vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
+    }
+    #wheel {
+        width: 100%;
+        height: 100%;
+        display: block;
+        filter: drop-shadow(0 10px 26px rgba(0, 0, 0, 0.8));
+    }
+
+    .spinTag {
+        position: absolute;
+        top: 2%;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 0.6rem;
+        font-weight: 900;
+        letter-spacing: 1.4px;
+        color: var(--violet2);
+        background: rgba(10, 4, 24, 0.82);
+        border: 1px solid rgba(168, 85, 247, 0.5);
+        border-radius: 20px;
+        padding: 3px 11px;
+        white-space: nowrap;
+        max-width: 94%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        text-shadow: 0 0 10px rgba(168, 85, 247, 0.8);
+    }
+
+    .resultPop {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%) scale(0.4);
+        opacity: 0;
+        pointer-events: none;
+        text-align: center;
+        transition: transform 0.28s cubic-bezier(0.2, 1.5, 0.4, 1), opacity 0.2s ease;
+        z-index: 5;
+    }
+    .resultPop.on { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    .resultPop .rpNum {
+        display: block;
+        font-size: clamp(2.2rem, 12vw, 3.4rem);
+        font-weight: 900;
+        line-height: 1;
+        font-variant-numeric: tabular-nums;
+        text-shadow: 0 0 26px currentColor, 0 0 60px currentColor;
+    }
+    .resultPop .rpSub {
+        display: block;
+        margin-top: 3px;
+        font-size: 0.72rem;
+        font-weight: 900;
+        letter-spacing: 0.6px;
+    }
+    .resultPop.jack .rpNum { animation: jpPulse 0.7s ease-in-out infinite alternate; }
+    @keyframes jpPulse {
+        from { transform: scale(1); }
+        to { transform: scale(1.12); }
+    }
+
+    .strikeRail {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(53, 224, 255, 0.07);
+        border: 1px solid rgba(53, 224, 255, 0.28);
+        border-radius: 10px;
+        padding: 4px 7px;
+        min-height: 30px;
+    }
+    .srLabel {
+        font-size: 0.55rem;
+        font-weight: 900;
+        letter-spacing: 0.8px;
+        color: #8ff0ff;
+        white-space: nowrap;
+    }
+    .srChips { display: flex; gap: 4px; flex-wrap: wrap; }
+    .srChip {
+        font-size: 0.58rem;
+        font-weight: 900;
+        padding: 2px 6px;
+        border-radius: 6px;
+        background: rgba(53, 224, 255, 0.14);
+        border: 1px solid rgba(53, 224, 255, 0.55);
+        color: #d7fbff;
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+        animation: srIn 0.3s ease-out;
+    }
+    .srChip.red { border-color: rgba(255, 120, 150, 0.7); background: rgba(225, 29, 72, 0.18); color: #ffd7e0; }
+    .srChip.hit { background: linear-gradient(135deg, rgba(255, 207, 77, 0.4), rgba(53, 224, 255, 0.3)); border-color: var(--gold); color: #16100a; box-shadow: 0 0 14px rgba(255, 207, 77, 0.7); }
+    @keyframes srIn {
+        from { opacity: 0; transform: translateY(-6px) scale(0.8); }
+        to { opacity: 1; transform: none; }
+    }
+    .srEmpty { font-size: 0.56rem; color: #56788a; font-weight: 700; }
+
+    .railWrap {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        border-radius: 10px;
+        padding: 4px 7px;
+        min-height: 30px;
+    }
+    .railLabel { font-size: 0.53rem; font-weight: 900; color: var(--sub); letter-spacing: 0.5px; white-space: nowrap; }
+    .rail { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; flex: 1; }
+    .rail::-webkit-scrollbar { display: none; }
+    .rBall {
+        flex: 0 0 auto;
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.6rem;
+        font-weight: 900;
+        font-variant-numeric: tabular-nums;
+        color: #fff;
+        animation: srIn 0.25s ease-out;
+    }
+    .rBall.r { background: linear-gradient(180deg, #f4244f, #a50f2e); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35); }
+    .rBall.b { background: linear-gradient(180deg, #2a2145, #120c22); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18); border: 1px solid #3b2d63; }
+    .rBall.g { background: linear-gradient(180deg, #22c55e, #0b7a38); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35); }
+    .rBall.lt { box-shadow: 0 0 10px var(--cyan), inset 0 1px 0 rgba(255, 255, 255, 0.3); border: 1px solid var(--cyan); }
+
+    /* ---------------- table ---------------- */
+    .tablecol {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .betbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        background: linear-gradient(135deg, rgba(255, 207, 77, 0.13), rgba(18, 10, 36, 0.9));
+        border: 1px solid rgba(255, 207, 77, 0.34);
+        border-radius: 11px;
+        padding: 5px 9px;
+    }
+    .betinfo { display: flex; flex-direction: column; line-height: 1.1; }
+    .betinfo span { font-size: 0.5rem; color: var(--sub); font-weight: 800; letter-spacing: 0.6px; }
+    .betinfo b { font-size: 0.95rem; color: var(--gold2); font-weight: 900; font-variant-numeric: tabular-nums; }
+
+    .chips { display: flex; gap: 4px; }
+    .chipBtn {
+        border-radius: 50%;
+        width: 34px;
+        height: 34px;
+        font-size: 0.6rem;
+        font-weight: 900;
+        cursor: pointer;
+        color: #fff;
+        border: 2px dashed rgba(255, 255, 255, 0.55);
+        background: radial-gradient(circle at 35% 30%, #6d28d9, #3b0f74);
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+        transition: transform 0.12s ease;
+        font-variant-numeric: tabular-nums;
+    }
+    .chipBtn[data-chip="500"] { background: radial-gradient(circle at 35% 30%, #0e7490, #083344); }
+    .chipBtn[data-chip="1000"] { background: radial-gradient(circle at 35% 30%, #b91c1c, #5b0808); }
+    .chipBtn[data-chip="5000"] { background: radial-gradient(circle at 35% 30%, #b45309, #55240a); }
+    .chipBtn[data-chip="10000"] { background: radial-gradient(circle at 35% 30%, #1e1b4b, #0b0a1e); border-color: var(--gold); color: var(--gold2); }
+    .chipBtn.on { transform: translateY(-3px) scale(1.06); box-shadow: 0 0 0 2px var(--gold), 0 6px 14px rgba(0, 0, 0, 0.6); }
+    .chipBtn:active { transform: scale(0.94); }
+
+    .board {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        background: linear-gradient(180deg, #12081f, #0a0418);
+        border: 1px solid #2c1550;
+        border-radius: 12px;
+        padding: 5px;
+        box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.6);
+    }
+    .numrow { display: flex; gap: 3px; }
+
+    .cell {
+        position: relative;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 5px;
+        background: linear-gradient(180deg, #241640, #150b28);
+        color: #efe6ff;
+        font-weight: 900;
+        font-size: clamp(0.5rem, 2.3vw, 0.72rem);
+        font-variant-numeric: tabular-nums;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        transition: filter 0.12s ease, transform 0.08s ease, box-shadow 0.15s ease;
+        user-select: none;
+        padding: 0;
+    }
+    .cell:active { transform: scale(0.94); }
+    .cell.red { background: linear-gradient(180deg, #c6183f, #7a0a24); border-color: rgba(255, 150, 175, 0.3); }
+    .cell.zero { background: linear-gradient(180deg, #16a34a, #075c2a); border-color: rgba(160, 255, 200, 0.35); writing-mode: vertical-rl; letter-spacing: 2px; width: 26px; flex: 0 0 26px; }
+    .cell .out { display: flex; align-items: center; justify-content: center; gap: 2px; }
+    .cell .cb {
+        position: absolute;
+        right: 1px;
+        bottom: 1px;
+        min-width: 0;
+        font-size: 0.44rem;
+        font-weight: 900;
+        padding: 0 2px;
+        border-radius: 4px;
+        background: rgba(255, 207, 77, 0.92);
+        color: #1a1005;
+        opacity: 0;
+        transform: scale(0.6);
+        transition: opacity 0.14s ease, transform 0.14s ease;
+        line-height: 1.3;
+        font-variant-numeric: tabular-nums;
+    }
+    .cell.betted .cb { opacity: 1; transform: scale(1); }
+    .cell.betted { box-shadow: inset 0 0 0 1px var(--gold), 0 0 8px rgba(255, 207, 77, 0.35); }
+
+    .cell .bolt {
+        position: absolute;
+        top: 0;
+        left: 1px;
+        font-size: 0.5rem;
+        font-style: normal;
+        opacity: 0;
+        transform: scale(0.5);
+        transition: opacity 0.2s ease, transform 0.25s ease;
+        filter: drop-shadow(0 0 5px rgba(53, 224, 255, 0.95));
+    }
+    .cell .mult {
+        position: absolute;
+        top: 0;
+        right: 0;
+        font-size: 0.4rem;
+        font-weight: 900;
+        line-height: 1.25;
+        color: #06131a;
+        background: linear-gradient(120deg, #8ff0ff, #35e0ff);
+        border-radius: 0 4px 0 5px;
+        padding: 0 2px;
+        opacity: 0;
+        transform: translateY(-100%);
+        transition: opacity 0.2s ease, transform 0.25s ease;
+        font-variant-numeric: tabular-nums;
+    }
+    .cell.struck { box-shadow: inset 0 0 0 2px var(--cyan), 0 0 14px rgba(53, 224, 255, 0.55); }
+    .cell.struck .bolt { opacity: 1; transform: scale(1); }
+    .cell.struck .mult { opacity: 1; transform: none; }
+    .cell.struck.lit .bolt { animation: boltLit 0.4s ease-out 3; }
+    @keyframes boltLit {
+        0% { transform: scale(1); filter: drop-shadow(0 0 4px #fff); }
+        40% { transform: scale(1.9); filter: drop-shadow(0 0 14px #fff); }
+        100% { transform: scale(1); }
+    }
+    .cell.winner {
+        box-shadow: 0 0 0 2px #fff, 0 0 22px rgba(255, 255, 255, 0.9);
+        z-index: 3;
+        animation: winPulse 0.55s ease-in-out 3 alternate;
+    }
+    @keyframes winPulse {
+        from { filter: brightness(1); }
+        to { filter: brightness(1.85); }
+    }
+    .cell.hotnum::after {
+        content: '🔥';
+        position: absolute;
+        bottom: 0;
+        left: 1px;
+        font-size: 0.42rem;
+        opacity: 0.9;
+    }
+    .cell.coldnum::after {
+        content: '❄️';
+        position: absolute;
+        bottom: 0;
+        left: 1px;
+        font-size: 0.42rem;
+        opacity: 0.75;
+    }
+
+    .nums {
+        flex: 1;
+        display: grid;
+        grid-template-columns: repeat(12, minmax(0, 1fr));
+        grid-template-rows: repeat(3, minmax(0, 1fr));
+        gap: 3px;
+        min-height: 108px;
+    }
+    .colbets { display: grid; grid-template-rows: repeat(3, minmax(0, 1fr)); gap: 3px; flex: 0 0 34px; }
+
+    .dozbets, .evenbets { display: grid; gap: 3px; }
+    .dozbets { grid-template-columns: repeat(3, 1fr); }
+    .evenbets { grid-template-columns: repeat(6, 1fr); }
+
+    .wide {
+        position: relative;
+        border: 1px solid rgba(255, 255, 255, 0.13);
+        border-radius: 5px;
+        background: linear-gradient(180deg, #1c1133, #100823);
+        color: #e9dcff;
+        font-weight: 900;
+        font-size: clamp(0.46rem, 2vw, 0.62rem);
+        letter-spacing: 0.3px;
+        cursor: pointer;
+        min-height: 27px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: filter 0.12s ease, transform 0.08s ease, box-shadow 0.15s ease;
+        user-select: none;
+        padding: 0 2px;
+        text-align: center;
+        line-height: 1.1;
+    }
+    .wide:active { transform: scale(0.95); }
+    .wide.red { background: linear-gradient(180deg, #b0143a, #6a0820); }
+    .wide.black { background: linear-gradient(180deg, #221835, #0d0819); }
+    .wide .cb, .cell .cb {
+        position: absolute;
+    }
+    .wide .cb {
+        right: 1px;
+        bottom: 1px;
+        font-size: 0.44rem;
+        font-weight: 900;
+        padding: 0 2px;
+        border-radius: 4px;
+        background: rgba(255, 207, 77, 0.92);
+        color: #1a1005;
+        opacity: 0;
+        transform: scale(0.6);
+        transition: opacity 0.14s ease, transform 0.14s ease;
+        line-height: 1.3;
+        font-variant-numeric: tabular-nums;
+    }
+    .wide.betted .cb { opacity: 1; transform: scale(1); }
+    .wide.betted { box-shadow: inset 0 0 0 1px var(--gold), 0 0 8px rgba(255, 207, 77, 0.35); }
+    .wide.redDot::before {
+        content: '';
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        margin-right: 3px;
+        background: #e11d48;
+        box-shadow: 0 0 6px rgba(225, 29, 72, 0.9);
+    }
+    .wide.blackDot::before {
+        content: '';
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        margin-right: 3px;
+        background: #0b0616;
+        border: 1px solid #6b5a8f;
+    }
+
+    /* ---------------- quick / actions ---------------- */
+    .quick { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; }
+    .quick button {
+        border: 1px solid #3b2065;
+        background: linear-gradient(180deg, #1d1236, #120a22);
+        color: #d9c8ff;
+        border-radius: 8px;
+        min-height: 32px;
+        font-size: 0.62rem;
+        font-weight: 900;
+        cursor: pointer;
+        letter-spacing: 0.2px;
+        padding: 0 2px;
+    }
+    .quick button:active { transform: scale(0.95); background: #2a1a4a; }
+
+    .actions { display: flex; gap: 6px; align-items: stretch; }
+    .spin {
+        flex: 1;
+        min-height: 54px;
+        border: none;
+        border-radius: 12px;
+        font-size: 1.02rem;
+        font-weight: 900;
+        letter-spacing: 2.2px;
+        color: #1a0f02;
+        cursor: pointer;
+        background: linear-gradient(135deg, #ffe89a 0%, #ffcf4d 34%, #f5a623 68%, #ffcf4d 100%);
+        box-shadow: 0 6px 20px rgba(245, 166, 35, 0.45), inset 0 2px 0 rgba(255, 255, 255, 0.6);
+        transition: transform 0.1s ease, filter 0.15s ease;
+        text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+    }
+    .spin:active { transform: scale(0.98); }
+    .spin:disabled { filter: grayscale(0.65) brightness(0.68); cursor: not-allowed; }
+    .spin.spinning { animation: spinGlow 0.9s ease-in-out infinite alternate; }
+    @keyframes spinGlow {
+        from { box-shadow: 0 0 12px rgba(255, 207, 77, 0.5), inset 0 2px 0 rgba(255, 255, 255, 0.6); }
+        to { box-shadow: 0 0 34px rgba(53, 224, 255, 0.75), inset 0 2px 0 rgba(255, 255, 255, 0.6); }
+    }
+
+    .sideActions { display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px; flex: 0 0 40%; }
+    .tog {
+        border: 1px solid #3b2065;
+        background: linear-gradient(180deg, #1a1030, #0e0720);
+        color: #c8b6ee;
+        border-radius: 9px;
+        font-size: 0.56rem;
+        font-weight: 900;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 3px;
+        padding: 0 3px;
+        line-height: 1.15;
+    }
+    .tog b { color: var(--gold); font-size: 0.56rem; }
+    .tog.on { border-color: var(--cyan); color: #d8fbff; background: linear-gradient(180deg, #0b2e3a, #071a22); box-shadow: 0 0 12px rgba(53, 224, 255, 0.35); }
+    .tog:active { transform: scale(0.95); }
+
+    /* ---------------- stats ---------------- */
+    .stats {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 4px;
+        background: linear-gradient(180deg, #120a24, #0a0418);
+        border: 1px solid #291352;
+        border-radius: 12px;
+        padding: 6px;
+    }
+    .st {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1px;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.025);
+        padding: 3px 2px;
+        min-width: 0;
+    }
+    .st small { font-size: 0.47rem; color: var(--sub); font-weight: 800; letter-spacing: 0.2px; white-space: nowrap; }
+    .st b {
+        font-size: 0.72rem;
+        font-weight: 900;
+        font-variant-numeric: tabular-nums;
+        color: var(--text);
+        white-space: nowrap;
+    }
+    .st b.plus { color: #4ade80; }
+    .st b.minus { color: #fb7185; }
+    .st b.bolt { color: var(--cyan); }
+
+    .hotcold {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        background: linear-gradient(180deg, #120a24, #0a0418);
+        border: 1px solid #291352;
+        border-radius: 12px;
+        padding: 6px 8px;
+    }
+    .hcRow { display: flex; align-items: center; gap: 6px; min-height: 20px; }
+    .hcLabel { font-size: 0.5rem; font-weight: 900; color: var(--sub); letter-spacing: 0.4px; white-space: nowrap; flex: 0 0 auto; }
+    .hcList { display: flex; gap: 4px; flex-wrap: wrap; }
+    .hcNum {
+        font-size: 0.55rem;
+        font-weight: 900;
+        padding: 1px 5px;
+        border-radius: 5px;
+        font-variant-numeric: tabular-nums;
+        border: 1px solid transparent;
+    }
+    .hcNum.r { background: rgba(225, 29, 72, 0.3); color: #ffd7e0; }
+    .hcNum.b { background: rgba(255, 255, 255, 0.1); color: #ded3f5; }
+    .hcNum.g { background: rgba(34, 197, 94, 0.32); color: #d6ffe6; }
+    .hcEmpty { font-size: 0.5rem; color: #6b5a8f; font-weight: 700; }
+
+    .foot { text-align: center; font-size: 0.52rem; color: #5d4b80; font-weight: 700; padding: 2px 0 6px; }
+
+    /* ---------------- overlays ---------------- */
+    .ov {
+        position: fixed;
+        inset: 0;
+        background: rgba(4, 1, 12, 0.86);
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+        z-index: 90;
+    }
+    .ov.on { display: flex; }
+    .ovBox {
+        width: 100%;
+        max-width: 380px;
+        background: linear-gradient(180deg, #1c0f36, #0c0519);
+        border: 1px solid rgba(168, 85, 247, 0.55);
+        border-radius: 18px;
+        padding: 18px 16px;
+        text-align: center;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(211, 168, 255, 0.25);
+    }
+    .ovTitle {
+        font-size: 1.05rem;
+        font-weight: 900;
+        letter-spacing: 1px;
+        background: linear-gradient(100deg, #fff, var(--gold), var(--cyan));
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 6px;
+    }
+    .ovDesc { font-size: 0.72rem; color: #b9a6dd; line-height: 1.5; margin-bottom: 12px; }
+    .ovDesc b { color: var(--gold2); }
+    .bar { height: 9px; border-radius: 6px; background: rgba(255, 255, 255, 0.09); overflow: hidden; margin: 10px 0 6px; }
+    .bar i { display: block; height: 100%; width: 0%; border-radius: 6px; background: linear-gradient(90deg, var(--violet), var(--cyan), var(--gold)); transition: width 0.2s linear; }
+    .ovTime { font-size: 0.65rem; color: var(--cyan); font-weight: 800; margin-bottom: 8px; min-height: 1em; }
+    .ovBtns { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; }
+    .btn {
+        border: none;
+        border-radius: 10px;
+        padding: 10px 16px;
+        font-size: 0.76rem;
+        font-weight: 900;
+        cursor: pointer;
+        background: linear-gradient(135deg, #ffe89a, #ffcf4d 45%, #f5a623);
+        color: #1a0f02;
+        box-shadow: 0 4px 14px rgba(245, 166, 35, 0.4);
+    }
+    .btn:active { transform: scale(0.96); }
+    .btn.ghost {
+        background: rgba(255, 255, 255, 0.06);
+        color: #c8b6ee;
+        border: 1px solid rgba(168, 85, 247, 0.45);
+        box-shadow: none;
+    }
+
+    .winBox { max-width: 400px; }
+    .winAmount {
+        font-size: 2rem;
+        font-weight: 900;
+        color: var(--gold2);
+        font-variant-numeric: tabular-nums;
+        text-shadow: 0 0 26px rgba(255, 207, 77, 0.8);
+        line-height: 1.1;
+        margin: 2px 0 2px;
+    }
+    .winSub { font-size: 0.66rem; color: #c9b6ee; font-weight: 800; margin-bottom: 10px; }
+    .winBox.lightning { border-color: var(--cyan); box-shadow: 0 0 50px rgba(53, 224, 255, 0.4), 0 20px 60px rgba(0, 0, 0, 0.9); }
+
+    .ptRow {
+        display: flex;
+        justify-content: space-between;
+        gap: 8px;
+        font-size: 0.63rem;
+        padding: 3px 4px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        color: #c8b6ee;
+        text-align: left;
+    }
+    .ptRow b { color: var(--gold2); font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .ptRow.hi { background: rgba(53, 224, 255, 0.08); border-radius: 5px; }
+    .ptBox { max-height: 46vh; overflow-y: auto; margin-bottom: 10px; }
+
+    /* ---------------- desktop ---------------- */
+    @media (min-width: 900px) {
+        .stage {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1.12fr);
+            align-items: start;
+            gap: 10px;
+        }
+        .wheelbox { max-height: none; }
+        .app { gap: 9px; }
+        .nums { min-height: 150px; }
+    }
+</style>
+</head>
+<body>
+<canvas id="fx"></canvas>
+
+<div class="app">
+    <header class="top">
+        <a class="lobby" href="../index.html">🏠 로비</a>
+        <div class="brand"><b>⚡ LIGHTNING ROULETTE</b><span>EXTREME · 37 POCKETS</span></div>
+        <div class="hbtns">
+            <button id="muteBtn" class="ic" title="소리 켜기/끄기">🔊</button>
+            <div class="wallet" id="walletBox">🪙 <span id="balance">10,000</span></div>
+        </div>
+    </header>
+
+    <main class="stage">
+        <section class="wheelcol">
+            <div class="wheelbox">
+                <canvas id="wheel"></canvas>
+                <div class="spinTag" id="spinTag">칩을 배치하고 SPIN</div>
+                <div class="resultPop" id="resultPop">
+                    <span class="rpNum" id="rpNum">0</span>
+                    <span class="rpSub" id="rpSub"></span>
+                </div>
+            </div>
+            <div class="strikeRail">
+                <span class="srLabel">⚡ 라이트닝</span>
+                <div class="srChips" id="strikeRail"><span class="srEmpty">스핀하면 1~5개 번호에 낙뢰</span></div>
+            </div>
+            <div class="railWrap">
+                <span class="railLabel">최근 출목</span>
+                <div class="rail" id="rail"></div>
+            </div>
+        </section>
+
+        <section class="tablecol">
+            <div class="betbar">
+                <div class="betinfo"><span>총 베팅</span><b id="totalBet">0</b></div>
+                <div class="chips" id="chipRow">
+                    <button class="chipBtn on" data-chip="100">100</button>
+                    <button class="chipBtn" data-chip="500">500</button>
+                    <button class="chipBtn" data-chip="1000">1K</button>
+                    <button class="chipBtn" data-chip="5000">5K</button>
+                    <button class="chipBtn" data-chip="10000">10K</button>
+                </div>
+            </div>
+
+            <div class="board" id="board">
+                <div class="numrow">
+                    <button class="cell zero" data-bet="S0" aria-label="0"><span class="out">0</span><span class="cb"></span><i class="bolt">⚡</i><b class="mult"></b></button>
+                    <div class="nums" id="nums"></div>
+                    <div class="colbets" id="colbets"></div>
+                </div>
+                <div class="dozbets" id="dozbets"></div>
+                <div class="evenbets" id="evenbets"></div>
+            </div>
+
+            <div class="quick">
+                <button data-act="half">½</button>
+                <button data-act="double">2X</button>
+                <button data-act="undo">↩ 취소</button>
+                <button data-act="rebate">재베팅</button>
+                <button data-act="clear">초기화</button>
+                <button data-act="allin">ALL IN</button>
+            </div>
+
+            <div class="actions">
+                <button id="spinBtn" class="spin">SPIN</button>
+                <div class="sideActions">
+                    <button id="turboBtn" class="tog">⏩ 터보 <b id="turboState">OFF</b></button>
+                    <button id="autoBtn" class="tog">🔁 AUTO <b id="autoState">10회</b></button>
+                    <button id="adBtn" class="tog">📺 무료칩</button>
+                    <button id="infoBtn" class="tog">📖 배당표</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <section class="stats">
+        <div class="st"><small>총 스핀</small><b id="stSpins">0</b></div>
+        <div class="st"><small>적중</small><b id="stWins">0</b></div>
+        <div class="st"><small>승률</small><b id="stRate">0.0%</b></div>
+        <div class="st"><small>순손익</small><b id="stNet">0</b></div>
+        <div class="st"><small>최고 배수</small><b id="stBest">-</b></div>
+        <div class="st"><small>최대 당첨</small><b id="stMaxWin">0</b></div>
+        <div class="st"><small>⚡ 적중</small><b id="stBolt" class="bolt">0</b></div>
+        <div class="st"><small>최근 10 적중</small><b id="stRecent">-</b></div>
+    </section>
+
+    <section class="hotcold">
+        <div class="hcRow"><span class="hcLabel">🔥 HOT</span><div class="hcList" id="hotList"><span class="hcEmpty">데이터 수집 중…</span></div></div>
+        <div class="hcRow"><span class="hcLabel">❄️ COLD</span><div class="hcList" id="coldList"><span class="hcEmpty">데이터 수집 중…</span></div></div>
+    </section>
+
+    <div class="foot">RoyMing-Lab · Mini Games Arcade · 공용 코인 지갑 연동</div>
+</div>
+
+<!-- reward ad -->
+<div class="ov" id="adOverlay">
+    <div class="ovBox">
+        <div class="ovTitle">📺 무료 칩 충전</div>
+        <div class="ovDesc">광고를 끝까지 보면 <b>+5,000칩</b>이 공용 지갑에 충전됩니다.</div>
+        <div class="bar"><i id="adFill"></i></div>
+        <div class="ovTime" id="adTime">5초 후 충전 완료...</div>
+        <div class="ovBtns">
+            <button class="btn ghost" id="adCancel">건너뛰기</button>
+        </div>
+    </div>
+</div>
+
+<!-- relief -->
+<div class="ov" id="reliefOverlay">
+    <div class="ovBox">
+        <div class="ovTitle">💸 긴급 구호금</div>
+        <div class="ovDesc">보유 칩이 <b>100칩 미만</b>입니다.<br>긴급 구호금 <b>+2,000칩</b>을 받아 다시 도전하세요.</div>
+        <div class="ovBtns">
+            <button class="btn" id="reliefBtn">+2,000칩 받기</button>
+            <button class="btn ghost" id="reliefClose">닫기</button>
+        </div>
+    </div>
+</div>
+
+<!-- win -->
+<div class="ov" id="winOverlay">
+    <div class="ovBox winBox" id="winBox">
+        <div class="ovTitle" id="woTitle">BIG WIN</div>
+        <div class="winAmount" id="woAmount">+0</div>
+        <div class="winSub" id="woSub"></div>
+        <div class="ovBtns"><button class="btn" id="woClose">계속</button></div>
+    </div>
+</div>
+
+<!-- paytable -->
+<div class="ov" id="infoOverlay">
+    <div class="ovBox">
+        <div class="ovTitle">📖 배당표 & 규칙</div>
+        <div class="ptBox" id="ptBody"></div>
+        <div class="ovBtns"><button class="btn" id="infoClose">닫기</button></div>
+    </div>
+</div>
+
+<script src="../shared/wallet.js"></script>
+<script>
+(function () {
+    'use strict';
+
+    /* =========================================================
+       상수
+       ========================================================= */
+    var TAU = Math.PI * 2;
+    var WHEEL = [0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6, 27, 13, 36, 11, 30, 8, 23, 10, 5,
+        24, 16, 33, 1, 20, 14, 31, 9, 22, 18, 29, 7, 28, 12, 35, 3, 26];
+    var SLICE = TAU / 37;
+    var REDS = [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36];
+    var CHIPS = [100, 500, 1000, 5000, 10000];
+    var MIN_CHIP = 100;
+    var BAILOUT_AT = 100;
+    var STORE = 'lightning_roulette_extreme_v1';
+    var STORE_SOUND = 'lightning_roulette_extreme_sound';
+
+    /* 라이트닝 배수 분포 (가중치 합 100) — 가중 평균 101.5배
+       스트레이트 업 RTP = (3 x 101.5 + 34 x 30) / 37^2 = 1324.5 / 1369 = 96.75% */
+    var MULT_TABLE = [
+        { m: 50, w: 46 }, { m: 100, w: 28 }, { m: 150, w: 15 },
+        { m: 200, w: 7 }, { m: 300, w: 3 }, { m: 500, w: 1 }
+    ];
+    var STRAIGHT_BASE = 30;   /* 29:1 */
+
+    var WHEEL_SIZE = 720, WC = 360;
+    var OUTER_R = 342, NUM_R = 274, INNER_R = 198, HUB_R = 82;
+    var TRACK_R = 320, POCKET_R = 236;
+
+    /* =========================================================
+       DOM helpers
+       ========================================================= */
+    function $(id) { return document.getElementById(id); }
+    function fmt(n) { return Math.floor(n).toLocaleString('en-US'); }
+    function fmtK(n) {
+        n = Math.floor(n);
+        if (n >= 1000000) return (n / 1000000).toFixed(n % 1000000 ? 1 : 0) + 'M';
+        if (n >= 1000) return (n / 1000).toFixed(n % 1000 ? 1 : 0) + 'K';
+        return String(n);
+    }
+    function wait(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+    function isRed(n) { return REDS.indexOf(n) >= 0; }
+
+    /* =========================================================
+       사운드 (Web Audio 합성)
+       ========================================================= */
+    var Sound = (function () {
+        var ctx = null;
+        var muted = false;
+        var lastTick = 0;
+        try { muted = localStorage.getItem(STORE_SOUND) === 'off'; } catch (e) {}
+
+        function ensure() {
+            if (muted) return null;
+            if (!ctx) {
+                try { ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return null; }
+            }
+            if (ctx.state === 'suspended') { try { ctx.resume(); } catch (e) {} }
+            return ctx;
+        }
+        function tone(freq, dur, type, gain, when, slideTo) {
+            var c = ensure();
+            if (!c) return;
+            var t0 = c.currentTime + (when || 0);
+            var osc = c.createOscillator();
+            var g = c.createGain();
+            osc.type = type || 'sine';
+            osc.frequency.setValueAtTime(freq, t0);
+            if (slideTo) osc.frequency.exponentialRampToValueAtTime(Math.max(30, slideTo), t0 + dur);
+            g.gain.setValueAtTime(0.0001, t0);
+            g.gain.exponentialRampToValueAtTime(gain || 0.06, t0 + 0.012);
+            g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+            osc.connect(g).connect(c.destination);
+            osc.start(t0);
+            osc.stop(t0 + dur + 0.03);
+        }
+        function noise(dur, gain, when, hp) {
+            var c = ensure();
+            if (!c) return;
+            var t0 = c.currentTime + (when || 0);
+            var len = Math.max(1, Math.floor(c.sampleRate * dur));
+            var buf = c.createBuffer(1, len, c.sampleRate);
+            var d = buf.getChannelData(0);
+            for (var i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / len);
+            var src = c.createBufferSource();
+            src.buffer = buf;
+            var g = c.createGain();
+            g.gain.value = gain || 0.05;
+            var node = src;
+            if (hp) {
+                var f = c.createBiquadFilter();
+                f.type = 'highpass';
+                f.frequency.value = hp;
+                node.connect(f);
+                node = f;
+            }
+            node.connect(g).connect(c.destination);
+            src.start(t0);
+        }
+        return {
+            muted: function () { return muted; },
+            toggle: function () {
+                muted = !muted;
+                try { localStorage.setItem(STORE_SOUND, muted ? 'off' : 'on'); } catch (e) {}
+                if (!muted) tone(680, 0.08, 'sine', 0.05);
+                return muted;
+            },
+            chip: function () { tone(760, 0.045, 'square', 0.026); tone(1040, 0.05, 'square', 0.02, 0.045); },
+            tick: function () {
+                var now = Date.now();
+                if (now - lastTick < 42) return;
+                lastTick = now;
+                tone(1250 + Math.random() * 260, 0.024, 'square', 0.016);
+            },
+            ballDrop: function () {
+                tone(520, 0.13, 'triangle', 0.035, 0, 250);
+                tone(300, 0.16, 'sine', 0.03, 0.1, 150);
+                noise(0.12, 0.022, 0, 900);
+            },
+            lightning: function (i) {
+                var t = (i || 0) * 0.07;
+                noise(0.16, 0.055, t, 1600);
+                tone(2400, 0.09, 'sawtooth', 0.03, t, 420);
+                tone(90, 0.3, 'sine', 0.05, t + 0.01, 40);
+            },
+            boltStrike: function () {
+                noise(0.42, 0.075, 0, 800);
+                tone(70, 0.5, 'sawtooth', 0.06, 0, 36);
+                tone(1800, 0.2, 'square', 0.03, 0.02, 300);
+            },
+            win: function () {
+                [523, 659, 784].forEach(function (f, i) { tone(f, 0.16, 'sine', 0.062, i * 0.06); });
+            },
+            bigwin: function () {
+                [523, 659, 784, 1046].forEach(function (f, i) { tone(f, 0.22, 'sine', 0.07, i * 0.075); });
+                tone(196, 0.4, 'triangle', 0.04, 0);
+            },
+            jackpot: function () {
+                [392, 523, 659, 784, 988, 1175, 1568, 1976].forEach(function (f, i) { tone(f, 0.3, 'sine', 0.078, i * 0.095); });
+                tone(131, 0.9, 'triangle', 0.05, 0);
+                noise(0.32, 0.022, 0.45);
+            },
+            lose: function () { tone(300, 0.14, 'triangle', 0.032, 0, 210); },
+            click: function () { tone(900, 0.03, 'square', 0.02); },
+            bankrupt: function () { [392, 330, 262, 196].forEach(function (f, i) { tone(f, 0.28, 'triangle', 0.062, i * 0.16); }); }
+        };
+    })();
+
+    /* =========================================================
+       파티클 FX
+       ========================================================= */
+    var FX = (function () {
+        var cvs = $('fx');
+        var ctx = cvs.getContext('2d');
+        var W = 0, H = 0, dpr = 1;
+        var parts = [];
+        var raf = null, last = 0;
+
+        function resize() {
+            dpr = Math.min(2, window.devicePixelRatio || 1);
+            W = window.innerWidth;
+            H = window.innerHeight;
+            cvs.width = Math.floor(W * dpr);
+            cvs.height = Math.floor(H * dpr);
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        }
+        resize();
+        window.addEventListener('resize', resize);
+
+        function tick(ts) {
+            var dt = last ? Math.min(0.05, (ts - last) / 1000) : 0.016;
+            last = ts;
+            ctx.clearRect(0, 0, W, H);
+            var alive = [];
+            for (var i = 0; i < parts.length; i++) {
+                var p = parts[i];
+                p.vy += p.g * dt;
+                p.x += p.vx * dt;
+                p.y += p.vy * dt;
+                p.life -= dt;
+                if (p.life <= 0 || p.y > H + 40 || p.x < -50 || p.x > W + 50) continue;
+                p.rot += p.vr * dt;
+                var a = Math.max(0, Math.min(1, p.life / p.fade));
+                ctx.globalAlpha = a;
+                if (p.type === 'spark') {
+                    ctx.strokeStyle = p.color;
+                    ctx.lineWidth = p.r * 0.6;
+                    ctx.beginPath();
+                    ctx.moveTo(p.x, p.y);
+                    ctx.lineTo(p.x - p.vx * 0.022, p.y - p.vy * 0.022);
+                    ctx.stroke();
+                } else {
+                    ctx.save();
+                    ctx.translate(p.x, p.y);
+                    ctx.rotate(p.rot);
+                    ctx.fillStyle = p.color;
+                    ctx.fillRect(-p.r, -p.r * 0.45, p.r * 2, p.r * 0.9);
+                    ctx.restore();
+                }
+                alive.push(p);
+            }
+            parts = alive;
+            ctx.globalAlpha = 1;
+            if (parts.length) raf = requestAnimationFrame(tick);
+            else { raf = null; last = 0; ctx.clearRect(0, 0, W, H); }
+        }
+        function kick() { if (!raf) { last = 0; raf = requestAnimationFrame(tick); } }
+
+        return {
+            burst: function (x, y, n) {
+                var cols = ['#ffcf4d', '#a855f7', '#35e0ff', '#fff4c9', '#ffffff', '#e11d48'];
+                for (var i = 0; i < n; i++) {
+                    var a = Math.random() * TAU;
+                    var sp = 110 + Math.random() * 380;
+                    parts.push({
+                        type: 'confetti', x: x, y: y,
+                        vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 110,
+                        r: 2 + Math.random() * 3.6,
+                        rot: Math.random() * 6.28, vr: (Math.random() - 0.5) * 13,
+                        g: 540, life: 1.1 + Math.random() * 1.2, fade: 2.3,
+                        color: cols[Math.floor(Math.random() * cols.length)]
+                    });
+                }
+                if (parts.length > 420) parts = parts.slice(-420);
+                kick();
+            },
+            sparks: function (x, y, n) {
+                for (var i = 0; i < n; i++) {
+                    var a = Math.random() * TAU;
+                    var sp = 160 + Math.random() * 460;
+                    parts.push({
+                        type: 'spark', x: x, y: y,
+                        vx: Math.cos(a) * sp, vy: Math.sin(a) * sp,
+                        r: 1.2 + Math.random() * 2.2, rot: 0, vr: 0,
+                        g: 340, life: 0.3 + Math.random() * 0.45, fade: 0.75,
+                        color: Math.random() < 0.5 ? '#8ff0ff' : '#fff6c9'
+                    });
+                }
+                if (parts.length > 420) parts = parts.slice(-420);
+                kick();
+            }
+        };
+    })();
+
+    /* =========================================================
+       휠 프리렌더
+       ========================================================= */
+    var wheelCanvas = document.createElement('canvas');
+    wheelCanvas.width = WHEEL_SIZE;
+    wheelCanvas.height = WHEEL_SIZE;
+
+    function buildWheelCanvas() {
+        var g = wheelCanvas.getContext('2d');
+        g.setTransform(1, 0, 0, 1, 0, 0);
+        g.clearRect(0, 0, WHEEL_SIZE, WHEEL_SIZE);
+        g.translate(WC, WC);
+
+        /* 바깥 림 (바이올렛 메탈) */
+        var rim = g.createRadialGradient(0, 0, OUTER_R - 46, 0, 0, OUTER_R);
+        rim.addColorStop(0, '#2b1350');
+        rim.addColorStop(0.55, '#3d1a6e');
+        rim.addColorStop(0.82, '#1c0b33');
+        rim.addColorStop(1, '#0a0418');
+        g.beginPath();
+        g.arc(0, 0, OUTER_R, 0, TAU);
+        g.fillStyle = rim;
+        g.fill();
+
+        /* 골드 네온 링 */
+        g.beginPath();
+        g.arc(0, 0, OUTER_R - 2, 0, TAU);
+        g.strokeStyle = '#ffcf4d';
+        g.lineWidth = 4;
+        g.shadowColor = 'rgba(255,207,77,0.95)';
+        g.shadowBlur = 20;
+        g.stroke();
+        g.shadowBlur = 0;
+
+        /* 볼 트랙 (어두운 링) */
+        g.beginPath();
+        g.arc(0, 0, OUTER_R - 8, 0, TAU);
+        g.arc(0, 0, NUM_R + 8, 0, TAU, true);
+        var track = g.createRadialGradient(0, 0, NUM_R, 0, 0, OUTER_R - 8);
+        track.addColorStop(0, '#150a26');
+        track.addColorStop(0.6, '#0d0619');
+        track.addColorStop(1, '#1a0d30');
+        g.fillStyle = track;
+        g.fill();
+
+        /* 트랙 미세 원 */
+        g.beginPath();
+        g.arc(0, 0, TRACK_R, 0, TAU);
+        g.strokeStyle = 'rgba(168,85,247,0.22)';
+        g.lineWidth = 1.5;
+        g.stroke();
+
+        /* 포켓 */
+        for (var i = 0; i < 37; i++) {
+            var ang = i * SLICE;
+            var num = WHEEL[i];
+            var red = isRed(num);
+            g.beginPath();
+            g.moveTo(0, 0);
+            g.arc(0, 0, NUM_R, ang, ang + SLICE);
+            g.closePath();
+            if (num === 0) {
+                var gr = g.createRadialGradient(0, 0, INNER_R, 0, 0, NUM_R);
+                gr.addColorStop(0, '#12813f');
+                gr.addColorStop(1, '#1dc264');
+                g.fillStyle = gr;
+            } else if (red) {
+                var gr2 = g.createRadialGradient(0, 0, INNER_R, 0, 0, NUM_R);
+                gr2.addColorStop(0, '#8c0f2c');
+                gr2.addColorStop(1, '#d81844');
+                g.fillStyle = gr2;
+            } else {
+                var gr3 = g.createRadialGradient(0, 0, INNER_R, 0, 0, NUM_R);
+                gr3.addColorStop(0, '#120b22');
+                gr3.addColorStop(1, '#241838');
+                g.fillStyle = gr3;
+            }
+            g.fill();
+
+            /* 프렛(구분 금속) */
+            g.beginPath();
+            g.moveTo(Math.cos(ang) * (INNER_R - 4), Math.sin(ang) * (INNER_R - 4));
+            g.lineTo(Math.cos(ang) * (NUM_R + 3), Math.sin(ang) * (NUM_R + 3));
+            g.strokeStyle = 'rgba(255,207,77,0.7)';
+            g.lineWidth = 2;
+            g.stroke();
+
+            /* 숫자 */
+            g.save();
+            g.rotate(ang + SLICE / 2);
+            g.fillStyle = '#ffffff';
+            g.font = 'bold 23px -apple-system, "Segoe UI", Roboto, sans-serif';
+            g.textAlign = 'center';
+            g.textBaseline = 'middle';
+            g.shadowColor = 'rgba(0,0,0,0.85)';
+            g.shadowBlur = 5;
+            g.fillText(String(num), (NUM_R + INNER_R) / 2 + 6, 0);
+            g.restore();
+        }
+
+        /* 안쪽 원판 */
+        g.beginPath();
+        g.arc(0, 0, INNER_R, 0, TAU);
+        var inner = g.createRadialGradient(0, 0, HUB_R, 0, 0, INNER_R);
+        inner.addColorStop(0, '#2a1550');
+        inner.addColorStop(1, '#0d0620');
+        g.fillStyle = inner;
+        g.fill();
+        g.strokeStyle = '#ffcf4d';
+        g.lineWidth = 3;
+        g.shadowColor = 'rgba(255,207,77,0.8)';
+        g.shadowBlur = 14;
+        g.stroke();
+        g.shadowBlur = 0;
+
+        /* 안쪽 장식 링 */
+        g.beginPath();
+        g.arc(0, 0, (INNER_R + HUB_R) / 2, 0, TAU);
+        g.strokeStyle = 'rgba(168,85,247,0.35)';
+        g.lineWidth = 2;
+        g.setLineDash([7, 9]);
+        g.stroke();
+        g.setLineDash([]);
+
+        /* 허브 */
+        var hub = g.createRadialGradient(-16, -20, 6, 0, 0, HUB_R);
+        hub.addColorStop(0, '#fff8dc');
+        hub.addColorStop(0.35, '#ffcf4d');
+        hub.addColorStop(0.75, '#c98a13');
+        hub.addColorStop(1, '#5c3a06');
+        g.beginPath();
+        g.arc(0, 0, HUB_R, 0, TAU);
+        g.fillStyle = hub;
+        g.fill();
+        g.strokeStyle = '#ffe89a';
+        g.lineWidth = 2;
+        g.stroke();
+
+        /* 허브 번개 로고 */
+        g.save();
+        g.scale(1.55, 1.55);
+        g.beginPath();
+        g.moveTo(2, -26);
+        g.lineTo(-13, 3);
+        g.lineTo(-2, 3);
+        g.lineTo(-5, 26);
+        g.lineTo(13, -5);
+        g.lineTo(1, -5);
+        g.closePath();
+        g.fillStyle = '#1a0f02';
+        g.fill();
+        g.restore();
+    }
+    buildWheelCanvas();
+
+    /* =========================================================
+       휠 렌더 / 애니메이션
+       ========================================================= */
+    var canvas = $('wheel');
+    var ctx = canvas.getContext('2d');
+    var view = 400, dpr = 1;
+
+    var wheelRot = 0;
+    var ballAngle = Math.PI * 0.35;
+    var ballRad = TRACK_R;
+    var rafId = null;
+
+    function sizeCanvas() {
+        var rect = canvas.getBoundingClientRect();
+        var nextView = Math.max(220, Math.round(rect.width || 360));
+        var nextDpr = Math.min(2, window.devicePixelRatio || 1);
+        var w = Math.floor(nextView * nextDpr);
+        if (w !== canvas.width) {
+            view = nextView;
+            dpr = nextDpr;
+            canvas.width = w;
+            canvas.height = w;
+        } else {
+            view = nextView;
+            dpr = nextDpr;
+        }
+        draw();
+    }
+
+    function draw() {
+        var sc = view / WHEEL_SIZE;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.clearRect(0, 0, view, view);
+        ctx.save();
+        ctx.translate(view / 2, view / 2);
+
+        /* 외곽 네온 글로우 */
+        var glow = ctx.createRadialGradient(0, 0, view * 0.36, 0, 0, view * 0.5);
+        glow.addColorStop(0, 'rgba(168,85,247,0)');
+        glow.addColorStop(0.72, 'rgba(168,85,247,0.10)');
+        glow.addColorStop(1, 'rgba(53,224,255,0)');
+        ctx.beginPath();
+        ctx.arc(0, 0, view * 0.5, 0, TAU);
+        ctx.fillStyle = glow;
+        ctx.fill();
+
+        /* 휠 */
+        ctx.save();
+        ctx.rotate(wheelRot);
+        ctx.drawImage(wheelCanvas,
+            -WHEEL_SIZE / 2 * sc, -WHEEL_SIZE / 2 * sc,
+            WHEEL_SIZE * sc, WHEEL_SIZE * sc);
+
+        /* 라이트닝 낙뢰 마크 (휠과 함께 회전) */
+        for (var n in strikes) {
+            if (!Object.prototype.hasOwnProperty.call(strikes, n)) continue;
+            var idx = WHEEL.indexOf(Number(n));
+            if (idx < 0) continue;
+            var a = idx * SLICE + SLICE / 2;
+            var rr = (NUM_R + 26) * sc;
+            ctx.save();
+            ctx.translate(Math.cos(a) * rr, Math.sin(a) * rr);
+            ctx.rotate(a + Math.PI / 2);
+            ctx.font = 'bold 22px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.shadowColor = 'rgba(53,224,255,0.95)';
+            ctx.shadowBlur = 14;
+            ctx.fillStyle = '#c9f9ff';
+            ctx.fillText('⚡', 0, 0);
+            ctx.restore();
+        }
+        ctx.restore();
+
+        /* 볼 */
+        var bx = Math.cos(ballAngle) * ballRad * sc;
+        var by = Math.sin(ballAngle) * ballRad * sc;
+        var br = 11 * sc;
+        ctx.beginPath();
+        ctx.arc(bx, by + br * 0.55, br * 1.05, 0, TAU);
+        ctx.fillStyle = 'rgba(0,0,0,0.5)';
+        ctx.fill();
+
+        var ballGrad = ctx.createRadialGradient(bx - br * 0.35, by - br * 0.4, br * 0.15, bx, by, br);
+        ballGrad.addColorStop(0, '#ffffff');
+        ballGrad.addColorStop(0.55, '#f2ecff');
+        ballGrad.addColorStop(1, '#b9a8dd');
+        ctx.beginPath();
+        ctx.arc(bx, by, br, 0, TAU);
+        ctx.fillStyle = ballGrad;
+        ctx.shadowColor = 'rgba(200,240,255,0.8)';
+        ctx.shadowBlur = 12;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+
+        ctx.restore();
+    }
+
+    function animateSpin(winIdx, dur) {
+        return new Promise(function (resolve) {
+            var t0 = performance.now();
+            var w0 = wheelRot;
+            var w1 = w0 + (4 + Math.random() * 2.4) * TAU;
+            var b0 = ballAngle;
+            var b1 = w1 + winIdx * SLICE + SLICE / 2;
+            while (b1 > b0 - TAU * 3) b1 -= TAU;
+            var lastPocket = -1;
+            var dropFired = false;
+
+            function frame(now) {
+                var p = Math.min(1, (now - t0) / dur);
+
+                var wp = Math.min(1, p / 0.9);
+                wheelRot = w0 + (w1 - w0) * (1 - Math.pow(1 - wp, 3));
+
+                var be = 1 - Math.pow(1 - p, 3.1);
+                ballAngle = b0 + (b1 - b0) * be;
+
+                if (p < 0.64) {
+                    ballRad = TRACK_R - Math.sin(p / 0.64 * Math.PI) * 9;
+                } else {
+                    if (!dropFired) { dropFired = true; Sound.ballDrop(); }
+                    var rp = (p - 0.64) / 0.36;
+                    var re = 1 - Math.pow(1 - rp, 2.2);
+                    ballRad = TRACK_R + (POCKET_R - TRACK_R) * re + Math.sin(rp * Math.PI * 1.6) * 9 * (1 - rp);
+                }
+
+                var pk = Math.floor((((ballAngle % TAU) + TAU) % TAU) / SLICE);
+                if (pk !== lastPocket) {
+                    lastPocket = pk;
+                    if (p > 0.02 && p < 0.96) Sound.tick();
+                }
+
+                draw();
+
+                if (p < 1) {
+                    rafId = requestAnimationFrame(frame);
+                } else {
+                    rafId = null;
+                    wheelRot = w1;
+                    ballAngle = b1;
+                    ballRad = POCKET_R;
+                    draw();
+                    resolve();
+                }
+            }
+            if (rafId) cancelAnimationFrame(rafId);
+            rafId = requestAnimationFrame(frame);
+        });
+    }
+
+    /* =========================================================
+       상태
+       ========================================================= */
+    var balance = Wallet.getBalance();
+    var chip = 100;
+    var bets = {};
+    var betOrder = [];
+    var undoStack = [];
+    var lastBets = null;
+    var totalBet = 0;
+    var spinning = false;
+    var turbo = false;
+    var autoLeft = 0;
+    var autoStop = false;
+    var strikes = {};
+    var pendingOverlay = false;
+    var lastSpot = 'RED';
+
+    var stats = { spins: 0, wins: 0, net: 0, best: 0, maxWin: 0, bolt: 0 };
+    var history = [];
+    var recentWins = [];
+
+    /* =========================================================
+       저장
+       ========================================================= */
+    function loadState() {
+        try {
+            var raw = localStorage.getItem(STORE);
+            if (!raw) return;
+            var s = JSON.parse(raw);
+            if (!s || typeof s !== 'object') return;
+            if (s.stats && typeof s.stats === 'object') {
+                stats.spins = Number(s.stats.spins) || 0;
+                stats.wins = Number(s.stats.wins) || 0;
+                stats.net = Number(s.stats.net) || 0;
+                stats.best = Number(s.stats.best) || 0;
+                stats.maxWin = Number(s.stats.maxWin) || 0;
+                stats.bolt = Number(s.stats.bolt) || 0;
+            }
+            if (Array.isArray(s.history)) history = s.history.filter(function (n) { return typeof n === 'number'; }).slice(-60);
+            if (Array.isArray(s.recentWins)) recentWins = s.recentWins.slice(-10);
+            if (CHIPS.indexOf(Number(s.chip)) >= 0) chip = Number(s.chip);
+            if (typeof s.turbo === 'boolean') turbo = s.turbo;
+        } catch (e) {}
+    }
+    function saveState() {
+        try {
+            localStorage.setItem(STORE, JSON.stringify({
+                stats: stats, history: history.slice(-60), recentWins: recentWins.slice(-10),
+                chip: chip, turbo: turbo
+            }));
+        } catch (e) {}
+    }
+
+    /* =========================================================
+       보드 구성
+       ========================================================= */
+    var spotEls = {};
+
+    function buildBoard() {
+        var nums = $('nums');
+        nums.innerHTML = '';
+        var grid = [];
+        /* 행 우선 배치: 위줄 3,6,9…36 / 가운데 2,5…35 / 아래 1,4…34 */
+        for (var r = 0; r < 3; r++) {
+            for (var c = 0; c < 12; c++) {
+                grid.push(c * 3 + (3 - r));
+            }
+        }
+        grid.forEach(function (num) {
+            var b = document.createElement('button');
+            b.className = 'cell' + (isRed(num) ? ' red' : '');
+            b.setAttribute('data-bet', 'S' + num);
+            b.innerHTML = '<span class="out">' + num + '</span><span class="cb"></span><i class="bolt">⚡</i><b class="mult"></b>';
+            nums.appendChild(b);
+        });
+
+        var colbets = $('colbets');
+        colbets.innerHTML = '';
+        [['COL3', '2:1'], ['COL2', '2:1'], ['COL1', '2:1']].forEach(function (p) {
+            var b = document.createElement('button');
+            b.className = 'wide';
+            b.setAttribute('data-bet', p[0]);
+            b.innerHTML = p[1] + '<span class="cb"></span>';
+            colbets.appendChild(b);
+        });
+
+        var doz = $('dozbets');
+        doz.innerHTML = '';
+        [['DOZ1', '1st 12'], ['DOZ2', '2nd 12'], ['DOZ3', '3rd 12']].forEach(function (p) {
+            var b = document.createElement('button');
+            b.className = 'wide';
+            b.setAttribute('data-bet', p[0]);
+            b.innerHTML = p[1] + '<span class="cb"></span>';
+            doz.appendChild(b);
+        });
+
+        var ev = $('evenbets');
+        ev.innerHTML = '';
+        [['LOW', '1-18'], ['EVEN', '짝'], ['RED', '빨강', 'redDot'], ['BLACK', '검정', 'blackDot'],
+            ['ODD', '홀'], ['HIGH', '19-36']].forEach(function (p) {
+            var b = document.createElement('button');
+            b.className = 'wide' + (p[0] === 'RED' ? ' red' : p[0] === 'BLACK' ? ' black' : '') + (p[2] ? ' ' + p[2] : '');
+            b.setAttribute('data-bet', p[0]);
+            b.innerHTML = '<span class="out">' + p[1] + '</span><span class="cb"></span>';
+            ev.appendChild(b);
+        });
+
+        spotEls = {};
+        var all = document.querySelectorAll('[data-bet]');
+        for (var i = 0; i < all.length; i++) {
+            spotEls[all[i].getAttribute('data-bet')] = all[i];
+        }
+        document.querySelectorAll('[data-bet]').forEach(function (el) {
+            el.addEventListener('click', function () {
+                placeBet(el.getAttribute('data-bet'));
+            });
+        });
+    }
+
+    /* =========================================================
+       베팅
+       ========================================================= */
+    function sumBets() {
+        var s = 0;
+        for (var k in bets) if (Object.prototype.hasOwnProperty.call(bets, k)) s += bets[k];
+        return s;
+    }
+
+    function placeBet(id) {
+        if (spinning) return;
+        if (pendingOverlay) return;
+        lastSpot = id;
+        if (balance - totalBet < chip) {
+            setStatus('잔고 부족 · 무료칩 충전 또는 베팅 축소');
+            Sound.bankrupt();
+            if (balance < BAILOUT_AT) openRelief();
+            return;
+        }
+        undoStack.push({ id: id, amount: chip });
+        if (undoStack.length > 80) undoStack.shift();
+        bets[id] = (bets[id] || 0) + chip;
+        totalBet = sumBets();
+        renderBets();
+        Sound.chip();
+        var el = spotEls[id];
+        if (el) {
+            el.style.filter = 'brightness(1.7)';
+            setTimeout(function () { el.style.filter = ''; }, 130);
+        }
+    }
+
+    function undoBet() {
+        if (spinning) return;
+        var last = undoStack.pop();
+        if (!last) { setStatus('되돌릴 베팅이 없습니다'); return; }
+        bets[last.id] = (bets[last.id] || 0) - last.amount;
+        if (bets[last.id] <= 0) delete bets[last.id];
+        totalBet = sumBets();
+        renderBets();
+        Sound.click();
+    }
+
+    function clearBets() {
+        if (spinning) return;
+        bets = {};
+        undoStack = [];
+        totalBet = 0;
+        renderBets();
+        Sound.click();
+        setStatus('베팅 초기화');
+    }
+
+    function scaleBets(mult) {
+        if (spinning) return;
+        var s = sumBets();
+        if (s <= 0) { setStatus('베팅이 없습니다'); return; }
+        var target = Math.floor(s * mult);
+        var keys = Object.keys(bets);
+        if (!keys.length) return;
+        /* 비율 유지, 최소 100칩 유지 */
+        var ratio = target / s;
+        var newBets = {};
+        var tot = 0;
+        keys.forEach(function (k) {
+            var v = Math.floor(bets[k] * ratio / 100) * 100;
+            if (v < 100) v = 100;
+            newBets[k] = v;
+            tot += v;
+        });
+        if (mult < 1) {
+            /* ½: 100 미만이 되면 100칩 */
+            if (tot < keys.length * 100) tot = keys.length * 100;
+        }
+        if (tot > balance) {
+            var over = tot - balance;
+            var guard = 0;
+            while (over > 0 && guard < 400) {
+                guard += 1;
+                var big = null;
+                for (var k in newBets) {
+                    if (newBets[k] > 100 && (big === null || newBets[k] > newBets[big])) big = k;
+                }
+                if (!big) break;
+                newBets[big] -= 100;
+                over -= 100;
+                if (newBets[big] < 100) delete newBets[big];
+            }
+        }
+        var check = 0;
+        for (var k2 in newBets) check += newBets[k2];
+        if (check > balance) { setStatus('잔고보다 큰 베팅입니다'); return; }
+        bets = newBets;
+        totalBet = check;
+        undoStack = [];
+        renderBets();
+        Sound.chip();
+        setStatus(mult < 1 ? '베팅 ½ 축소' : '베팅 2X 확대');
+    }
+
+    function allIn() {
+        if (spinning) return;
+        var room = balance - totalBet;
+        if (room < chip) { setStatus('올인할 잔고가 부족합니다'); return; }
+        var spot = lastSpot || 'RED';
+        bets[spot] = (bets[spot] || 0) + room;
+        undoStack.push({ id: spot, amount: room });
+        totalBet = sumBets();
+        renderBets();
+        Sound.chip();
+        setStatus('ALL IN · ' + fmt(room) + '칩 → ' + spotLabel(spot));
+    }
+
+    function rebet() {
+        if (spinning) return;
+        if (!lastBets || !Object.keys(lastBets).length) { setStatus('재베팅할 이전 베팅이 없습니다'); return; }
+        var s = 0;
+        for (var k in lastBets) s += lastBets[k];
+        if (s > balance) { setStatus('재베팅 금액(' + fmt(s) + ')이 잔고를 초과합니다'); Sound.bankrupt(); return; }
+        bets = {};
+        for (var k2 in lastBets) bets[k2] = lastBets[k2];
+        totalBet = s;
+        undoStack = [];
+        renderBets();
+        Sound.chip();
+        setStatus('이전 베팅 재배치 · ' + fmt(s) + '칩');
+    }
+
+    function spotLabel(id) {
+        if (id.indexOf('S') === 0) return '넘버 ' + id.slice(1);
+        var m = {
+            RED: '레드', BLACK: '블랙', ODD: '홀', EVEN: '짝', LOW: '1-18', HIGH: '19-36',
+            DOZ1: '1st 12', DOZ2: '2nd 12', DOZ3: '3rd 12', COL1: '컬럼 1', COL2: '컬럼 2', COL3: '컬럼 3'
+        };
+        return m[id] || id;
+    }
+
+    /* =========================================================
+       렌더
+       ========================================================= */
+    function renderBalance(flash) {
+        $('balance').textContent = fmt(balance);
+        if (flash) {
+            var box = $('walletBox');
+            box.classList.remove('flash');
+            void box.offsetWidth;
+            box.classList.add('flash');
+        }
+    }
+
+    function renderBets() {
+        for (var id in spotEls) {
+            if (!Object.prototype.hasOwnProperty.call(spotEls, id)) continue;
+            var el = spotEls[id];
+            var amt = bets[id] || 0;
+            var cb = el.querySelector('.cb');
+            if (cb) cb.textContent = amt > 0 ? fmtK(amt) : '';
+            if (amt > 0) el.classList.add('betted'); else el.classList.remove('betted');
+        }
+        totalBet = sumBets();
+        $('totalBet').textContent = fmt(totalBet);
+        $('spinBtn').disabled = spinning || totalBet <= 0;
+    }
+
+    function renderChips() {
+        document.querySelectorAll('.chipBtn').forEach(function (b) {
+            b.classList.toggle('on', Number(b.getAttribute('data-chip')) === chip);
+        });
+    }
+
+    function renderStats() {
+        $('stSpins').textContent = fmt(stats.spins);
+        $('stWins').textContent = fmt(stats.wins);
+        $('stRate').textContent = (stats.spins ? (stats.wins / stats.spins * 100) : 0).toFixed(1) + '%';
+        var net = $('stNet');
+        net.textContent = (stats.net > 0 ? '+' : stats.net < 0 ? '-' : '') + fmt(Math.abs(stats.net));
+        net.className = stats.net > 0 ? 'plus' : stats.net < 0 ? 'minus' : '';
+        $('stBest').textContent = stats.best > 0 ? (Math.round(stats.best * 10) / 10) + 'x' : '-';
+        $('stMaxWin').textContent = fmt(stats.maxWin);
+        $('stBolt').textContent = fmt(stats.bolt);
+
+        var rw = recentWins.slice(-10);
+        var hits = rw.filter(function (v) { return v === 1; }).length;
+        $('stRecent').textContent = rw.length ? hits + '/' + rw.length : '-';
+    }
+
+    function renderRail() {
+        var rail = $('rail');
+        rail.innerHTML = '';
+        var list = history.slice(-10);
+        list.forEach(function (n) {
+            var d = document.createElement('div');
+            d.className = 'rBall ' + (n === 0 ? 'g' : isRed(n) ? 'r' : 'b') + (strikes[n] ? ' lt' : '');
+            d.textContent = n;
+            rail.appendChild(d);
+        });
+        rail.scrollLeft = rail.scrollWidth;
+    }
+
+    function hcChips(list) {
+        var box = document.createElement('div');
+        list.forEach(function (n) {
+            var s = document.createElement('span');
+            s.className = 'hcNum ' + (n === 0 ? 'g' : isRed(n) ? 'r' : 'b');
+            s.textContent = n;
+            box.appendChild(s);
+        });
+        return box;
+    }
+
+    function renderHotCold() {
+        var hot = $('hotList'), cold = $('coldList');
+        hot.innerHTML = ''; cold.innerHTML = '';
+        var recent = history.slice(-30);
+        if (recent.length < 8) {
+            hot.innerHTML = '<span class="hcEmpty">데이터 수집 중…</span>';
+            cold.innerHTML = '<span class="hcEmpty">데이터 수집 중…</span>';
+            return;
+        }
+        var count = {};
+        for (var i = 0; i <= 36; i++) count[i] = 0;
+        recent.forEach(function (n) { count[n] = (count[n] || 0) + 1; });
+        var arr = [];
+        for (var k = 0; k <= 36; k++) arr.push({ n: k, c: count[k] });
+        var byHot = arr.slice().sort(function (a, b) { return b.c - a.c || a.n - b.n; });
+        var byCold = arr.slice().sort(function (a, b) { return a.c - b.c || a.n - b.n; });
+        var hotNums = byHot.slice(0, 4).filter(function (x) { return x.c > 0; }).map(function (x) { return x.n; });
+        var coldNums = byCold.slice(0, 4).map(function (x) { return x.n; });
+        if (hotNums.length) hot.appendChild(hcChips(hotNums));
+        else hot.innerHTML = '<span class="hcEmpty">아직 반복된 번호 없음</span>';
+        cold.appendChild(hcChips(coldNums));
+
+        for (var j = 0; j <= 36; j++) {
+            var el = spotEls['S' + j];
+            if (!el) continue;
+            el.classList.remove('hotnum', 'coldnum');
+            if (hotNums.indexOf(j) >= 0) el.classList.add('hotnum');
+            else if (coldNums.indexOf(j) >= 0) el.classList.add('coldnum');
+        }
+    }
+
+    function renderStrikes(hitNum) {
+        for (var j = 0; j <= 36; j++) {
+            var el = spotEls['S' + j];
+            if (!el) continue;
+            el.classList.remove('struck', 'lit');
+            var multEl = el.querySelector('.mult');
+            if (multEl) multEl.textContent = '';
+        }
+        var rail = $('strikeRail');
+        rail.innerHTML = '';
+        var nums = Object.keys(strikes).map(Number).sort(function (a, b) { return strikes[b] - strikes[a]; });
+        if (!nums.length) {
+            rail.innerHTML = '<span class="srEmpty">스핀하면 1~5개 번호에 낙뢰</span>';
+            return;
+        }
+        nums.forEach(function (n) {
+            var el = spotEls['S' + n];
+            if (el) {
+                el.classList.add('struck');
+                var m = el.querySelector('.mult');
+                if (m) m.textContent = strikes[n] + 'x';
+            }
+            var c = document.createElement('span');
+            c.className = 'srChip' + (isRed(n) ? ' red' : '') + (n === hitNum ? ' hit' : '');
+            c.textContent = n + ' · ' + strikes[n] + 'x';
+            rail.appendChild(c);
+        });
+    }
+
+    function setStatus(msg) {
+        $('spinTag').textContent = msg;
+    }
+
+    function showResultPop(num, sub, jack) {
+        var pop = $('resultPop');
+        $('rpNum').textContent = num;
+        $('rpNum').style.color = num === 0 ? '#4ade80' : isRed(num) ? '#ff6b8d' : '#d9ccff';
+        $('rpSub').textContent = sub;
+        $('rpSub').style.color = jack ? '#8ff0ff' : '#c8b6ee';
+        pop.classList.toggle('jack', !!jack);
+        pop.classList.add('on');
+    }
+    function hideResultPop() { $('resultPop').classList.remove('on'); }
+
+    /* =========================================================
+       낙뢰 추첨
+       ========================================================= */
+    function pickMult() {
+        var total = 0;
+        for (var i = 0; i < MULT_TABLE.length; i++) total += MULT_TABLE[i].w;
+        var r = Math.random() * total;
+        for (var j = 0; j < MULT_TABLE.length; j++) {
+            r -= MULT_TABLE[j].w;
+            if (r <= 0) return MULT_TABLE[j].m;
+        }
+        return MULT_TABLE[0].m;
+    }
+
+    function rollStrikes() {
+        strikes = {};
+        var k = 1 + Math.floor(Math.random() * 5);   /* 1~5개 */
+        var pool = [];
+        for (var i = 0; i <= 36; i++) pool.push(i);
+        for (var s = 0; s < k; s++) {
+            var idx = Math.floor(Math.random() * pool.length);
+            var n = pool.splice(idx, 1)[0];
+            strikes[n] = pickMult();
+        }
+    }
+
+    /* =========================================================
+       정산
+       ========================================================= */
+    function betWins(id, n) {
+        if (id.charAt(0) === 'S') return Number(id.slice(1)) === n;
+        switch (id) {
+            case 'RED': return n !== 0 && isRed(n);
+            case 'BLACK': return n !== 0 && !isRed(n);
+            case 'ODD': return n !== 0 && n % 2 === 1;
+            case 'EVEN': return n !== 0 && n % 2 === 0;
+            case 'LOW': return n >= 1 && n <= 18;
+            case 'HIGH': return n >= 19 && n <= 36;
+            case 'DOZ1': return n >= 1 && n <= 12;
+            case 'DOZ2': return n >= 13 && n <= 24;
+            case 'DOZ3': return n >= 25 && n <= 36;
+            case 'COL1': return n !== 0 && n % 3 === 1;
+            case 'COL2': return n !== 0 && n % 3 === 2;
+            case 'COL3': return n !== 0 && n % 3 === 0;
+        }
+        return false;
+    }
+
+    function payoutMult(id, n) {
+        if (id.charAt(0) === 'S') {
+            if (strikes[n]) return strikes[n];   /* 라이트닝 적중 시 배수로 대체 */
+            return STRAIGHT_BASE;
+        }
+        if (id === 'RED' || id === 'BLACK' || id === 'ODD' || id === 'EVEN' || id === 'LOW' || id === 'HIGH') return 2;
+        return 3;
+    }
+
+    /* =========================================================
+       스핀
+       ========================================================= */
+    async function doSpin() {
+        if (spinning) return;
+        if (pendingOverlay) { closeWin(); return; }
+        if (totalBet <= 0) { setStatus('먼저 칩을 배치하세요'); return; }
+        if (balance < totalBet) {
+            setStatus('잔고 부족 · 무료칩을 충전하세요');
+            Sound.bankrupt();
+            openRelief();
+            stopAuto();
+            return;
+        }
+
+        spinning = true;
+        pendingOverlay = false;
+        hideResultPop();
+        $('spinBtn').textContent = 'STRIKING…';
+        $('spinBtn').classList.add('spinning');
+        renderBets();
+
+        /* 베팅 차감 */
+        var stake = totalBet;
+        balance -= stake;
+        Wallet.setBalance(balance);
+        renderBalance(true);
+        lastBets = {};
+        for (var b in bets) lastBets[b] = bets[b];
+
+        if (autoLeft > 0) {
+            autoLeft -= 1;
+            $('autoState').textContent = autoLeft > 0 ? autoLeft + '회' : '마지막';
+        }
+
+        /* 낙뢰 */
+        rollStrikes();
+        renderStrikes();
+        Sound.boltStrike();
+        var struckNums = Object.keys(strikes).map(Number);
+        setStatus('⚡ 라이트닝 낙뢰 ' + struckNums.length + '개 번호!');
+        for (var i = 0; i < struckNums.length; i++) {
+            (function (n, idx) {
+                setTimeout(function () {
+                    var el = spotEls['S' + n];
+                    if (el) {
+                        el.classList.add('lit');
+                        var r = el.getBoundingClientRect();
+                        FX.sparks(r.left + r.width / 2, r.top + r.height / 2, 14);
+                    }
+                    Sound.lightning(idx);
+                }, turbo ? idx * 70 : 120 + idx * 130);
+            })(struckNums[i], i);
+        }
+        await wait(turbo ? 380 : 980 + struckNums.length * 60);
+
+        /* 결과 추첨 (37칸 균등) */
+        var winIdx = Math.floor(Math.random() * 37);
+        var num = WHEEL[winIdx];
+
+        $('spinBtn').textContent = 'SPINNING';
+        setStatus('🎡 휠 회전 중…');
+        await animateSpin(winIdx, turbo ? 2050 : 5100);
+
+        settle(winIdx, num, stake);
+    }
+
+    function settle(winIdx, num, stake) {
+        var win = 0;
+        var bestMult = 0;
+        var boltHit = false;
+
+        for (var id in bets) {
+            if (!Object.prototype.hasOwnProperty.call(bets, id)) continue;
+            if (!betWins(id, num)) continue;
+            var pm = payoutMult(id, num);
+            win += bets[id] * pm;
+            if (id.charAt(0) === 'S' && strikes[num] && Number(id.slice(1)) === num) {
+                boltHit = true;
+                if (strikes[num] > bestMult) bestMult = strikes[num];
+            }
+        }
+        if (win > 0) balance += win;
+        Wallet.setBalance(balance);
+        renderBalance(win > 0);
+
+        renderStrikes(num);
+
+        var net = win - stake;
+        stats.spins += 1;
+        if (win > 0) stats.wins += 1;
+        stats.net += net;
+        if (win > stats.maxWin) stats.maxWin = win;
+        if (stake > 0) {
+            var ratio = win / stake;
+            if (ratio > stats.best) stats.best = ratio;
+            if (ratio > bestMult) bestMult = ratio;
+        }
+        if (boltHit) stats.bolt += 1;
+
+        history.push(num);
+        if (history.length > 60) history = history.slice(-60);
+        recentWins.push(win > 0 ? 1 : 0);
+        if (recentWins.length > 10) recentWins = recentWins.slice(-10);
+        saveState();
+
+        spinning = false;
+        $('spinBtn').textContent = 'SPIN';
+        $('spinBtn').classList.remove('spinning');
+        renderBets();
+        renderStats();
+        renderRail();
+        renderHotCold();
+
+        /* 결과 연출 */
+        var colorTxt = num === 0 ? 'GREEN' : isRed(num) ? 'RED' : 'BLACK';
+        var label = num + ' ' + colorTxt;
+        var winCell = spotEls['S' + num];
+        if (winCell) {
+            winCell.classList.add('winner');
+            setTimeout(function () { winCell.classList.remove('winner'); }, 1900);
+        }
+
+        var big = win >= stake * 20 && win >= 2000;
+        if (boltHit && strikes[num] >= 100) {
+            showResultPop(num, '⚡ ' + strikes[num] + 'x LIGHTNING HIT', true);
+            setStatus('⚡ 라이트닝 잭팟! ' + num + '번 ' + strikes[num] + '배 → +' + fmt(win) + '칩');
+            Sound.jackpot();
+            FX.burst(window.innerWidth / 2, window.innerHeight * 0.3, 200);
+            FX.sparks(window.innerWidth / 2, window.innerHeight * 0.3, 60);
+            showWin('⚡ LIGHTNING JACKPOT', win, num + '번 · ' + strikes[num] + 'x', true);
+        } else if (big) {
+            showResultPop(num, '+' + fmt(win) + ' BIG WIN', true);
+            setStatus(num + ' ' + colorTxt + ' · BIG WIN +' + fmt(win) + '칩');
+            Sound.bigwin();
+            FX.burst(window.innerWidth / 2, window.innerHeight * 0.3, 130);
+            showWin('BIG WIN', win, colorTxt + ' · ' + (Math.round(win / stake * 10) / 10) + 'x', false);
+        } else if (win > 0) {
+            showResultPop(num, '+' + fmt(win), false);
+            setStatus(num + ' ' + colorTxt + ' · +' + fmt(win) + '칩' + (boltHit ? ' (⚡' + strikes[num] + 'x)' : ''));
+            Sound.win();
+            if (win >= stake * 5) FX.burst(window.innerWidth / 2, window.innerHeight * 0.32, 60);
+        } else {
+            showResultPop(num, '꽝', false);
+            setStatus(num + ' ' + colorTxt + ' · 아쉽습니다');
+            Sound.lose();
+        }
+        setTimeout(hideResultPop, 2200);
+
+        /* 잔고 부족 → 구호금 */
+        if (balance < BAILOUT_AT && !pendingOverlay) {
+            setTimeout(function () {
+                if (!spinning && !pendingOverlay && balance < BAILOUT_AT) {
+                    Sound.bankrupt();
+                    openRelief();
+                }
+            }, 1200);
+        }
+
+        autoContinue();
+    }
+
+    /* =========================================================
+       오토 / 터보
+       ========================================================= */
+    function autoContinue() {
+        if (autoStop || autoLeft <= 0) { stopAuto(); return; }
+        if (pendingOverlay) return;
+        setTimeout(function () {
+            if (spinning || autoLeft <= 0) return;
+            if (balance < totalBet || totalBet <= 0) { stopAuto(); return; }
+            doSpin();
+        }, turbo ? 420 : 900);
+    }
+
+    function stopAuto() {
+        autoLeft = 0;
+        autoStop = false;
+        $('autoState').textContent = '10회';
+        $('autoBtn').classList.remove('on');
+    }
+
+    function closeWin() {
+        $('winOverlay').classList.remove('on');
+        pendingOverlay = false;
+        if (autoLeft > 0) autoContinue();
+    }
+
+    function showWin(title, amount, sub, lightning) {
+        $('woTitle').textContent = title;
+        $('woAmount').textContent = '+' + fmt(amount);
+        $('woSub').textContent = sub;
+        $('winBox').classList.toggle('lightning', !!lightning);
+        $('winOverlay').classList.add('on');
+        pendingOverlay = true;
+    }
+
+    /* =========================================================
+       광고 / 구호금
+       ========================================================= */
+    var adTimer = null;
+    function openAd() {
+        var ov = $('adOverlay');
+        var fill = $('adFill');
+        var timeEl = $('adTime');
+        ov.classList.add('on');
+        fill.style.width = '0%';
+        var left = 5;
+        timeEl.textContent = left + '초 후 충전 완료...';
+        clearInterval(adTimer);
+        setTimeout(function () { fill.style.width = '20%'; }, 30);
+        adTimer = setInterval(function () {
+            left -= 1;
+            fill.style.width = ((5 - left) / 5 * 100) + '%';
+            if (left <= 0) {
+                clearInterval(adTimer);
+                timeEl.textContent = '충전 완료!';
+                setTimeout(function () {
+                    ov.classList.remove('on');
+                    balance += 5000;
+                    Wallet.setBalance(balance);
+                    renderBalance(true);
+                    setStatus('📺 광고 시청 완료! 무료 칩 +5,000');
+                    Sound.chip();
+                }, 340);
+            } else {
+                timeEl.textContent = left + '초 후 충전 완료...';
+            }
+        }, 1000);
+    }
+    function openRelief() { $('reliefOverlay').classList.add('on'); }
+
+    /* =========================================================
+       배당표
+       ========================================================= */
+    function renderPaytable() {
+        var rows = [
+            ['스트레이트 업 (단일 번호)', '29:1 → 30배', false],
+            ['⚡ 라이트닝 적중 번호 (스트레이트 업)', '50x ~ 500x', true],
+            ['스플릿 대체 없음 · 더즌 (1st/2nd/3rd 12)', '2:1 → 3배', false],
+            ['컬럼 (2:1)', '2:1 → 3배', false],
+            ['레드 / 블랙', '1:1 → 2배', false],
+            ['홀 / 짝', '1:1 → 2배', false],
+            ['1-18 / 19-36', '1:1 → 2배', false]
+        ];
+        var box = $('ptBody');
+        box.innerHTML = '';
+        rows.forEach(function (r) {
+            var d = document.createElement('div');
+            d.className = 'ptRow' + (r[2] ? ' hi' : '');
+            d.innerHTML = '<span>' + r[0] + '</span><b>' + r[1] + '</b>';
+            box.appendChild(d);
+        });
+
+        var info = document.createElement('div');
+        info.style.cssText = 'margin-top:10px;font-size:0.6rem;line-height:1.6;color:#a897c9;text-align:left;';
+        info.innerHTML =
+            '<b style="color:#d3a8ff">⚡ 라이트닝 낙뢰</b><br>' +
+            '매 스핀 베팅 마감 직후 37개 번호 중 <b>1~5개</b>에 낙뢰가 떨어집니다. ' +
+            '낙뢰 배수는 50x(46%) · 100x(28%) · 150x(15%) · 200x(7%) · 300x(3%) · 500x(1%)이며, ' +
+            '해당 번호의 <b>스트레이트 업 베팅만</b> 기본 30배 대신 낙뢰 배수로 지급됩니다.<br><br>' +
+            '<b style="color:#d3a8ff">📊 RTP</b><br>' +
+            '스트레이트 업 <b>96.75%</b> · 더즌/컬럼 <b>97.30%</b> · 레드/블랙·홀짝·하이로우 <b>97.30%</b><br>' +
+            '(낙뢰 가중평균 101.5배 기준 · 유러피언 37칸)<br><br>' +
+            '<b style="color:#d3a8ff">🎮 조작</b><br>' +
+            '칩 선택 → 테이블 클릭으로 배치(여러 곳 동시 베팅 가능) · ½ / 2X / 취소 / 재베팅 / 초기화 / ALL IN · ' +
+            '터보 스핀 · AUTO 10회(중단 가능). 모든 잔액은 공용 코인 지갑을 함께 씁니다.';
+        box.appendChild(info);
+    }
+
+    /* =========================================================
+       이벤트
+       ========================================================= */
+    function bind() {
+        document.querySelectorAll('.chipBtn').forEach(function (b) {
+            b.addEventListener('click', function () {
+                chip = Number(b.getAttribute('data-chip'));
+                renderChips();
+                Sound.click();
+                saveState();
+            });
+        });
+
+        document.querySelectorAll('.quick button').forEach(function (b) {
+            b.addEventListener('click', function () {
+                var act = b.getAttribute('data-act');
+                if (act === 'half') scaleBets(0.5);
+                else if (act === 'double') scaleBets(2);
+                else if (act === 'undo') undoBet();
+                else if (act === 'rebate') rebet();
+                else if (act === 'clear') clearBets();
+                else if (act === 'allin') allIn();
+            });
+        });
+
+        $('spinBtn').addEventListener('click', function () {
+            if (spinning) return;
+            if (autoLeft > 0) { autoStop = true; stopAuto(); setStatus('오토 플레이 중단'); return; }
+            if (pendingOverlay) { closeWin(); return; }
+            doSpin();
+        });
+
+        $('autoBtn').addEventListener('click', function () {
+            if (autoLeft > 0) { autoStop = true; stopAuto(); setStatus('오토 플레이 중단'); return; }
+            if (spinning) return;
+            if (totalBet <= 0) { setStatus('AUTO 전 칩을 배치하세요'); return; }
+            if (balance < totalBet) { setStatus('잔고 부족'); Sound.bankrupt(); openRelief(); return; }
+            autoLeft = 10;
+            autoStop = false;
+            $('autoBtn').classList.add('on');
+            $('autoState').textContent = '10회';
+            setStatus('🔁 AUTO 10회 시작 · 같은 베팅으로 연속 스핀');
+            doSpin();
+        });
+
+        $('turboBtn').addEventListener('click', function () {
+            turbo = !turbo;
+            $('turboBtn').classList.toggle('on', turbo);
+            $('turboState').textContent = turbo ? 'ON' : 'OFF';
+            Sound.click();
+            saveState();
+        });
+
+        $('muteBtn').addEventListener('click', function () {
+            var m = Sound.toggle();
+            $('muteBtn').textContent = m ? '🔇' : '🔊';
+        });
+        $('muteBtn').textContent = Sound.muted() ? '🔇' : '🔊';
+
+        $('adBtn').addEventListener('click', openAd);
+        $('adCancel').addEventListener('click', function () {
+            clearInterval(adTimer);
+            $('adOverlay').classList.remove('on');
+        });
+        $('reliefBtn').addEventListener('click', function () {
+            balance += 2000;
+            Wallet.setBalance(balance);
+            renderBalance(true);
+            $('reliefOverlay').classList.remove('on');
+            Sound.chip();
+            setStatus('💸 긴급 구호금 +2,000칩 지급');
+        });
+        $('reliefClose').addEventListener('click', function () { $('reliefOverlay').classList.remove('on'); });
+        $('woClose').addEventListener('click', closeWin);
+        $('infoBtn').addEventListener('click', function () { $('infoOverlay').classList.add('on'); });
+        $('infoClose').addEventListener('click', function () { $('infoOverlay').classList.remove('on'); });
+
+        window.addEventListener('resize', sizeCanvas);
+
+        /* 공용 지갑 동기화 */
+        Wallet.subscribe(function (shared) {
+            if (shared === balance) return;
+            balance = shared;
+            renderBalance();
+            renderBets();
+        });
+    }
+
+    /* =========================================================
+       부트
+       ========================================================= */
+    loadState();
+    buildBoard();
+    renderChips();
+    bind();
+    totalBet = 0;
+    renderBets();
+    renderBalance();
+    renderStats();
+    renderRail();
+    renderHotCold();
+    renderPaytable();
+    $('turboBtn').classList.toggle('on', turbo);
+    $('turboState').textContent = turbo ? 'ON' : 'OFF';
+    setStatus('칩을 배치하고 SPIN');
+    sizeCanvas();
+    setTimeout(sizeCanvas, 120);
+
+})();
+</script>
+</body>
+</html>
