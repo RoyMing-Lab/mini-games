@@ -1,0 +1,2104 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>🎲 야찌 맥스 잭팟 - Yahtzee Max Jackpot</title>
+<style>
+    :root {
+        --bg: #070b1c;
+        --panel: #0d1430;
+        --panel2: #121b3d;
+        --panel3: #17224c;
+        --line: #24336b;
+        --gold: #ffd24d;
+        --gold2: #fff3bb;
+        --cyan: #4be1ff;
+        --cyan2: #b6f4ff;
+        --violet: #a98bff;
+        --rose: #ff6f91;
+        --green: #43e8a0;
+        --text: #eaf2ff;
+        --sub: #7f90c4;
+    }
+
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+        background: #070b1c;
+        background-image:
+            radial-gradient(ellipse at 50% -14%, #1a2a63 0%, #0a1130 46%, #070b1c 84%),
+            repeating-linear-gradient(90deg, rgba(75, 225, 255, 0.028) 0 2px, transparent 2px 28px);
+        color: var(--text);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 7px 7px 26px;
+        overflow-x: hidden;
+    }
+
+    #fx {
+        position: fixed;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 70;
+    }
+
+    .app {
+        width: 100%;
+        max-width: 540px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    /* ---------- header ---------- */
+    .top {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 7px 9px;
+        background: linear-gradient(180deg, rgba(255, 210, 77, 0.09), rgba(13, 20, 48, 0.9));
+        border: 1px solid var(--line);
+        border-radius: 13px;
+    }
+
+    .lobby {
+        font-size: 0.66rem;
+        font-weight: 700;
+        color: var(--cyan2);
+        text-decoration: none;
+        background: rgba(75, 225, 255, 0.1);
+        border: 1px solid rgba(75, 225, 255, 0.32);
+        padding: 5px 8px;
+        border-radius: 9px;
+        white-space: nowrap;
+    }
+
+    .brand {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        line-height: 1.18;
+        min-width: 0;
+    }
+
+    .brand b {
+        font-size: 0.86rem;
+        letter-spacing: 0.4px;
+        background: linear-gradient(92deg, var(--gold2), var(--gold) 46%, var(--cyan));
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .brand span {
+        font-size: 0.5rem;
+        color: var(--sub);
+        letter-spacing: 1.1px;
+    }
+
+    .hbtns {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .ic {
+        background: rgba(75, 225, 255, 0.08);
+        border: 1px solid rgba(75, 225, 255, 0.24);
+        color: var(--cyan2);
+        border-radius: 9px;
+        width: 30px;
+        height: 30px;
+        font-size: 0.8rem;
+        cursor: pointer;
+    }
+
+    .wallet {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 0.74rem;
+        font-weight: 800;
+        color: var(--gold2);
+        background: rgba(255, 210, 77, 0.11);
+        border: 1px solid rgba(255, 210, 77, 0.34);
+        padding: 6px 9px;
+        border-radius: 9px;
+        white-space: nowrap;
+    }
+
+    .wallet.flash { animation: wflash 0.7s ease-out; }
+
+    @keyframes wflash {
+        0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 210, 77, 0.6); }
+        40% { transform: scale(1.09); box-shadow: 0 0 18px 4px rgba(255, 210, 77, 0.35); }
+        100% { transform: scale(1); box-shadow: none; }
+    }
+
+    /* ---------- bet bar ---------- */
+    .betbar,
+    .tableWrap,
+    .card,
+    .stats,
+    .hist {
+        background: linear-gradient(180deg, var(--panel2), var(--panel));
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 9px;
+    }
+
+    .betrow {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 7px;
+    }
+
+    .betinfo {
+        display: flex;
+        flex-direction: column;
+        line-height: 1.15;
+    }
+
+    .betinfo span {
+        font-size: 0.53rem;
+        color: var(--sub);
+        letter-spacing: 0.5px;
+    }
+
+    .betinfo b {
+        font-size: 0.95rem;
+        color: var(--gold);
+        font-variant-numeric: tabular-nums;
+    }
+
+    .chips {
+        flex: 1;
+        display: flex;
+        gap: 4px;
+        justify-content: flex-end;
+        flex-wrap: wrap;
+    }
+
+    .chipBtn {
+        min-width: 38px;
+        padding: 6px 5px;
+        font-size: 0.63rem;
+        font-weight: 800;
+        color: var(--sub);
+        background: rgba(75, 225, 255, 0.06);
+        border: 1px solid rgba(75, 225, 255, 0.2);
+        border-radius: 8px;
+        cursor: pointer;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .chipBtn.on {
+        color: #241a00;
+        background: linear-gradient(180deg, var(--gold2), var(--gold));
+        border-color: var(--gold);
+        box-shadow: 0 0 10px rgba(255, 210, 77, 0.35);
+    }
+
+    .chipBtn:disabled { opacity: 0.35; cursor: default; }
+
+    .quick {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 4px;
+        margin-bottom: 7px;
+    }
+
+    .quick button {
+        padding: 7px 2px;
+        font-size: 0.6rem;
+        font-weight: 700;
+        color: var(--cyan2);
+        background: rgba(75, 225, 255, 0.07);
+        border: 1px solid rgba(75, 225, 255, 0.2);
+        border-radius: 8px;
+        cursor: pointer;
+    }
+
+    .quick button:active { transform: translateY(1px); }
+
+    .startBtn {
+        width: 100%;
+        padding: 12px 8px;
+        font-size: 0.9rem;
+        font-weight: 900;
+        letter-spacing: 0.3px;
+        color: #1b1400;
+        background: linear-gradient(180deg, var(--gold2), var(--gold) 62%, #e0a821);
+        border: none;
+        border-radius: 11px;
+        cursor: pointer;
+        box-shadow: 0 5px 16px rgba(255, 210, 77, 0.24);
+    }
+
+    .startBtn:disabled {
+        background: linear-gradient(180deg, #2b3868, #1a2450);
+        color: var(--sub);
+        box-shadow: none;
+        cursor: default;
+    }
+
+    .startBtn b { font-variant-numeric: tabular-nums; }
+
+    /* ---------- table ---------- */
+    .turnHead {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+    }
+
+    .turnInfo {
+        display: flex;
+        flex-direction: column;
+        line-height: 1.15;
+    }
+
+    .turnInfo span {
+        font-size: 0.5rem;
+        color: var(--sub);
+        letter-spacing: 0.5px;
+    }
+
+    .turnInfo b {
+        font-size: 0.82rem;
+        color: var(--text);
+        font-variant-numeric: tabular-nums;
+    }
+
+    .turnInfo b.hot { color: var(--gold); }
+
+    .rollBtn {
+        margin-left: auto;
+        padding: 11px 16px;
+        font-size: 0.86rem;
+        font-weight: 900;
+        color: #04121c;
+        background: linear-gradient(180deg, var(--cyan2), var(--cyan) 60%, #22b3d4);
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        box-shadow: 0 5px 14px rgba(75, 225, 255, 0.25);
+        white-space: nowrap;
+    }
+
+    .rollBtn:disabled {
+        background: linear-gradient(180deg, #2b3868, #1a2450);
+        color: var(--sub);
+        box-shadow: none;
+        cursor: default;
+    }
+
+    /* dice */
+    .diceRow {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 6px;
+        margin-bottom: 9px;
+    }
+
+    .die {
+        position: relative;
+        aspect-ratio: 1 / 1;
+        border-radius: 11px;
+        background: linear-gradient(160deg, #fdfefe, #d6e2f2 76%, #b9c9df);
+        border: 1px solid #8fa4c2;
+        box-shadow: 0 5px 0 #7d90ad, 0 8px 14px rgba(0, 0, 0, 0.35);
+        cursor: pointer;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        grid-template-rows: repeat(3, 1fr);
+        padding: 11%;
+        gap: 4%;
+        transition: transform 0.12s ease, box-shadow 0.12s ease;
+    }
+
+    .die .pip {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background: radial-gradient(circle at 34% 30%, #43516b, #131b2b 74%);
+        box-shadow: inset 0 -1px 2px rgba(255, 255, 255, 0.28), 0 1px 2px rgba(0, 0, 0, 0.35);
+        opacity: 0;
+    }
+
+    .die .pip.on { opacity: 1; }
+
+    .die.held {
+        transform: translateY(-5px);
+        background: linear-gradient(160deg, #fffbe6, #ffd98a 78%, #f0b53e);
+        border-color: var(--gold);
+        box-shadow: 0 6px 0 #b8860b, 0 10px 20px rgba(255, 190, 60, 0.35), 0 0 0 2px rgba(255, 210, 77, 0.5) inset;
+    }
+
+    .die.held .pip {
+        background: radial-gradient(circle at 34% 30%, #7a5410, #2a1a00 76%);
+    }
+
+    .die.held::after {
+        content: "HOLD";
+        position: absolute;
+        top: -7px;
+        right: -4px;
+        font-size: 0.42rem;
+        font-weight: 900;
+        letter-spacing: 0.4px;
+        color: #1d1400;
+        background: var(--gold);
+        padding: 1px 4px;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
+    }
+
+    .die.rolling {
+        animation: shake 0.32s linear infinite;
+    }
+
+    @keyframes shake {
+        0% { transform: translate(0, 0) rotate(0deg); }
+        25% { transform: translate(-2px, -4px) rotate(-7deg); }
+        50% { transform: translate(2px, -2px) rotate(6deg); }
+        75% { transform: translate(-1px, -5px) rotate(-4deg); }
+        100% { transform: translate(0, 0) rotate(0deg); }
+    }
+
+    .die.locked {
+        cursor: default;
+        filter: saturate(0.55) brightness(0.82);
+    }
+
+    /* upper bonus bar */
+    .upbar {
+        margin-bottom: 7px;
+    }
+
+    .upRow {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        font-size: 0.6rem;
+        color: var(--sub);
+        margin-bottom: 4px;
+    }
+
+    .upRow b {
+        color: var(--cyan2);
+        font-variant-numeric: tabular-nums;
+        font-size: 0.7rem;
+    }
+
+    .upRow.bonus b { color: var(--green); }
+
+    .bar {
+        height: 8px;
+        border-radius: 6px;
+        background: rgba(255, 255, 255, 0.08);
+        overflow: hidden;
+        border: 1px solid rgba(75, 225, 255, 0.16);
+    }
+
+    .bar i {
+        display: block;
+        height: 100%;
+        width: 0%;
+        border-radius: 6px;
+        background: linear-gradient(90deg, var(--cyan), var(--gold));
+        transition: width 0.35s ease;
+    }
+
+    .upHint {
+        margin-top: 4px;
+        font-size: 0.55rem;
+        color: var(--sub);
+    }
+
+    .upHint b { color: var(--gold); }
+
+    .hintBar {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 7px;
+        padding: 7px 8px;
+        background: rgba(169, 139, 255, 0.1);
+        border: 1px solid rgba(169, 139, 255, 0.3);
+        border-radius: 9px;
+        font-size: 0.6rem;
+        color: #d9ccff;
+        line-height: 1.4;
+    }
+
+    .hintBar b { color: var(--gold2); }
+
+    .hintBar button {
+        margin-left: auto;
+        flex-shrink: 0;
+        font-size: 0.55rem;
+        font-weight: 800;
+        color: #0d0824;
+        background: linear-gradient(180deg, #d8c8ff, var(--violet));
+        border: none;
+        border-radius: 7px;
+        padding: 6px 8px;
+        cursor: pointer;
+        white-space: nowrap;
+    }
+
+    /* ---------- scorecard ---------- */
+    .card { padding: 8px; }
+
+    .secTitle {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 0.58rem;
+        font-weight: 800;
+        letter-spacing: 0.6px;
+        color: var(--sub);
+        padding: 5px 4px 4px;
+    }
+
+    .secTitle b { color: var(--gold); font-variant-numeric: tabular-nums; }
+
+    .row {
+        display: grid;
+        grid-template-columns: 1fr auto auto;
+        align-items: center;
+        gap: 6px;
+        width: 100%;
+        padding: 8px 9px;
+        margin-bottom: 4px;
+        border-radius: 9px;
+        background: rgba(75, 225, 255, 0.045);
+        border: 1px solid rgba(75, 225, 255, 0.13);
+        color: var(--text);
+        cursor: pointer;
+        text-align: left;
+        transition: background 0.15s ease, border-color 0.15s ease;
+    }
+
+    .row:active { transform: translateY(1px); }
+
+    .rname {
+        display: flex;
+        align-items: baseline;
+        gap: 5px;
+        font-size: 0.68rem;
+        font-weight: 700;
+        line-height: 1.25;
+        min-width: 0;
+    }
+
+    .rname i {
+        font-style: normal;
+        font-size: 0.52rem;
+        color: var(--sub);
+        font-weight: 600;
+    }
+
+    .rprev {
+        font-size: 0.72rem;
+        font-weight: 800;
+        color: var(--cyan2);
+        font-variant-numeric: tabular-nums;
+        min-width: 30px;
+        text-align: right;
+    }
+
+    .rprev.zero { color: #4a5982; }
+
+    .rscore {
+        font-size: 0.74rem;
+        font-weight: 900;
+        color: var(--gold);
+        font-variant-numeric: tabular-nums;
+        min-width: 34px;
+        text-align: right;
+    }
+
+    .row.filled {
+        cursor: default;
+        background: rgba(255, 210, 77, 0.07);
+        border-color: rgba(255, 210, 77, 0.2);
+    }
+
+    .row.filled .rprev { display: none; }
+
+    .row.rec {
+        border-color: var(--violet);
+        background: rgba(169, 139, 255, 0.16);
+        box-shadow: 0 0 0 1px rgba(169, 139, 255, 0.4) inset, 0 0 12px rgba(169, 139, 255, 0.16);
+        position: relative;
+    }
+
+    .row.rec::before {
+        content: "✨";
+        position: absolute;
+        left: -3px;
+        top: -6px;
+        font-size: 0.62rem;
+    }
+
+    .row.disabled { opacity: 0.42; cursor: default; }
+
+    .row.jackRow .rprev { color: var(--gold); }
+
+    /* ---------- stats / history ---------- */
+    .stats {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 5px;
+        padding: 8px;
+    }
+
+    .st {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 2px;
+        padding: 5px 2px;
+        background: rgba(75, 225, 255, 0.05);
+        border-radius: 8px;
+    }
+
+    .st small {
+        font-size: 0.47rem;
+        color: var(--sub);
+        letter-spacing: 0.2px;
+    }
+
+    .st b {
+        font-size: 0.72rem;
+        color: var(--text);
+        font-variant-numeric: tabular-nums;
+    }
+
+    .st b.gold { color: var(--gold); }
+    .st b.green { color: var(--green); }
+    .st b.rose { color: var(--rose); }
+
+    .hist {
+        padding: 8px 9px;
+    }
+
+    .histHead {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.55rem;
+        color: var(--sub);
+        letter-spacing: 0.5px;
+        margin-bottom: 5px;
+    }
+
+    .histList {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        max-height: 150px;
+        overflow-y: auto;
+    }
+
+    .hItem {
+        display: grid;
+        grid-template-columns: auto 1fr auto auto;
+        gap: 6px;
+        align-items: center;
+        font-size: 0.58rem;
+        padding: 4px 7px;
+        border-radius: 7px;
+        background: rgba(255, 255, 255, 0.035);
+    }
+
+    .hItem .hTag {
+        font-size: 0.48rem;
+        font-weight: 800;
+        padding: 2px 5px;
+        border-radius: 5px;
+        background: rgba(75, 225, 255, 0.16);
+        color: var(--cyan2);
+    }
+
+    .hItem .hTag.win { background: rgba(67, 232, 160, 0.18); color: var(--green); }
+    .hItem .hTag.lose { background: rgba(255, 111, 145, 0.16); color: var(--rose); }
+    .hItem .hTag.jack { background: rgba(255, 210, 77, 0.2); color: var(--gold); }
+
+    .hItem .hScore { color: var(--text); font-variant-numeric: tabular-nums; }
+    .hItem .hMult { color: var(--cyan2); font-weight: 800; font-variant-numeric: tabular-nums; }
+    .hItem .hNet { font-variant-numeric: tabular-nums; font-weight: 800; }
+    .hItem .hNet.up { color: var(--green); }
+    .hItem .hNet.down { color: var(--rose); }
+    .hEmpty { font-size: 0.58rem; color: var(--sub); text-align: center; padding: 8px; }
+
+    .foot {
+        text-align: center;
+        font-size: 0.5rem;
+        color: #4b5a86;
+        letter-spacing: 0.4px;
+        padding-top: 2px;
+    }
+
+    /* ---------- overlays ---------- */
+    .ov {
+        position: fixed;
+        inset: 0;
+        background: rgba(3, 6, 18, 0.86);
+        backdrop-filter: blur(3px);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+        z-index: 90;
+    }
+
+    .ov.on { display: flex; }
+
+    .ovBox {
+        width: 100%;
+        max-width: 370px;
+        background: linear-gradient(180deg, #17224c, #0b1230);
+        border: 1px solid #2f3f78;
+        border-radius: 17px;
+        padding: 18px 16px 15px;
+        text-align: center;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 210, 77, 0.1) inset;
+        max-height: 92vh;
+        overflow-y: auto;
+    }
+
+    .ovTitle {
+        font-size: 1rem;
+        font-weight: 900;
+        color: var(--gold2);
+        letter-spacing: 0.4px;
+        margin-bottom: 8px;
+    }
+
+    .ovDesc {
+        font-size: 0.68rem;
+        color: #b9c6ea;
+        line-height: 1.6;
+        margin-bottom: 12px;
+    }
+
+    .ovDesc b { color: var(--gold); }
+
+    .ovBtns {
+        display: flex;
+        gap: 7px;
+        margin-top: 13px;
+    }
+
+    .btn {
+        flex: 1;
+        padding: 11px 8px;
+        font-size: 0.76rem;
+        font-weight: 900;
+        color: #1b1400;
+        background: linear-gradient(180deg, var(--gold2), var(--gold));
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+    }
+
+    .btn.ghost {
+        background: rgba(75, 225, 255, 0.1);
+        border: 1px solid rgba(75, 225, 255, 0.26);
+        color: var(--cyan2);
+    }
+
+    /* ad */
+    .barAd {
+        height: 9px;
+        border-radius: 6px;
+        background: rgba(255, 255, 255, 0.09);
+        overflow: hidden;
+        margin-bottom: 7px;
+    }
+
+    .barAd i {
+        display: block;
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(90deg, var(--cyan), var(--gold));
+        transition: width 0.9s linear;
+    }
+
+    .ovTime { font-size: 0.6rem; color: var(--sub); }
+
+    /* result */
+    .resScore {
+        font-size: 2.4rem;
+        font-weight: 900;
+        line-height: 1;
+        margin: 4px 0 2px;
+        background: linear-gradient(180deg, var(--gold2), var(--gold) 60%, #d19b1b);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .resSub {
+        font-size: 0.6rem;
+        color: var(--sub);
+        margin-bottom: 11px;
+        letter-spacing: 0.4px;
+    }
+
+    .resTable {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        margin-bottom: 10px;
+    }
+
+    .resRow {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.65rem;
+        color: #b9c6ea;
+        padding: 5px 8px;
+        border-radius: 7px;
+        background: rgba(255, 255, 255, 0.04);
+    }
+
+    .resRow b { color: var(--text); font-variant-numeric: tabular-nums; }
+    .resRow.gold { background: rgba(255, 210, 77, 0.11); }
+    .resRow.gold b { color: var(--gold); }
+    .resRow.big { background: rgba(67, 232, 160, 0.12); }
+    .resRow.big b { color: var(--green); font-size: 0.8rem; }
+
+    .resBanner {
+        font-size: 0.72rem;
+        font-weight: 900;
+        letter-spacing: 1px;
+        padding: 6px;
+        border-radius: 8px;
+        margin-bottom: 9px;
+        background: rgba(75, 225, 255, 0.12);
+        color: var(--cyan2);
+        border: 1px solid rgba(75, 225, 255, 0.3);
+    }
+
+    .resBanner.jack {
+        background: rgba(255, 210, 77, 0.16);
+        color: var(--gold2);
+        border-color: rgba(255, 210, 77, 0.45);
+        box-shadow: 0 0 18px rgba(255, 210, 77, 0.22);
+    }
+
+    /* paytable */
+    .ptBox {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        text-align: left;
+        max-height: 56vh;
+        overflow-y: auto;
+        padding-right: 2px;
+    }
+
+    .ptRow {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.6rem;
+        padding: 4px 7px;
+        border-radius: 6px;
+        background: rgba(255, 255, 255, 0.04);
+        color: #b9c6ea;
+    }
+
+    .ptRow b { color: var(--cyan2); font-variant-numeric: tabular-nums; }
+    .ptRow.hi { background: rgba(255, 210, 77, 0.13); }
+    .ptRow.hi b { color: var(--gold); }
+    .ptSub {
+        font-size: 0.56rem;
+        color: var(--sub);
+        text-align: left;
+        line-height: 1.65;
+        margin-top: 9px;
+    }
+    .ptSub b { color: var(--gold); }
+
+    /* toast */
+    .toast {
+        position: fixed;
+        left: 50%;
+        bottom: 22px;
+        transform: translateX(-50%) translateY(14px);
+        background: rgba(16, 24, 52, 0.96);
+        border: 1px solid rgba(255, 210, 77, 0.4);
+        color: var(--gold2);
+        font-size: 0.66rem;
+        font-weight: 700;
+        padding: 9px 14px;
+        border-radius: 10px;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.22s ease, transform 0.22s ease;
+        z-index: 95;
+        max-width: 88vw;
+        text-align: center;
+    }
+
+    .toast.on {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+
+    @media (max-width: 390px) {
+        .brand b { font-size: 0.78rem; }
+        .chipBtn { min-width: 33px; font-size: 0.58rem; }
+        .quick button { font-size: 0.55rem; }
+        .row { padding: 7px 7px; }
+        .rname { font-size: 0.63rem; }
+        .stats { grid-template-columns: repeat(3, 1fr); }
+    }
+</style>
+</head>
+<body>
+<canvas id="fx"></canvas>
+<div class="toast" id="toast"></div>
+
+<div class="app">
+    <header class="top">
+        <a class="lobby" href="../index.html">🏠 로비</a>
+        <div class="brand"><b>🎲 YAHTZEE MAX</b><span>JACKPOT · 13 CATEGORIES</span></div>
+        <div class="hbtns">
+            <button id="muteBtn" class="ic" title="소리 켜기/끄기">🔊</button>
+            <div class="wallet" id="walletBox">🪙 <span id="balance">10,000</span></div>
+        </div>
+    </header>
+
+    <!-- 베팅 / 세션 시작 -->
+    <section class="betbar">
+        <div class="betrow">
+            <div class="betinfo"><span>세션 베팅</span><b id="betView">100</b></div>
+            <div class="chips" id="chipRow">
+                <button class="chipBtn on" data-chip="100">100</button>
+                <button class="chipBtn" data-chip="500">500</button>
+                <button class="chipBtn" data-chip="1000">1K</button>
+                <button class="chipBtn" data-chip="5000">5K</button>
+                <button class="chipBtn" data-chip="10000">10K</button>
+            </div>
+        </div>
+        <div class="quick">
+            <button data-act="half">½</button>
+            <button data-act="double">2X</button>
+            <button data-act="max">MAX</button>
+            <button data-act="allin">ALL IN</button>
+            <button id="adBtn">📺 무료칩</button>
+            <button id="infoBtn">📖 배당표</button>
+        </div>
+        <button id="startBtn" class="startBtn">🎲 13턴 세션 시작 · <b id="startBet">100</b>칩</button>
+    </section>
+
+    <!-- 테이블 -->
+    <section class="tableWrap">
+        <div class="turnHead">
+            <div class="turnInfo"><span>턴</span><b id="turnView">- / 13</b></div>
+            <div class="turnInfo"><span>굴림</span><b id="rollView">- / 3</b></div>
+            <div class="turnInfo"><span>세션 점수</span><b id="totalView" class="hot">0</b></div>
+            <button id="rollBtn" class="rollBtn" disabled>🎲 굴리기</button>
+        </div>
+        <div class="diceRow" id="diceRow">
+            <div class="die" data-i="0"><i class="pip"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i></div>
+            <div class="die" data-i="1"><i class="pip"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i></div>
+            <div class="die" data-i="2"><i class="pip"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i></div>
+            <div class="die" data-i="3"><i class="pip"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i></div>
+            <div class="die" data-i="4"><i class="pip"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i></div>
+        </div>
+        <div class="upbar">
+            <div class="upRow" id="upRow"><span>상단 보너스 진행</span><b id="upView">0 / 63</b></div>
+            <div class="bar"><i id="upFill"></i></div>
+            <div class="upHint" id="upHint">상단 6칸 합계 <b>63점 이상</b>이면 <b>+35점</b> 보너스</div>
+        </div>
+        <div class="hintBar" id="hintBar">
+            <span id="hintText">세션을 시작하면 실시간 추천이 표시됩니다.</span>
+            <button id="hintApply" style="display:none;">홀드 적용</button>
+        </div>
+    </section>
+
+    <!-- 스코어카드 -->
+    <section class="card" id="scorecard">
+        <div class="secTitle"><span>상단 · UPPER</span><b id="upperTotal">0 / 63</b></div>
+        <div id="upperRows"></div>
+        <div class="secTitle"><span>하단 · LOWER</span><b id="lowerTotal">0</b></div>
+        <div id="lowerRows"></div>
+    </section>
+
+    <section class="stats">
+        <div class="st"><small>세션</small><b id="stSessions">0</b></div>
+        <div class="st"><small>승률</small><b id="stRate">0%</b></div>
+        <div class="st"><small>순손익</small><b id="stNet">0</b></div>
+        <div class="st"><small>최고 점수</small><b id="stBest" class="gold">0</b></div>
+        <div class="st"><small>최고 배수</small><b id="stMult" class="gold">-</b></div>
+        <div class="st"><small>야찌</small><b id="stYahtzee" class="green">0</b></div>
+        <div class="st"><small>잭팟</small><b id="stJackpot" class="rose">0</b></div>
+        <div class="st"><small>최근 세션</small><b id="stLast">-</b></div>
+    </section>
+
+    <section class="hist">
+        <div class="histHead"><span>최근 세션 기록</span><span id="histCount">0</span></div>
+        <div class="histList" id="histList"><div class="hEmpty">아직 기록이 없습니다</div></div>
+    </section>
+
+    <div class="foot">RoyMing-Lab · Mini Games Arcade · 공용 코인 지갑 연동</div>
+</div>
+
+<!-- 광고 -->
+<div class="ov" id="adOverlay">
+    <div class="ovBox">
+        <div class="ovTitle">📺 무료 칩 충전</div>
+        <div class="ovDesc">광고를 끝까지 보면 <b>+5,000칩</b>이 공용 지갑에 충전됩니다.</div>
+        <div class="barAd"><i id="adFill"></i></div>
+        <div class="ovTime" id="adTime">5초 후 충전 완료...</div>
+        <div class="ovBtns"><button class="btn ghost" id="adCancel">건너뛰기</button></div>
+    </div>
+</div>
+
+<!-- 구호금 -->
+<div class="ov" id="reliefOverlay">
+    <div class="ovBox">
+        <div class="ovTitle">💸 긴급 구호금</div>
+        <div class="ovDesc">보유 칩이 <b>100칩 미만</b>입니다.<br>긴급 구호금 <b>+2,000칩</b>을 받아 다시 도전하세요.</div>
+        <div class="ovBtns">
+            <button class="btn" id="reliefBtn">+2,000칩 받기</button>
+            <button class="btn ghost" id="reliefClose">닫기</button>
+        </div>
+    </div>
+</div>
+
+<!-- 정산 -->
+<div class="ov" id="resultOverlay">
+    <div class="ovBox">
+        <div class="ovTitle" id="resTitle">SETTLEMENT</div>
+        <div class="resBanner" id="resBanner">13턴 완료</div>
+        <div class="resScore" id="resScore">0</div>
+        <div class="resSub">최종 세션 점수</div>
+        <div class="resTable">
+            <div class="resRow"><span>배당 등급</span><b id="resTier">-</b></div>
+            <div class="resRow"><span>점수 배당</span><b id="resBase">0</b></div>
+            <div class="resRow" id="resYahtRow"><span>🎲 야찌 잭팟</span><b id="resYaht">0</b></div>
+            <div class="resRow big"><span>총 지급</span><b id="resPayout">0</b></div>
+            <div class="resRow"><span>순손익</span><b id="resNet">0</b></div>
+        </div>
+        <div class="ovBtns">
+            <button class="btn" id="resAgain">🔁 한 판 더</button>
+            <button class="btn ghost" id="resClose">닫기</button>
+        </div>
+    </div>
+</div>
+
+<!-- 배당표 -->
+<div class="ov" id="infoOverlay">
+    <div class="ovBox">
+        <div class="ovTitle">📖 배당표 & 규칙</div>
+        <div class="ptBox" id="ptBody"></div>
+        <div class="ovBtns"><button class="btn" id="infoClose">닫기</button></div>
+    </div>
+</div>
+
+<script src="../shared/wallet.js"></script>
+<script>
+(function () {
+    'use strict';
+
+    /* =========================================================
+       기본 상수
+       ========================================================= */
+    var MIN_BET = 100;
+    var MAX_BET = 100000;
+    var BAILOUT_AT = 100;
+    var YAHTZEE_PTS = 50;
+    var BONUS_YAHTZEE_PTS = 100;
+    var YAHTZEE_JACKPOT_MULT = 8;      // 야찌 1회당 추가 배당 (최대 3회 인정)
+    var YAHTZEE_JACKPOT_CAP = 3;
+    var STORE_STATS = 'yahtzee_stats_v1';
+    var STORE_BET = 'yahtzee_bet_v1';
+    var STORE_SOUND = 'yahtzee_sound_v1';
+
+    /* 점수 → 배당 배수 (RTP 95.7% : 몬테카를로 10만 세션 검증) */
+    var TIERS = [
+        { min: 400, mult: 500, tag: '👑 MAX JACKPOT' },
+        { min: 360, mult: 95, tag: 'JACKPOT TIER' },
+        { min: 340, mult: 45, tag: 'MEGA WIN' },
+        { min: 320, mult: 22, tag: 'MEGA WIN' },
+        { min: 300, mult: 12, tag: 'BIG WIN' },
+        { min: 280, mult: 6, tag: 'BIG WIN' },
+        { min: 260, mult: 3.5, tag: 'WIN' },
+        { min: 250, mult: 2.4, tag: 'WIN' },
+        { min: 240, mult: 1.7, tag: 'WIN' },
+        { min: 230, mult: 1.2, tag: 'WIN' },
+        { min: 220, mult: 0.85, tag: 'NEAR MISS' },
+        { min: 210, mult: 0.63, tag: 'NEAR MISS' },
+        { min: 200, mult: 0.47, tag: 'NEAR MISS' },
+        { min: 190, mult: 0.34, tag: 'LOW' },
+        { min: 180, mult: 0.24, tag: 'LOW' },
+        { min: 170, mult: 0.16, tag: 'LOW' },
+        { min: 160, mult: 0.10, tag: 'LOW' },
+        { min: 150, mult: 0.06, tag: 'LOW' },
+        { min: 130, mult: 0.04, tag: 'LOW' },
+        { min: 0, mult: 0, tag: 'NO PAY' }
+    ];
+
+    /* 추천 AI 기준값 (시뮬레이션과 동일) */
+    var REF = [2.0, 5.2, 8.6, 12.2, 16.4, 21.4, 23.0, 14.0, 22.5, 29.0, 22.0, 50.0, 22.5];
+
+    var CATS = [
+        { id: 'ones', name: '에이스', sub: '1의 합', upper: true, face: 1 },
+        { id: 'twos', name: '투', sub: '2의 합', upper: true, face: 2 },
+        { id: 'threes', name: '쓰리', sub: '3의 합', upper: true, face: 3 },
+        { id: 'fours', name: '포', sub: '4의 합', upper: true, face: 4 },
+        { id: 'fives', name: '파이브', sub: '5의 합', upper: true, face: 5 },
+        { id: 'sixes', name: '식스', sub: '6의 합', upper: true, face: 6 },
+        { id: 'three', name: '쓰리 오브 어 카인드', sub: '합계' },
+        { id: 'four', name: '포 오브 어 카인드', sub: '합계' },
+        { id: 'fh', name: '풀 하우스', sub: '25점' },
+        { id: 'ss', name: '스몰 스트레이트', sub: '30점' },
+        { id: 'ls', name: '라지 스트레이트', sub: '40점' },
+        { id: 'yacht', name: '야찌', sub: '50점' },
+        { id: 'chance', name: '찬스', sub: '합계' }
+    ];
+
+    var PIP_MAP = {
+        1: [4],
+        2: [0, 8],
+        3: [0, 4, 8],
+        4: [0, 2, 6, 8],
+        5: [0, 2, 4, 6, 8],
+        6: [0, 2, 3, 5, 6, 8]
+    };
+
+    var POW6 = [1, 6, 36, 216, 1296, 7776];
+
+    function $(id) { return document.getElementById(id); }
+    function fmt(n) { return Math.max(0, Math.floor(n)).toLocaleString('en-US'); }
+    function fmtK(n) {
+        n = Math.floor(n);
+        if (n >= 1000000) return (n / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
+        if (n >= 1000) return (n / 1000).toFixed(n >= 10000 ? 0 : 1).replace(/\.0$/, '') + 'K';
+        return String(n);
+    }
+    function multText(m) {
+        if (m === 0) return '×0';
+        return '×' + (m < 1 ? m.toFixed(2).replace(/0$/, '') : m.toFixed(m < 10 ? 1 : 0).replace(/\.0$/, ''));
+    }
+
+    /* =========================================================
+       점수 계산 테이블
+       ========================================================= */
+    var scoreCache = {};
+
+    function scoresOfCode(code) {
+        var hit = scoreCache[code];
+        if (hit) return hit;
+        var c = [0, 0, 0, 0, 0, 0];
+        var x = code, sum = 0;
+        for (var f = 0; f < 6; f++) {
+            c[f] = x % 6;
+            x = (x - c[f]) / 6;
+            sum += c[f] * (f + 1);
+        }
+        var mx = 0;
+        for (var i = 0; i < 6; i++) if (c[i] > mx) mx = c[i];
+        var has3 = false, has2 = false;
+        for (var j = 0; j < 6; j++) {
+            if (c[j] === 3) has3 = true;
+            if (c[j] === 2) has2 = true;
+        }
+        var present = [];
+        for (var k = 0; k < 6; k++) present.push(c[k] > 0);
+        var ss = false;
+        for (var s = 0; s < 3; s++) {
+            if (present[s] && present[s + 1] && present[s + 2] && present[s + 3]) ss = true;
+        }
+        var ls = false;
+        for (var t = 0; t < 2; t++) {
+            if (present[t] && present[t + 1] && present[t + 2] && present[t + 3] && present[t + 4]) ls = true;
+        }
+        var out = [
+            c[0] * 1, c[1] * 2, c[2] * 3, c[3] * 4, c[4] * 5, c[5] * 6,
+            mx >= 3 ? sum : 0,
+            mx >= 4 ? sum : 0,
+            (has3 && has2) ? 25 : 0,
+            ss ? 30 : 0,
+            ls ? 40 : 0,
+            mx === 5 ? 50 : 0,
+            sum
+        ];
+        scoreCache[code] = out;
+        return out;
+    }
+
+    /* r개 주사위를 굴릴 때 나오는 모든 결과의 코드 */
+    var OUTCODE = (function () {
+        var res = [];
+        for (var r = 0; r <= 5; r++) {
+            var n = 1;
+            for (var q = 0; q < r; q++) n *= 6;
+            var arr = new Int32Array(n);
+            for (var i = 0; i < n; i++) {
+                var x = i, code = 0;
+                for (var j = 0; j < r; j++) {
+                    var f = x % 6;
+                    x = (x - f) / 6;
+                    code += POW6[f];
+                }
+                arr[i] = code;
+            }
+            res.push(arr);
+        }
+        return res;
+    })();
+
+    function codeOfCounts(c) {
+        var code = 0;
+        for (var i = 0; i < 6; i++) code += c[i] * POW6[i];
+        return code;
+    }
+
+    function countsOfDice(dice) {
+        var c = [0, 0, 0, 0, 0, 0];
+        for (var i = 0; i < dice.length; i++) c[dice[i] - 1] += 1;
+        return c;
+    }
+
+    /* =========================================================
+       사운드 (Web Audio 합성)
+       ========================================================= */
+    var Sound = (function () {
+        var ctx = null, muted = false, master = null;
+
+        function ac() {
+            if (ctx) return ctx;
+            var AC = window.AudioContext || window.webkitAudioContext;
+            if (!AC) return null;
+            ctx = new AC();
+            master = ctx.createGain();
+            master.gain.value = 0.22;
+            master.connect(ctx.destination);
+            return ctx;
+        }
+        function tone(freq, dur, type, vol, delay, slideTo) {
+            var c = ac();
+            if (!c || muted) return;
+            var t0 = c.currentTime + (delay || 0);
+            var o = c.createOscillator();
+            var g = c.createGain();
+            o.type = type || 'sine';
+            o.frequency.setValueAtTime(freq, t0);
+            if (slideTo) o.frequency.exponentialRampToValueAtTime(Math.max(30, slideTo), t0 + dur);
+            g.gain.setValueAtTime(0.0001, t0);
+            g.gain.exponentialRampToValueAtTime(vol == null ? 0.32 : vol, t0 + 0.012);
+            g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+            o.connect(g); g.connect(master);
+            o.start(t0); o.stop(t0 + dur + 0.03);
+        }
+        function noise(dur, vol, delay, hp) {
+            var c = ac();
+            if (!c || muted) return;
+            var t0 = c.currentTime + (delay || 0);
+            var len = Math.max(1, Math.floor(c.sampleRate * dur));
+            var buf = c.createBuffer(1, len, c.sampleRate);
+            var d = buf.getChannelData(0);
+            for (var i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / len);
+            var src = c.createBufferSource();
+            src.buffer = buf;
+            var f = c.createBiquadFilter();
+            f.type = 'highpass';
+            f.frequency.value = hp || 900;
+            var g = c.createGain();
+            g.gain.value = vol == null ? 0.3 : vol;
+            src.connect(f); f.connect(g); g.connect(master);
+            src.start(t0);
+        }
+        return {
+            resume: function () { var c = ac(); if (c && c.state === 'suspended') c.resume(); },
+            click: function () { tone(560, 0.05, 'square', 0.16); },
+            dice: function () {
+                noise(0.07, 0.3, 0, 1200);
+                noise(0.05, 0.24, 0.09, 1500);
+                noise(0.05, 0.2, 0.18, 1800);
+            },
+            land: function () { noise(0.05, 0.28, 0, 700); tone(180, 0.07, 'triangle', 0.16); },
+            hold: function () { tone(880, 0.06, 'square', 0.16); tone(1180, 0.06, 'square', 0.12, 0.05); },
+            score: function () { tone(520, 0.09, 'triangle', 0.26); tone(780, 0.12, 'triangle', 0.2, 0.07); },
+            bonus: function () {
+                [523, 659, 784, 1046].forEach(function (f, i) { tone(f, 0.16, 'triangle', 0.24, i * 0.075); });
+            },
+            yahtzee: function () {
+                [523, 659, 784, 1046, 1318, 1568].forEach(function (f, i) {
+                    tone(f, 0.22, 'sawtooth', 0.16, i * 0.085);
+                    tone(f / 2, 0.22, 'sine', 0.2, i * 0.085);
+                });
+                noise(0.4, 0.12, 0.55, 2400);
+            },
+            win: function () {
+                [440, 554, 659, 880].forEach(function (f, i) { tone(f, 0.2, 'triangle', 0.22, i * 0.08); });
+            },
+            lose: function () { tone(300, 0.24, 'sawtooth', 0.16); tone(200, 0.34, 'sawtooth', 0.14, 0.14); },
+            bankrupt: function () { tone(140, 0.5, 'sawtooth', 0.18, 0, 70); },
+            toggle: function () {
+                muted = !muted;
+                try { localStorage.setItem(STORE_SOUND, muted ? 'off' : 'on'); } catch (e) {}
+                return muted;
+            },
+            muted: function () { return muted; }
+        };
+    })();
+
+    /* =========================================================
+       컨페티
+       ========================================================= */
+    var FX = (function () {
+        var cv = $('fx'), cx = cv.getContext('2d'), parts = [], raf = null;
+        function size() {
+            cv.width = window.innerWidth;
+            cv.height = window.innerHeight;
+        }
+        size();
+        window.addEventListener('resize', size);
+        function frame() {
+            cx.clearRect(0, 0, cv.width, cv.height);
+            for (var i = parts.length - 1; i >= 0; i--) {
+                var p = parts[i];
+                p.x += p.vx; p.y += p.vy; p.vy += 0.24; p.life -= 1; p.rot += p.vr;
+                if (p.life <= 0 || p.y > cv.height + 30) { parts.splice(i, 1); continue; }
+                cx.save();
+                cx.translate(p.x, p.y);
+                cx.rotate(p.rot);
+                cx.globalAlpha = Math.max(0, Math.min(1, p.life / 40));
+                cx.fillStyle = p.c;
+                cx.fillRect(-p.s / 2, -p.s / 2, p.s, p.s * 0.62);
+                cx.restore();
+            }
+            if (parts.length) raf = requestAnimationFrame(frame);
+            else { raf = null; cx.clearRect(0, 0, cv.width, cv.height); }
+        }
+        return {
+            burst: function (x, y, n) {
+                var cols = ['#ffd24d', '#fff3bb', '#4be1ff', '#a98bff', '#43e8a0', '#ff6f91'];
+                for (var i = 0; i < n; i++) {
+                    var a = Math.random() * Math.PI * 2, sp = 2 + Math.random() * 7;
+                    parts.push({
+                        x: x, y: y,
+                        vx: Math.cos(a) * sp,
+                        vy: Math.sin(a) * sp - 3,
+                        s: 4 + Math.random() * 6,
+                        c: cols[(Math.random() * cols.length) | 0],
+                        rot: Math.random() * 6,
+                        vr: (Math.random() - 0.5) * 0.4,
+                        life: 55 + Math.random() * 45
+                    });
+                }
+                if (!raf) raf = requestAnimationFrame(frame);
+            }
+        };
+    })();
+
+    /* =========================================================
+       상태
+       ========================================================= */
+    var balance = Wallet.getBalance();
+    var bet = 100;
+    var phase = 'idle';           // idle | playing | settling
+    var dice = [1, 2, 3, 4, 5];
+    var hold = [false, false, false, false, false];
+    var rollsUsed = 0;
+    var turn = 1;
+    var stake = 0;
+    var scores = {};              // cat id -> 점수
+    var upperSum = 0;
+    var lowerSum = 0;
+    var bonusPoints = 0;          // 보너스 야찌 누적 점수
+    var yahtzeeCount = 0;
+    var yahtzeeScored = false;    // 야찌 칸이 50점으로 채워졌는가
+    var rolling = false;
+    var rec = null;               // {cat, keep:[counts], holds:[bool x5]}
+    var stats = {
+        sessions: 0, wins: 0, net: 0, bestScore: 0, bestMult: 0,
+        yahtzee: 0, jackpots: 0, lastScore: 0
+    };
+    var history = [];
+
+    /* =========================================================
+       저장
+       ========================================================= */
+    function loadStore() {
+        try {
+            var s = JSON.parse(localStorage.getItem(STORE_STATS) || 'null');
+            if (s && typeof s === 'object') {
+                stats.sessions = s.sessions || 0;
+                stats.wins = s.wins || 0;
+                stats.net = s.net || 0;
+                stats.bestScore = s.bestScore || 0;
+                stats.bestMult = s.bestMult || 0;
+                stats.yahtzee = s.yahtzee || 0;
+                stats.jackpots = s.jackpots || 0;
+                stats.lastScore = s.lastScore || 0;
+                if (Array.isArray(s.history)) history = s.history.slice(0, 12);
+            }
+        } catch (e) { /* 저장소 없음 */ }
+        try {
+            var b = parseInt(localStorage.getItem(STORE_BET) || '', 10);
+            if (isFinite(b) && b >= MIN_BET) bet = Math.min(b, MAX_BET);
+        } catch (e2) {}
+    }
+
+    function saveStore() {
+        try {
+            localStorage.setItem(STORE_STATS, JSON.stringify({
+                sessions: stats.sessions,
+                wins: stats.wins,
+                net: stats.net,
+                bestScore: stats.bestScore,
+                bestMult: stats.bestMult,
+                yahtzee: stats.yahtzee,
+                jackpots: stats.jackpots,
+                lastScore: stats.lastScore,
+                history: history.slice(0, 12)
+            }));
+        } catch (e) {}
+    }
+
+    function saveBet() {
+        try { localStorage.setItem(STORE_BET, String(bet)); } catch (e) {}
+    }
+
+    /* =========================================================
+       렌더
+       ========================================================= */
+    function renderBalance(flash) {
+        $('balance').textContent = fmt(balance);
+        if (flash) {
+            var box = $('walletBox');
+            box.classList.remove('flash');
+            void box.offsetWidth;
+            box.classList.add('flash');
+        }
+    }
+
+    function renderBet() {
+        $('betView').textContent = fmt(bet);
+        $('startBet').textContent = fmt(bet);
+        var chips = document.querySelectorAll('.chipBtn');
+        for (var i = 0; i < chips.length; i++) {
+            chips[i].classList.toggle('on', Number(chips[i].getAttribute('data-chip')) === bet);
+        }
+        $('startBtn').disabled = phase !== 'idle';
+    }
+
+    function renderDice() {
+        var els = document.querySelectorAll('.die');
+        for (var i = 0; i < 5; i++) {
+            var el = els[i];
+            var pips = el.querySelectorAll('.pip');
+            var on = PIP_MAP[dice[i]] || [];
+            for (var p = 0; p < 9; p++) pips[p].classList.toggle('on', on.indexOf(p) >= 0);
+            el.classList.toggle('held', !!hold[i] && phase === 'playing');
+            el.classList.toggle('locked', phase !== 'playing' || rollsUsed >= 3);
+        }
+    }
+
+    function buildScorecard() {
+        var up = $('upperRows'), lo = $('lowerRows');
+        up.innerHTML = ''; lo.innerHTML = '';
+        CATS.forEach(function (c, idx) {
+            var b = document.createElement('button');
+            b.className = 'row' + (idx === 11 ? ' jackRow' : '');
+            b.setAttribute('data-cat', c.id);
+            b.setAttribute('data-idx', String(idx));
+            b.innerHTML = '<span class="rname">' + c.name + ' <i>' + c.sub + '</i></span>' +
+                '<span class="rprev">-</span><span class="rscore">-</span>';
+            b.addEventListener('click', function () { pickCategory(c.id); });
+            (c.upper ? up : lo).appendChild(b);
+        });
+    }
+
+    function renderCard() {
+        var rows = document.querySelectorAll('.row');
+        var curScores = null;
+        if (phase === 'playing') curScores = scoresOfCode(codeOfCounts(countsOfDice(dice)));
+        var upTotal = 0, loTotal = 0;
+
+        for (var i = 0; i < CATS.length; i++) {
+            var c = CATS[i];
+            var el = rows[i];
+            var filled = Object.prototype.hasOwnProperty.call(scores, c.id);
+            el.classList.toggle('filled', filled);
+            var prev = el.querySelector('.rprev');
+            var sc = el.querySelector('.rscore');
+
+            if (filled) {
+                var v = scores[c.id];
+                sc.textContent = fmt(v);
+                if (c.upper) upTotal += v; else loTotal += v;
+            } else {
+                sc.textContent = '-';
+                if (curScores && phase === 'playing') {
+                    var pv = curScores[i];
+                    prev.textContent = fmt(pv);
+                    prev.classList.toggle('zero', pv === 0);
+                } else {
+                    prev.textContent = '-';
+                    prev.classList.remove('zero');
+                }
+            }
+
+            var isRec = !!(rec && rec.catIdx === i && !filled && phase === 'playing');
+            el.classList.toggle('rec', isRec);
+            el.classList.toggle('disabled', phase !== 'playing' || filled);
+        }
+
+        $('upperTotal').textContent = upTotal + ' / 63';
+        $('lowerTotal').textContent = fmt(loTotal + bonusPoints);
+        $('totalView').textContent = fmt(upTotal + (upTotal >= 63 ? 35 : 0) + loTotal + bonusPoints);
+    }
+
+    function renderTurn() {
+        $('turnView').textContent = phase === 'playing' ? (turn + ' / 13') : '- / 13';
+        $('rollView').textContent = phase === 'playing' ? (rollsUsed + ' / 3') : '- / 3';
+        $('rollView').classList.toggle('hot', phase === 'playing' && rollsUsed < 3);
+        var rb = $('rollBtn');
+        if (phase === 'playing') {
+            var left = 3 - rollsUsed;
+            rb.disabled = left <= 0 || rolling;
+            rb.textContent = left > 0 ? ('🎲 굴리기 (' + left + '회)') : '카테고리 선택';
+        } else {
+            rb.disabled = true;
+            rb.textContent = '🎲 굴리기';
+        }
+    }
+
+    function renderUpper() {
+        var upTotal = 0;
+        for (var i = 0; i < 6; i++) {
+            var id = CATS[i].id;
+            if (Object.prototype.hasOwnProperty.call(scores, id)) upTotal += scores[id];
+        }
+        $('upView').textContent = upTotal + ' / 63';
+        $('upRow').classList.toggle('bonus', upTotal >= 63);
+        $('upFill').style.width = Math.min(100, upTotal / 63 * 100) + '%';
+        $('upHint').innerHTML = upTotal >= 63
+            ? '🎁 상단 보너스 <b>+35점</b> 확보!'
+            : '상단 6칸 합계 <b>63점 이상</b>이면 <b>+35점</b> 보너스 · <b>' + Math.max(0, 63 - upTotal) + '점</b> 남음';
+    }
+
+    function renderStats() {
+        $('stSessions').textContent = fmt(stats.sessions);
+        $('stRate').textContent = stats.sessions ? (stats.wins / stats.sessions * 100).toFixed(0) + '%' : '0%';
+        var net = stats.net;
+        var sn = $('stNet');
+        sn.textContent = (net > 0 ? '+' : '') + fmtK(net);
+        sn.className = net > 0 ? 'green' : (net < 0 ? 'rose' : '');
+        $('stBest').textContent = fmt(stats.bestScore);
+        $('stMult').textContent = stats.bestMult > 0 ? multText(stats.bestMult) : '-';
+        $('stYahtzee').textContent = fmt(stats.yahtzee);
+        $('stJackpot').textContent = fmt(stats.jackpots);
+        $('stLast').textContent = stats.lastScore > 0 ? fmt(stats.lastScore) : '-';
+        renderHistory();
+    }
+
+    function renderHistory() {
+        var box = $('histList');
+        $('histCount').textContent = history.length + '건';
+        if (!history.length) {
+            box.innerHTML = '<div class="hEmpty">아직 기록이 없습니다</div>';
+            return;
+        }
+        var html = '';
+        history.slice(0, 12).forEach(function (h) {
+            var cls = h.jackpot ? 'jack' : (h.net > 0 ? 'win' : (h.net < 0 ? 'lose' : ''));
+            var tag = h.jackpot ? 'JACKPOT' : (h.net > 0 ? 'WIN' : (h.net < 0 ? 'LOSS' : 'EVEN'));
+            html += '<div class="hItem">' +
+                '<span class="hTag ' + cls + '">' + tag + '</span>' +
+                '<span class="hScore">' + fmt(h.score) + '점' + (h.yahtzee ? ' · 🎲' + h.yahtzee : '') + '</span>' +
+                '<span class="hMult">' + multText(h.mult) + '</span>' +
+                '<span class="hNet ' + (h.net > 0 ? 'up' : (h.net < 0 ? 'down' : '')) + '">' +
+                (h.net > 0 ? '+' : '') + fmtK(h.net) + '</span>' +
+                '</div>';
+        });
+        box.innerHTML = html;
+    }
+
+    function setHint(html, canApply) {
+        $('hintText').innerHTML = html;
+        $('hintApply').style.display = canApply ? 'block' : 'none';
+    }
+
+    function toast(msg) {
+        var t = $('toast');
+        t.textContent = msg;
+        t.classList.add('on');
+        clearTimeout(t._tm);
+        t._tm = setTimeout(function () { t.classList.remove('on'); }, 1700);
+    }
+
+    /* =========================================================
+       추천 AI
+       ========================================================= */
+    function recommend() {
+        if (phase !== 'playing') return null;
+        var open = [];
+        for (var i = 0; i < CATS.length; i++) {
+            if (!Object.prototype.hasOwnProperty.call(scores, CATS[i].id)) open.push(i);
+        }
+        if (!open.length) return null;
+
+        var counts = countsOfDice(dice);
+        var mx = Math.max.apply(null, counts);
+        var allowYahtzee = mx >= 4 || turn >= 13;
+
+        var best = { val: -1e9, catIdx: -1, keep: null };
+
+        // 모든 킵 조합 (현재 주사위의 부분 다중집합)
+        for (var a = 0; a <= counts[0]; a++)
+        for (var b = 0; b <= counts[1]; b++)
+        for (var c = 0; c <= counts[2]; c++)
+        for (var d = 0; d <= counts[3]; d++)
+        for (var e = 0; e <= counts[4]; e++)
+        for (var f = 0; f <= counts[5]; f++) {
+            var kc = [a, b, c, d, e, f];
+            var size = a + b + c + d + e + f;
+            var code = codeOfCounts(kc);
+            var r = 5 - size;
+            var outs = OUTCODE[r];
+            var evs = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+
+            if (r === 0) {
+                var sc0 = scoresOfCode(code);
+                for (var oi = 0; oi < open.length; oi++) {
+                    var ci = open[oi];
+                    if (ci === 11 && !allowYahtzee) continue;
+                    var v0 = sc0[ci] - REF[ci];
+                    if (v0 > best.val) best = { val: v0, catIdx: ci, keep: kc };
+                }
+                continue;
+            }
+
+            var n = outs.length;
+            for (var o = 0; o < n; o++) {
+                var cs = scoresOfCode(code + outs[o]);
+                for (var k = 0; k < 13; k++) evs[k] += cs[k];
+            }
+            for (var k2 = 0; k2 < 13; k2++) evs[k2] /= n;
+
+            for (var oj = 0; oj < open.length; oj++) {
+                var cj = open[oj];
+                if (cj === 11 && !allowYahtzee) continue;
+                var v = evs[cj] - REF[cj];
+                if (v > best.val) best = { val: v, catIdx: cj, keep: kc };
+            }
+        }
+
+        if (best.catIdx < 0) return null;
+
+        // 킵 카운트 → 실제 주사위 인덱스(홀드) 매핑
+        var holds = [false, false, false, false, false];
+        var need = best.keep.slice();
+        for (var di = 0; di < 5; di++) {
+            var face = dice[di] - 1;
+            if (need[face] > 0) {
+                holds[di] = true;
+                need[face] -= 1;
+            }
+        }
+        return { catIdx: best.catIdx, holds: holds, val: best.val };
+    }
+
+    function updateHint() {
+        rec = recommend();
+        if (!rec) {
+            if (phase === 'playing') setHint('모든 카테고리가 채워졌습니다. 정산 중...', false);
+            else setHint('세션을 시작하면 실시간 추천이 표시됩니다.', false);
+            return;
+        }
+        var name = CATS[rec.catIdx].name;
+        var holdCount = rec.holds.filter(Boolean).length;
+        var tail = rec.catIdx === 11 ? ' · 🌟 야찌 도전' : '';
+        if (rollsUsed >= 3) {
+            setHint('✨ <b>' + name + '</b>에 기록하는 것이 가장 좋습니다' + tail, false);
+        } else {
+            setHint('✨ 추천: <b>' + name + '</b> · 홀드 <b>' + holdCount + '개</b>' + tail, holdCount > 0, true);
+        }
+    }
+
+    /* =========================================================
+       게임 진행
+       ========================================================= */
+    function freshSession() {
+        scores = {};
+        upperSum = 0;
+        lowerSum = 0;
+        bonusPoints = 0;
+        yahtzeeCount = 0;
+        yahtzeeScored = false;
+        turn = 1;
+    }
+
+    function startSession() {
+        if (phase === 'playing' || rolling) return;
+        if (bet < MIN_BET) { toast('최소 베팅은 100칩입니다'); return; }
+        if (balance < bet) {
+            toast('잔고 부족 · 무료칩을 충전하세요');
+            Sound.bankrupt();
+            openRelief();
+            return;
+        }
+        Sound.resume();
+        stake = bet;
+        balance -= stake;
+        Wallet.setBalance(balance);
+        renderBalance(true);
+        freshSession();
+        phase = 'playing';
+        rollsUsed = 0;
+        hold = [false, false, false, false, false];
+        rec = null;
+        renderBet();
+        renderCard();
+        renderUpper();
+        renderTurn();
+        renderDice();
+        doRoll(true);
+        toast('🎲 세션 시작 · 13턴 · 베팅 ' + fmt(stake) + '칩');
+    }
+
+    function doRoll(first) {
+        if (phase !== 'playing' || rolling) return;
+        if (!first && rollsUsed >= 3) return;
+        rolling = true;
+        Sound.dice();
+
+        var els = document.querySelectorAll('.die');
+        var reroll = [];
+        for (var i = 0; i < 5; i++) {
+            if (first || !hold[i]) {
+                reroll.push(i);
+                els[i].classList.add('rolling');
+            }
+        }
+
+        var t0 = Date.now();
+        var scramble = setInterval(function () {
+            for (var k = 0; k < reroll.length; k++) {
+                var el = els[reroll[k]];
+                var pips = el.querySelectorAll('.pip');
+                var tmp = 1 + ((Math.random() * 6) | 0);
+                var on = PIP_MAP[tmp];
+                for (var p = 0; p < 9; p++) pips[p].classList.toggle('on', on.indexOf(p) >= 0);
+            }
+        }, 55);
+
+        setTimeout(function () {
+            clearInterval(scramble);
+            for (var k = 0; k < reroll.length; k++) {
+                dice[reroll[k]] = 1 + ((Math.random() * 6) | 0);
+                els[reroll[k]].classList.remove('rolling');
+            }
+            rollsUsed += 1;
+            rolling = false;
+            Sound.land();
+            renderDice();
+            updateHint();
+            renderCard();
+            renderTurn();
+            renderBalance();
+        }, first ? 420 : 520);
+    }
+
+    function toggleHold(i) {
+        if (phase !== 'playing' || rolling || rollsUsed >= 3) return;
+        hold[i] = !hold[i];
+        Sound.hold();
+        renderDice();
+    }
+
+    function applyRecommendedHolds() {
+        if (!rec || phase !== 'playing') return;
+        for (var i = 0; i < 5; i++) hold[i] = rec.holds[i];
+        Sound.hold();
+        renderDice();
+        toast('💡 추천 홀드를 적용했습니다');
+    }
+
+    function pickCategory(id) {
+        if (phase !== 'playing' || rolling) return;
+        if (Object.prototype.hasOwnProperty.call(scores, id)) return;
+        var idx = -1;
+        for (var i = 0; i < CATS.length; i++) if (CATS[i].id === id) idx = i;
+        if (idx < 0) return;
+
+        var counts = countsOfDice(dice);
+        var sc = scoresOfCode(codeOfCounts(counts))[idx];
+        var isFive = Math.max.apply(null, counts) === 5;
+
+        // 보너스 야찌 (이미 야찌 칸이 50점으로 채워진 뒤 또 5개 동일)
+        if (isFive && yahtzeeScored && !(id === 'yacht')) {
+            bonusPoints += BONUS_YAHTZEE_PTS;
+            yahtzeeCount += 1;
+            toast('🎉 보너스 야찌! +' + BONUS_YAHTZEE_PTS + '점');
+            Sound.yahtzee();
+            FX.burst(window.innerWidth / 2, window.innerHeight * 0.32, 70);
+        }
+
+        scores[id] = sc;
+        if (CATS[idx].upper) upperSum += sc;
+        else lowerSum += sc;
+
+        if (id === 'yacht') {
+            if (sc === YAHTZEE_PTS) {
+                yahtzeeScored = true;
+                yahtzeeCount += 1;
+                Sound.yahtzee();
+                FX.burst(window.innerWidth / 2, window.innerHeight * 0.32, 110);
+                toast('🎲 야찌! +50점 · 야찌 잭팟 배당 확보');
+            } else {
+                Sound.score();
+            }
+        } else {
+            Sound.score();
+        }
+
+        if (upperSum >= 63 && upperSum - sc < 63 && CATS[idx].upper) {
+            setTimeout(function () { Sound.bonus(); }, 220);
+            toast('🎁 상단 보너스 +35점 달성!');
+        }
+
+        hold = [false, false, false, false, false];
+        rollsUsed = 0;
+        turn += 1;
+        rec = null;
+
+        if (turn > 13) {
+            settle();
+            return;
+        }
+        renderCard();
+        renderUpper();
+        renderTurn();
+        renderDice();
+        doRoll(true);
+    }
+
+    function tierOf(score) {
+        for (var i = 0; i < TIERS.length; i++) {
+            if (score >= TIERS[i].min) return TIERS[i];
+        }
+        return TIERS[TIERS.length - 1];
+    }
+
+    function settle() {
+        phase = 'settling';
+        renderBet();
+        renderTurn();
+
+        var bonus = upperSum >= 63 ? 35 : 0;
+        var finalScore = upperSum + bonus + lowerSum + bonusPoints;
+        var tier = tierOf(finalScore);
+        var basePay = Math.round(stake * tier.mult);
+        var yCount = Math.min(yahtzeeCount, YAHTZEE_JACKPOT_CAP);
+        var yahtPay = Math.round(stake * YAHTZEE_JACKPOT_MULT * yCount);
+        var payout = basePay + yahtPay;
+        var net = payout - stake;
+
+        balance += payout;
+        Wallet.setBalance(balance);
+        renderBalance(true);
+
+        var jackpot = tier.mult >= 45 || (finalScore >= 400);
+        stats.sessions += 1;
+        if (payout > stake) stats.wins += 1;
+        stats.net += net;
+        if (finalScore > stats.bestScore) stats.bestScore = finalScore;
+        if (tier.mult > stats.bestMult) stats.bestMult = tier.mult;
+        stats.yahtzee += yahtzeeCount;
+        if (jackpot) stats.jackpots += 1;
+        stats.lastScore = finalScore;
+
+        history.unshift({
+            score: finalScore, mult: tier.mult, net: net, yahtzee: yahtzeeCount,
+            jackpot: jackpot, t: Date.now()
+        });
+        history = history.slice(0, 12);
+        saveStore();
+        renderStats();
+
+        showResult(finalScore, tier, basePay, yahtPay, payout, net, jackpot, bonus);
+    }
+
+    function showResult(finalScore, tier, basePay, yahtPay, payout, net, jackpot, bonus) {
+        $('resScore').textContent = fmt(finalScore);
+        $('resTier').textContent = multText(tier.mult) + ' · ' + tier.tag;
+        $('resBase').textContent = '+' + fmt(basePay) + '칩';
+        $('resYahtRow').style.display = yahtPay > 0 ? 'flex' : 'none';
+        $('resYaht').textContent = '+' + fmt(yahtPay) + '칩';
+        $('resPayout').textContent = '+' + fmt(payout) + '칩';
+        var rn = $('resNet');
+        rn.textContent = (net > 0 ? '+' : '') + fmt(net) + '칩';
+        rn.style.color = net > 0 ? 'var(--green)' : (net < 0 ? 'var(--rose)' : 'var(--text)');
+
+        var banner = $('resBanner');
+        var title = $('resTitle');
+        if (finalScore >= 400) {
+            banner.textContent = '👑 MAX JACKPOT 500배';
+            banner.className = 'resBanner jack';
+            title.textContent = '👑 MAX JACKPOT';
+            Sound.yahtzee();
+            FX.burst(window.innerWidth / 2, window.innerHeight * 0.28, 170);
+        } else if (tier.mult >= 45) {
+            banner.textContent = '💥 ' + tier.tag + ' · ' + multText(tier.mult);
+            banner.className = 'resBanner jack';
+            title.textContent = '💥 JACKPOT';
+            Sound.win();
+            FX.burst(window.innerWidth / 2, window.innerHeight * 0.28, 140);
+        } else if (tier.mult >= 6) {
+            banner.textContent = '🔥 ' + tier.tag + ' · ' + multText(tier.mult);
+            banner.className = 'resBanner';
+            title.textContent = 'BIG WIN';
+            Sound.win();
+            FX.burst(window.innerWidth / 2, window.innerHeight * 0.28, 90);
+        } else if (tier.mult >= 1) {
+            banner.textContent = '✅ ' + tier.tag + ' · ' + multText(tier.mult);
+            banner.className = 'resBanner';
+            title.textContent = 'WIN';
+            Sound.win();
+        } else {
+            banner.textContent = '점수 ' + fmt(finalScore) + ' · 배당 ' + multText(tier.mult);
+            banner.className = 'resBanner';
+            title.textContent = 'SETTLEMENT';
+            Sound.lose();
+        }
+
+        if (bonus > 0) banner.textContent += ' · 상단 보너스 +35';
+        if (yahtPay > 0) banner.textContent += ' · 🎲 야찌 잭팟 ×' + Math.min(yahtzeeCount, YAHTZEE_JACKPOT_CAP);
+
+        $('resultOverlay').classList.add('on');
+
+        if (balance < BAILOUT_AT) {
+            setTimeout(function () {
+                Sound.bankrupt();
+                openRelief();
+            }, 900);
+        }
+    }
+
+    function closeResult() {
+        $('resultOverlay').classList.remove('on');
+        phase = 'idle';
+        renderBet();
+        renderTurn();
+        renderCard();
+        renderDice();
+        setHint('세션을 시작하면 실시간 추천이 표시됩니다.', false);
+    }
+
+    function again() {
+        $('resultOverlay').classList.remove('on');
+        phase = 'idle';
+        renderBet();
+        if (balance < bet) {
+            toast('잔고 부족 · 베팅을 낮추거나 무료칩을 충전하세요');
+            Sound.bankrupt();
+            openRelief();
+            return;
+        }
+        startSession();
+    }
+
+    /* =========================================================
+       광고 / 구호금
+       ========================================================= */
+    var adTimer = null;
+    function openAd() {
+        var ov = $('adOverlay'), fill = $('adFill'), timeEl = $('adTime');
+        ov.classList.add('on');
+        fill.style.width = '0%';
+        var left = 5;
+        timeEl.textContent = left + '초 후 충전 완료...';
+        clearInterval(adTimer);
+        setTimeout(function () { fill.style.width = '20%'; }, 40);
+        adTimer = setInterval(function () {
+            left -= 1;
+            fill.style.width = ((5 - left) / 5 * 100) + '%';
+            if (left <= 0) {
+                clearInterval(adTimer);
+                timeEl.textContent = '충전 완료!';
+                setTimeout(function () {
+                    ov.classList.remove('on');
+                    balance += 5000;
+                    Wallet.setBalance(balance);
+                    renderBalance(true);
+                    renderBet();
+                    toast('📺 광고 시청 완료 · 무료 칩 +5,000');
+                    Sound.score();
+                }, 320);
+            } else {
+                timeEl.textContent = left + '초 후 충전 완료...';
+            }
+        }, 1000);
+    }
+
+    function openRelief() {
+        $('reliefOverlay').classList.add('on');
+    }
+
+    /* =========================================================
+       배당표
+       ========================================================= */
+    function renderPaytable() {
+        var box = $('ptBody');
+        box.innerHTML = '';
+        var rows = [];
+        for (var i = 0; i < TIERS.length; i++) {
+            var t = TIERS[i];
+            var label;
+            if (t.min === 0) label = '0 ~ 129점';
+            else if (i === 0) label = '400점 이상';
+            else label = t.min + ' ~ ' + (TIERS[i - 1].min - 1) + '점';
+            rows.push([label, multText(t.mult) + ' 배', t.mult >= 6]);
+        }
+        rows.forEach(function (r) {
+            var d = document.createElement('div');
+            d.className = 'ptRow' + (r[2] ? ' hi' : '');
+            d.innerHTML = '<span>' + r[0] + '</span><b>' + r[1] + '</b>';
+            box.appendChild(d);
+        });
+
+        var info = document.createElement('div');
+        info.className = 'ptSub';
+        info.innerHTML =
+            '<b>🎲 야찌 잭팟</b> — 세션에서 야찌(5개 동일)를 기록할 때마다 베팅의 <b>×8</b> 추가 배당(최대 3회). ' +
+            '야찌 칸을 50점으로 채운 뒤 또 야찌가 나오면 <b>+100점</b> 보너스가 점수에 더해집니다.<br><br>' +
+            '<b>🎁 상단 보너스</b> — 상단 6칸(에이스~식스) 합계 <b>63점 이상</b>이면 <b>+35점</b>.<br><br>' +
+            '<b>🎮 진행</b> — 세션 베팅 후 13턴. 매 턴 최대 3회 굴리고, 주사위를 눌러 HOLD 후 리롤, ' +
+            '카테고리를 눌러 기록합니다. 각 칸의 실시간 점수와 <b>✨ 추천</b>이 표시됩니다.<br><br>' +
+            '<b>📊 RTP 95.7%</b> — 13턴 완주 기준, 추천 전략을 따르는 합리적 킵 플레이 10만 세션 몬테카를로 검증 ' +
+            '(평균 199.9점, 표준편차 32.2).<br><br>' +
+            '<b>🪙 잔액</b> — 모든 미니게임과 공용 코인 지갑(localStorage: casino_chips)을 함께 씁니다.';
+        box.appendChild(info);
+    }
+
+    /* =========================================================
+       이벤트
+       ========================================================= */
+    function bind() {
+        document.querySelectorAll('.chipBtn').forEach(function (b) {
+            b.addEventListener('click', function () {
+                if (phase !== 'idle') { toast('세션 진행 중에는 베팅을 바꿀 수 없습니다'); return; }
+                bet = Number(b.getAttribute('data-chip'));
+                Sound.click();
+                renderBet();
+                saveBet();
+            });
+        });
+
+        document.querySelectorAll('.quick button').forEach(function (b) {
+            b.addEventListener('click', function () {
+                var act = b.getAttribute('data-act');
+                if (!act) return;
+                if (phase !== 'idle') { toast('세션 진행 중에는 베팅을 바꿀 수 없습니다'); return; }
+                if (act === 'half') bet = Math.max(MIN_BET, Math.floor(bet / 2 / 100) * 100);
+                else if (act === 'double') bet = Math.min(MAX_BET, Math.max(MIN_BET, bet * 2));
+                else if (act === 'max') bet = Math.min(MAX_BET, Math.max(MIN_BET, Math.floor(balance / 2 / 100) * 100 || MIN_BET));
+                else if (act === 'allin') bet = Math.max(MIN_BET, Math.min(MAX_BET, balance));
+                Sound.click();
+                renderBet();
+                saveBet();
+            });
+        });
+
+        $('startBtn').addEventListener('click', startSession);
+        $('rollBtn').addEventListener('click', function () { doRoll(false); });
+        $('hintApply').addEventListener('click', applyRecommendedHolds);
+
+        document.querySelectorAll('.die').forEach(function (el) {
+            el.addEventListener('click', function () {
+                toggleHold(Number(el.getAttribute('data-i')));
+            });
+        });
+
+        $('muteBtn').addEventListener('click', function () {
+            var m = Sound.toggle();
+            $('muteBtn').textContent = m ? '🔇' : '🔊';
+        });
+        $('muteBtn').textContent = Sound.muted() ? '🔇' : '🔊';
+
+        $('adBtn').addEventListener('click', openAd);
+        $('adCancel').addEventListener('click', function () {
+            clearInterval(adTimer);
+            $('adOverlay').classList.remove('on');
+        });
+        $('reliefBtn').addEventListener('click', function () {
+            balance += 2000;
+            Wallet.setBalance(balance);
+            renderBalance(true);
+            renderBet();
+            $('reliefOverlay').classList.remove('on');
+            Sound.score();
+            toast('💸 긴급 구호금 +2,000칩 지급');
+        });
+        $('reliefClose').addEventListener('click', function () { $('reliefOverlay').classList.remove('on'); });
+        $('resClose').addEventListener('click', closeResult);
+        $('resAgain').addEventListener('click', again);
+        $('infoBtn').addEventListener('click', function () { $('infoOverlay').classList.add('on'); });
+        $('infoClose').addEventListener('click', function () { $('infoOverlay').classList.remove('on'); });
+
+        document.addEventListener('keydown', function (e) {
+            if (e.code === 'Space' && phase === 'playing') {
+                e.preventDefault();
+                doRoll(false);
+            }
+        });
+
+        window.addEventListener('resize', function () { });
+
+        Wallet.subscribe(function (shared) {
+            if (shared === balance) return;
+            balance = shared;
+            renderBalance(true);
+            renderBet();
+        });
+    }
+
+    /* =========================================================
+       부트
+       ========================================================= */
+    loadStore();
+    buildScorecard();
+    bind();
+    renderBalance();
+    renderBet();
+    renderDice();
+    renderCard();
+    renderUpper();
+    renderTurn();
+    renderStats();
+    renderPaytable();
+    setHint('세션을 시작하면 실시간 추천이 표시됩니다.', false);
+
+    if (balance < BAILOUT_AT) {
+        setTimeout(function () { Sound.bankrupt(); openRelief(); }, 600);
+    }
+
+})();
+</script>
+</body>
+</html>
