@@ -1676,6 +1676,7 @@
         rollsUsed = 0;
         hold = [false, false, false, false, false];
         rec = null;
+        setHint('🎲 첫 굴림을 준비하는 중...', false);
         renderBet();
         renderCard();
         renderUpper();
@@ -1811,6 +1812,8 @@
 
     function settle() {
         phase = 'settling';
+        rec = null;
+        setHint('세션 종료 · 정산 중입니다', false);
         renderBet();
         renderTurn();
         renderCard();
