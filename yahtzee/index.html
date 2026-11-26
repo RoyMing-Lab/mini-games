@@ -1090,6 +1090,10 @@
 
     function $(id) { return document.getElementById(id); }
     function fmt(n) { return Math.max(0, Math.floor(n)).toLocaleString('en-US'); }
+    function fmtSigned(n) {
+        n = Math.round(n);
+        return (n > 0 ? '+' : (n < 0 ? '-' : '')) + Math.abs(n).toLocaleString('en-US');
+    }
     function fmtK(n) {
         n = Math.floor(n);
         if (n >= 1000000) return (n / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
@@ -1809,6 +1813,7 @@
         phase = 'settling';
         renderBet();
         renderTurn();
+        renderCard();
 
         var bonus = upperSum >= 63 ? 35 : 0;
         var finalScore = upperSum + bonus + lowerSum + bonusPoints;
@@ -1852,7 +1857,7 @@
         $('resYaht').textContent = '+' + fmt(yahtPay) + '칩';
         $('resPayout').textContent = '+' + fmt(payout) + '칩';
         var rn = $('resNet');
-        rn.textContent = (net > 0 ? '+' : '') + fmt(net) + '칩';
+        rn.textContent = fmtSigned(net) + '칩';
         rn.style.color = net > 0 ? 'var(--green)' : (net < 0 ? 'var(--rose)' : 'var(--text)');
 
         var banner = $('resBanner');
