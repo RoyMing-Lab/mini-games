@@ -1034,7 +1034,7 @@
     var STORE_BET = 'yahtzee_bet_v1';
     var STORE_SOUND = 'yahtzee_sound_v1';
 
-    /* 점수 → 배당 배수 (RTP 95.7% : 몬테카를로 10만 세션 검증) */
+    /* 점수 → 배당 배수 (RTP 약 95.9% : 몬테카를로 22만 세션 검증) */
     var TIERS = [
         { min: 400, mult: 500, tag: '👑 MAX JACKPOT' },
         { min: 360, mult: 95, tag: 'JACKPOT TIER' },
@@ -1042,7 +1042,7 @@
         { min: 320, mult: 22, tag: 'MEGA WIN' },
         { min: 300, mult: 12, tag: 'BIG WIN' },
         { min: 280, mult: 6, tag: 'BIG WIN' },
-        { min: 260, mult: 3.5, tag: 'WIN' },
+        { min: 260, mult: 3.4, tag: 'WIN' },
         { min: 250, mult: 2.4, tag: 'WIN' },
         { min: 240, mult: 1.7, tag: 'WIN' },
         { min: 230, mult: 1.2, tag: 'WIN' },
@@ -1995,8 +1995,8 @@
             '<b>🎁 상단 보너스</b> — 상단 6칸(에이스~식스) 합계 <b>63점 이상</b>이면 <b>+35점</b>.<br><br>' +
             '<b>🎮 진행</b> — 세션 베팅 후 13턴. 매 턴 최대 3회 굴리고, 주사위를 눌러 HOLD 후 리롤, ' +
             '카테고리를 눌러 기록합니다. 각 칸의 실시간 점수와 <b>✨ 추천</b>이 표시됩니다.<br><br>' +
-            '<b>📊 RTP 95.7%</b> — 13턴 완주 기준, 추천 전략을 따르는 합리적 킵 플레이 10만 세션 몬테카를로 검증 ' +
-            '(평균 199.9점, 표준편차 32.2).<br><br>' +
+            '<b>📊 RTP 약 95.9%</b> — 13턴 완주 기준, 추천 전략을 따르는 합리적 킵 플레이 22만 세션 몬테카를로 검증 ' +
+            '(평균 199.9점, 표준편차 32.3).<br><br>' +
             '<b>🪙 잔액</b> — 모든 미니게임과 공용 코인 지갑(localStorage: casino_chips)을 함께 씁니다.';
         box.appendChild(info);
     }
