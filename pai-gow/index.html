@@ -1612,13 +1612,6 @@
     if (balance < BAILOUT_AT) {
         setTimeout(function () { Sound.bankrupt(); openRelief(); }, 600);
     }
-
-    /* QA hook (read-only) */
-    window.__PAIGOW = {
-        eval5: eval5, eval2: eval2, validSplit: validSplit, fortuneOf: fortuneOf,
-        houseWay: houseWay, handName5: handName5, handName2: handName2,
-        state: function () { return { phase: phase, hand: hand, dealer: dealerHand, lowSel: lowSel, balance: balance }; }
-    };
 })();
 </script>
 </body>
