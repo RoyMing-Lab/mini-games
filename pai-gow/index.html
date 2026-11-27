@@ -1017,7 +1017,7 @@
         var d = document.createElement('div');
         d.className = 'card' + (opts.sm ? ' sm' : '');
         if (c === null) { d.className += ' empty'; return d; }
-        if (opts.back) { d.className += ' back'; d.innerHTML = cardHtml(0); return d; }
+        if (opts.back) { d.className += ' back'; d.innerHTML = cardHtml(0); d.setAttribute('aria-hidden', 'true'); return d; }
         d.innerHTML = cardHtml(c);
         if (c !== JOKER && ((c & 3) === 1 || (c & 3) === 2)) d.className += ' red';
         if (c === JOKER) d.className += ' joker';
@@ -1359,11 +1359,11 @@
         $('resLow').innerHTML = handName2(playerSplit.l2) + ' <span style="color:var(--sub)">vs</span> ' + handName2(dealerSplit.l2) +
             ' → <b class="' + (lWin ? 'up' : (dealerSplit.l2.k === playerSplit.l2.k ? '' : 'down')) + '">' + (lWin ? '승' : (dealerSplit.l2.k === playerSplit.l2.k ? '무' : '패')) + '</b>';
         $('resMain').innerHTML = '<b class="' + (mainProfit > 0 ? 'up' : (mainProfit < 0 ? 'down' : '')) + '">' +
-            (mainProfit > 0 ? '+' : '') + fmt(mainProfit) + '</b> <span style="color:var(--sub)">(' + resText + ')</span>';
+            fmtSigned(mainProfit) + '</b> <span style="color:var(--sub)">(' + resText + ')</span>';
         $('resFort').innerHTML = fortOn
             ? (fortProfit > 0 ? '<b class="up">+' + fmt(fortProfit) + '</b>' : '<span style="color:var(--sub)">미적중</span>')
             : '<span style="color:var(--sub)">OFF</span>';
-        $('resNet').innerHTML = '<b class="' + (net > 0 ? 'up' : (net < 0 ? 'down' : '')) + '">' + (net > 0 ? '+' : '') + fmt(net) + ' 칩</b>';
+        $('resNet').innerHTML = '<b class="' + (net > 0 ? 'up' : (net < 0 ? 'down' : '')) + '">' + fmtSigned(net) + ' 칩</b>';
 
         renderStats();
         $('resultOverlay').classList.add('on');
