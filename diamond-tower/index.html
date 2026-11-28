@@ -1,0 +1,1344 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>💎 하이로우 다이아몬드 타워 - Diamond Tower</title>
+<style>
+    :root {
+        --bg: #03081a;
+        --bg2: #061129;
+        --panel: #0a1735;
+        --panel2: #0d1f45;
+        --panel3: #122a5c;
+        --line: #1b3364;
+        --ice: #7fe9ff;
+        --ice2: #d9f8ff;
+        --azure: #4a8cff;
+        --azure2: #9dc0ff;
+        --gold: #ffd76e;
+        --gold2: #fff3c8;
+        --rose: #ff5f8d;
+        --green: #3ce8a2;
+        --text: #eef6ff;
+        --sub: #7d93bd;
+    }
+
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+        background: var(--bg);
+        background-image:
+            radial-gradient(ellipse at 50% -12%, #123a7a 0%, #071630 44%, #03081a 82%),
+            radial-gradient(ellipse at 88% 6%, rgba(127, 233, 255, 0.14) 0%, transparent 52%),
+            radial-gradient(ellipse at 6% 34%, rgba(74, 140, 255, 0.16) 0%, transparent 56%),
+            radial-gradient(circle at 22% 78%, rgba(255, 215, 110, 0.05) 0%, transparent 40%),
+            repeating-linear-gradient(45deg, rgba(127, 233, 255, 0.02) 0 1px, transparent 1px 22px);
+        color: var(--text);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 7px 7px 24px;
+        overflow-x: hidden;
+    }
+
+    #fx { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 80; }
+
+    .toast {
+        position: fixed; left: 50%; bottom: 96px; transform: translateX(-50%) translateY(14px);
+        background: rgba(10, 23, 53, 0.96); border: 1px solid rgba(127, 233, 255, 0.45);
+        color: var(--ice2); font-size: 0.72rem; font-weight: 700; padding: 9px 14px; border-radius: 11px;
+        opacity: 0; pointer-events: none; transition: all 0.24s ease; z-index: 95; max-width: 88vw;
+        text-align: center; box-shadow: 0 10px 28px rgba(0, 0, 0, 0.55);
+    }
+    .toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    .app { width: 100%; max-width: 560px; display: flex; flex-direction: column; gap: 8px; }
+
+    /* ---------- header ---------- */
+    .top {
+        display: flex; align-items: center; gap: 7px; padding: 7px 8px;
+        background: linear-gradient(180deg, rgba(127, 233, 255, 0.10), rgba(10, 23, 53, 0.94));
+        border: 1px solid rgba(127, 233, 255, 0.28);
+        border-radius: 13px;
+        box-shadow: inset 0 1px 0 rgba(217, 248, 255, 0.12), 0 6px 18px rgba(0, 0, 0, 0.3);
+    }
+
+    .lobby {
+        font-size: 0.63rem; font-weight: 800; color: var(--ice2); text-decoration: none;
+        background: rgba(127, 233, 255, 0.1); border: 1px solid rgba(127, 233, 255, 0.35);
+        padding: 6px 8px; border-radius: 9px; white-space: nowrap;
+    }
+
+    .brand { flex: 1; display: flex; flex-direction: column; line-height: 1.15; min-width: 0; }
+    .brand b {
+        font-size: 0.84rem; letter-spacing: 0.5px;
+        background: linear-gradient(92deg, var(--ice2), var(--ice) 46%, var(--gold));
+        -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .brand span { font-size: 0.46rem; color: var(--sub); letter-spacing: 1.2px; }
+
+    .ic {
+        background: rgba(127, 233, 255, 0.08); border: 1px solid rgba(127, 233, 255, 0.25);
+        color: var(--ice2); border-radius: 9px; width: 31px; height: 31px; font-size: 0.82rem; cursor: pointer;
+        flex-shrink: 0;
+    }
+    .ic:active { transform: translateY(1px); }
+
+    .wallet {
+        display: flex; align-items: center; gap: 4px; font-size: 0.73rem; font-weight: 900;
+        color: var(--gold2); background: rgba(255, 215, 110, 0.12);
+        border: 1px solid rgba(255, 215, 110, 0.36); padding: 6px 8px; border-radius: 9px; white-space: nowrap;
+    }
+    .wallet.flash { animation: wflash 0.7s ease-out; }
+    @keyframes wflash {
+        0% { transform: scale(1); }
+        40% { transform: scale(1.08); box-shadow: 0 0 18px 4px rgba(255, 215, 110, 0.4); }
+        100% { transform: scale(1); box-shadow: none; }
+    }
+
+    /* ---------- panels ---------- */
+    .panel {
+        background: linear-gradient(180deg, var(--panel2), var(--panel));
+        border: 1px solid var(--line); border-radius: 14px; padding: 9px;
+        box-shadow: inset 0 1px 0 rgba(217, 248, 255, 0.05);
+    }
+    .pTitle {
+        display: flex; align-items: center; justify-content: space-between;
+        font-size: 0.56rem; font-weight: 800; letter-spacing: 0.9px; color: var(--sub);
+        margin-bottom: 7px;
+    }
+    .pTitle b { color: var(--ice); letter-spacing: 0.4px; }
+
+    /* ---------- difficulty ---------- */
+    .diffGrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
+    .diffBtn {
+        display: flex; flex-direction: column; align-items: center; gap: 1px; cursor: pointer;
+        padding: 7px 2px; border-radius: 10px; background: rgba(3, 8, 26, 0.5);
+        border: 1px solid rgba(127, 233, 255, 0.16); color: var(--sub);
+    }
+    .diffBtn strong { font-size: 0.62rem; font-weight: 900; letter-spacing: 0.4px; }
+    .diffBtn small { font-size: 0.46rem; letter-spacing: 0.2px; }
+    .diffBtn em { font-size: 0.5rem; font-style: normal; font-weight: 800; color: var(--gold); }
+    .diffBtn.on {
+        background: linear-gradient(180deg, rgba(127, 233, 255, 0.22), rgba(74, 140, 255, 0.1));
+        border-color: rgba(127, 233, 255, 0.75); color: var(--ice2);
+        box-shadow: 0 0 16px rgba(127, 233, 255, 0.28), inset 0 0 14px rgba(127, 233, 255, 0.12);
+    }
+    .diffBtn.on strong { color: #fff; }
+    .diffBtn:disabled { opacity: 0.42; cursor: not-allowed; }
+
+    /* ---------- tower ---------- */
+    .tower { display: flex; flex-direction: column; gap: 4px; }
+
+    .floor {
+        display: grid; grid-template-columns: 40px 1fr 72px; gap: 6px; align-items: center;
+        padding: 4px 6px; border-radius: 10px; border: 1px solid transparent;
+        transition: background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+    }
+    .floor.locked { opacity: 0.5; }
+    .floor.active {
+        background: linear-gradient(90deg, rgba(127, 233, 255, 0.14), rgba(74, 140, 255, 0.05));
+        border-color: rgba(127, 233, 255, 0.6);
+        box-shadow: 0 0 20px rgba(127, 233, 255, 0.22), inset 0 0 16px rgba(127, 233, 255, 0.08);
+        animation: floorPulse 1.8s ease-in-out infinite;
+    }
+    @keyframes floorPulse {
+        0%, 100% { box-shadow: 0 0 14px rgba(127, 233, 255, 0.16), inset 0 0 12px rgba(127, 233, 255, 0.06); }
+        50% { box-shadow: 0 0 26px rgba(127, 233, 255, 0.34), inset 0 0 20px rgba(127, 233, 255, 0.14); }
+    }
+    .floor.cleared { background: rgba(60, 232, 162, 0.055); border-color: rgba(60, 232, 162, 0.22); }
+    .floor.busted { background: rgba(255, 95, 141, 0.1); border-color: rgba(255, 95, 141, 0.48); }
+
+    .flLabel { display: flex; flex-direction: column; align-items: center; line-height: 1.05; }
+    .flLabel b { font-size: 0.72rem; font-weight: 900; color: var(--ice2); font-variant-numeric: tabular-nums; }
+    .flLabel i {
+        font-style: normal; font-size: 0.38rem; font-weight: 900; letter-spacing: 0.4px;
+        color: var(--gold); background: rgba(255, 215, 110, 0.14); border-radius: 4px; padding: 0 3px;
+        margin-top: 1px;
+    }
+    .floor.locked .flLabel b { color: var(--sub); }
+
+    .flCells { display: grid; grid-template-columns: repeat(var(--n), 1fr); gap: 4px; }
+
+    .cell {
+        height: 34px; border-radius: 9px; cursor: pointer; font-size: 0.92rem; line-height: 1;
+        display: flex; align-items: center; justify-content: center;
+        background: linear-gradient(180deg, rgba(127, 233, 255, 0.1), rgba(3, 8, 26, 0.75));
+        border: 1px solid rgba(127, 233, 255, 0.24); color: rgba(127, 233, 255, 0.55);
+        transition: transform 0.12s ease, box-shadow 0.16s ease, background 0.16s ease, border-color 0.16s ease;
+        font-weight: 900;
+    }
+    .cell:active { transform: scale(0.94); }
+    .cell.live { border-color: rgba(127, 233, 255, 0.6); color: var(--ice); }
+    .cell.live:hover { box-shadow: 0 0 16px rgba(127, 233, 255, 0.4); background: linear-gradient(180deg, rgba(127, 233, 255, 0.24), rgba(3, 8, 26, 0.7)); }
+    .cell.gem {
+        background: linear-gradient(180deg, rgba(127, 233, 255, 0.42), rgba(74, 140, 255, 0.25));
+        border-color: rgba(217, 248, 255, 0.95); color: #fff;
+        box-shadow: 0 0 18px rgba(127, 233, 255, 0.7), inset 0 0 12px rgba(255, 255, 255, 0.45);
+        animation: gemPop 0.5s ease-out;
+    }
+    @keyframes gemPop {
+        0% { transform: scale(0.5) rotate(-18deg); }
+        60% { transform: scale(1.22) rotate(6deg); }
+        100% { transform: scale(1) rotate(0); }
+    }
+    .cell.boom {
+        background: linear-gradient(180deg, rgba(255, 95, 141, 0.6), rgba(90, 10, 32, 0.8));
+        border-color: #ff8aa9; color: #fff;
+        box-shadow: 0 0 24px rgba(255, 95, 141, 0.8);
+        animation: boomShake 0.5s ease-out;
+    }
+    @keyframes boomShake {
+        0% { transform: scale(0.7); }
+        25% { transform: translateX(-4px) scale(1.12); }
+        50% { transform: translateX(4px) scale(1.06); }
+        75% { transform: translateX(-2px) scale(1.02); }
+        100% { transform: translateX(0) scale(1); }
+    }
+    .cell.tr { border-color: rgba(255, 95, 141, 0.55); background: rgba(255, 95, 141, 0.12); color: var(--rose); }
+    .cell.dim { opacity: 0.32; }
+    .cell.off { cursor: default; }
+
+    .flPay { text-align: right; line-height: 1.15; }
+    .flPay b { display: block; font-size: 0.72rem; font-weight: 900; color: var(--gold); font-variant-numeric: tabular-nums; }
+    .flPay span { font-size: 0.5rem; color: var(--sub); font-variant-numeric: tabular-nums; }
+    .floor.active .flPay b { color: var(--gold2); text-shadow: 0 0 10px rgba(255, 215, 110, 0.6); }
+    .floor.cleared .flPay b { color: var(--green); }
+
+    .status {
+        font-size: 0.6rem; font-weight: 700; color: var(--sub); text-align: center;
+        padding: 2px 0 1px; letter-spacing: 0.2px; min-height: 13px;
+    }
+    .status b { color: var(--ice); }
+    .status .hot { color: var(--gold); }
+
+    .towerTools { display: flex; gap: 5px; margin-top: 6px; }
+    .towerTools button {
+        flex: 1; padding: 7px 4px; font-size: 0.58rem; font-weight: 800; cursor: pointer;
+        color: var(--ice2); background: rgba(127, 233, 255, 0.07);
+        border: 1px solid rgba(127, 233, 255, 0.26); border-radius: 9px;
+    }
+    .towerTools button.on { border-color: rgba(255, 215, 110, 0.7); color: var(--gold2); background: rgba(255, 215, 110, 0.14); }
+    .towerTools button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* ---------- bet ---------- */
+    .betRow { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+    .betView { flex: 1; display: flex; flex-direction: column; line-height: 1.1; }
+    .betView small { font-size: 0.48rem; letter-spacing: 0.8px; color: var(--sub); font-weight: 800; }
+    .betView b { font-size: 1.02rem; font-weight: 900; color: var(--gold); font-variant-numeric: tabular-nums; }
+    .betView b em { font-style: normal; font-size: 0.56rem; color: var(--sub); font-weight: 700; }
+
+    .chips { display: flex; gap: 4px; flex-wrap: wrap; }
+    .chips button {
+        flex: 1; min-width: 40px; padding: 7px 2px; font-size: 0.58rem; font-weight: 800;
+        color: var(--sub); background: rgba(127, 233, 255, 0.05);
+        border: 1px solid rgba(127, 233, 255, 0.18); border-radius: 8px; cursor: pointer;
+        font-variant-numeric: tabular-nums;
+    }
+    .chips button.on { border-color: rgba(255, 215, 110, 0.7); color: var(--gold2); background: rgba(255, 215, 110, 0.13); }
+
+    .quick { display: flex; gap: 4px; margin-top: 5px; }
+    .quick button {
+        flex: 1; padding: 6px 2px; font-size: 0.56rem; font-weight: 800; cursor: pointer;
+        color: var(--azure2); background: rgba(74, 140, 255, 0.09);
+        border: 1px solid rgba(74, 140, 255, 0.28); border-radius: 8px;
+    }
+    .quick button:active { transform: translateY(1px); }
+
+    .acts { display: grid; grid-template-columns: 1.15fr 1fr; gap: 6px; margin-top: 7px; }
+    .acts button {
+        padding: 12px 4px; font-size: 0.74rem; font-weight: 900; letter-spacing: 0.4px;
+        border-radius: 11px; cursor: pointer; border: 1px solid transparent;
+    }
+    #startBtn {
+        color: #041024;
+        background: linear-gradient(180deg, #b6f4ff, var(--ice) 45%, #4a8cff);
+        border-color: rgba(217, 248, 255, 0.8);
+        box-shadow: 0 6px 20px rgba(74, 140, 255, 0.4);
+        text-shadow: 0 1px 0 rgba(255, 255, 255, 0.4);
+    }
+    #cashBtn {
+        color: #21140a; background: linear-gradient(180deg, var(--gold2), var(--gold) 55%, #d9a83a);
+        border-color: rgba(255, 243, 200, 0.85); box-shadow: 0 6px 20px rgba(255, 215, 110, 0.3);
+    }
+    .acts button:disabled {
+        opacity: 0.4; box-shadow: none; cursor: not-allowed; filter: grayscale(0.35);
+    }
+    .acts button:active:not(:disabled) { transform: translateY(1px) scale(0.995); }
+
+    /* ---------- stats / history ---------- */
+    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
+    .st {
+        background: rgba(3, 8, 26, 0.45); border: 1px solid rgba(127, 233, 255, 0.12);
+        border-radius: 9px; padding: 6px 4px; text-align: center; line-height: 1.15;
+    }
+    .st small { display: block; font-size: 0.46rem; color: var(--sub); letter-spacing: 0.3px; }
+    .st b { font-size: 0.7rem; font-weight: 900; color: var(--ice2); font-variant-numeric: tabular-nums; }
+    .st b.pos { color: var(--green); }
+    .st b.neg { color: var(--rose); }
+    .st b.gold { color: var(--gold); }
+
+    .histHead {
+        display: flex; align-items: center; justify-content: space-between;
+        font-size: 0.53rem; font-weight: 800; color: var(--sub); margin-bottom: 5px;
+    }
+    .histList { display: flex; flex-direction: column; gap: 3px; max-height: 168px; overflow-y: auto; }
+    .hItem {
+        display: grid; grid-template-columns: 42px 1fr 46px 62px; gap: 4px; align-items: center;
+        font-size: 0.56rem; padding: 5px 6px; border-radius: 7px;
+        background: rgba(3, 8, 26, 0.4); border: 1px solid rgba(127, 233, 255, 0.1);
+    }
+    .hItem .hf { font-weight: 900; color: var(--ice); font-variant-numeric: tabular-nums; }
+    .hItem .hd { color: var(--sub); font-size: 0.48rem; letter-spacing: 0.3px; }
+    .hItem .hm { text-align: right; color: var(--gold); font-weight: 800; font-variant-numeric: tabular-nums; }
+    .hItem .hp { text-align: right; font-weight: 900; font-variant-numeric: tabular-nums; }
+    .hItem .hp.pos { color: var(--green); }
+    .hItem .hp.neg { color: var(--rose); }
+    .hEmpty { font-size: 0.56rem; color: var(--sub); text-align: center; padding: 12px 0; }
+
+    .foot { text-align: center; font-size: 0.5rem; color: var(--sub); padding: 4px 0 0; letter-spacing: 0.2px; }
+
+    /* ---------- overlay ---------- */
+    .ov {
+        position: fixed; inset: 0; z-index: 90; display: none; align-items: center; justify-content: center;
+        padding: 18px; background: rgba(2, 6, 18, 0.78); backdrop-filter: blur(4px);
+    }
+    .ov.on { display: flex; }
+    .ovBox {
+        width: 100%; max-width: 380px; border-radius: 18px; padding: 18px;
+        background: linear-gradient(180deg, #102350, #060f28 70%);
+        border: 1px solid rgba(127, 233, 255, 0.4);
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.72), inset 0 1px 0 rgba(217, 248, 255, 0.16);
+        text-align: center; animation: ovIn 0.22s ease-out;
+    }
+    @keyframes ovIn { from { transform: translateY(14px) scale(0.97); opacity: 0; } to { transform: none; opacity: 1; } }
+    .ovTitle { font-size: 1.02rem; font-weight: 900; color: var(--ice2); margin-bottom: 6px; letter-spacing: 0.3px; }
+    .ovDesc { font-size: 0.66rem; color: var(--sub); line-height: 1.5; margin-bottom: 10px; }
+    .ovDesc b { color: var(--gold2); }
+    .ovBtns { display: flex; gap: 7px; margin-top: 12px; }
+    .btn {
+        flex: 1; padding: 11px 6px; font-size: 0.68rem; font-weight: 900; border-radius: 10px;
+        cursor: pointer; border: 1px solid transparent;
+    }
+    .btn.primary { color: #041024; background: linear-gradient(180deg, #b6f4ff, var(--ice) 50%, #4a8cff); border-color: rgba(217, 248, 255, 0.8); }
+    .btn.gold { color: #21140a; background: linear-gradient(180deg, var(--gold2), var(--gold) 55%, #d9a83a); border-color: rgba(255, 243, 200, 0.85); }
+    .btn.ghost { color: var(--sub); background: rgba(127, 233, 255, 0.06); border-color: rgba(127, 233, 255, 0.24); }
+
+    .barAd { height: 8px; border-radius: 99px; background: rgba(3, 8, 26, 0.7); overflow: hidden; border: 1px solid rgba(127, 233, 255, 0.2); }
+    .barAd i { display: block; height: 100%; width: 0%; background: linear-gradient(90deg, var(--ice), var(--azure)); transition: width 0.9s linear; }
+    .ovTime { font-size: 0.58rem; color: var(--sub); margin-top: 6px; }
+
+    .resBanner {
+        font-size: 0.82rem; font-weight: 900; letter-spacing: 1.4px; padding: 7px 0; border-radius: 9px;
+        margin-bottom: 9px;
+    }
+    .resBanner.win { color: #041024; background: linear-gradient(90deg, #6ff0c0, var(--green)); }
+    .resBanner.bust { color: #fff; background: linear-gradient(90deg, #a31c40, var(--rose)); }
+    .resBanner.mega { color: #21140a; background: linear-gradient(90deg, var(--gold2), var(--gold) 50%, #ff9f43); }
+
+    .resTable { display: flex; flex-direction: column; gap: 4px; }
+    .resRow {
+        display: flex; align-items: center; justify-content: space-between;
+        font-size: 0.62rem; color: var(--sub); padding: 5px 8px; border-radius: 7px;
+        background: rgba(3, 8, 26, 0.45);
+    }
+    .resRow b { color: var(--ice2); font-weight: 900; font-variant-numeric: tabular-nums; }
+    .resRow.big { background: rgba(127, 233, 255, 0.1); border: 1px solid rgba(127, 233, 255, 0.3); }
+    .resRow.big span { color: var(--ice); font-weight: 800; }
+    .resRow.big b { font-size: 0.86rem; }
+    .resRow.big b.pos { color: var(--green); }
+    .resRow.big b.neg { color: var(--rose); }
+
+    .ptBox { max-height: 56vh; overflow-y: auto; text-align: left; font-size: 0.6rem; line-height: 1.6; color: var(--sub); }
+    .ptBox b { color: var(--ice2); }
+    .ptHead { font-size: 0.62rem; font-weight: 900; color: var(--gold); margin: 9px 0 4px; letter-spacing: 0.3px; }
+    .ptRow { display: flex; justify-content: space-between; gap: 8px; padding: 2px 0; border-bottom: 1px dashed rgba(127, 233, 255, 0.08); }
+    .ptRow b { color: var(--ice2); font-variant-numeric: tabular-nums; }
+    .ptRow.hi b { color: var(--gold2); }
+    .ptSub { margin-top: 9px; font-size: 0.58rem; line-height: 1.65; color: var(--sub); }
+
+    .megaBox {
+        border-color: rgba(255, 215, 110, 0.6);
+        background: linear-gradient(180deg, #12295e, #0a1430 62%, #1b1206);
+        box-shadow: 0 24px 70px rgba(255, 215, 110, 0.24), inset 0 1px 0 rgba(255, 243, 200, 0.28);
+    }
+    .megaCrown { font-size: 2.4rem; line-height: 1; animation: crownFloat 1.6s ease-in-out infinite; }
+    @keyframes crownFloat { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-6px) scale(1.06); } }
+    .megaAmount {
+        font-size: 1.5rem; font-weight: 900; color: var(--gold2); margin: 6px 0 2px;
+        text-shadow: 0 0 22px rgba(255, 215, 110, 0.65); font-variant-numeric: tabular-nums;
+    }
+
+    @media (max-width: 380px) {
+        .brand span { display: none; }
+        .floor { grid-template-columns: 34px 1fr 64px; padding: 3px 4px; }
+        .cell { height: 31px; }
+        .stats { grid-template-columns: repeat(4, 1fr); }
+        .hItem { grid-template-columns: 38px 1fr 42px 56px; font-size: 0.52rem; }
+        .diffBtn small { display: none; }
+    }
+</style>
+</head>
+<body>
+<canvas id="fx"></canvas>
+<div class="toast" id="toast"></div>
+
+<div class="app">
+    <header class="top">
+        <a class="lobby" href="../index.html">🏠 로비</a>
+        <div class="brand"><b>💎 DIAMOND TOWER</b><span>HI-LO SAPPHIRE CLIMB · 10F</span></div>
+        <button id="muteBtn" class="ic" title="소리 켜기/끄기">🔊</button>
+        <button id="adBtn" class="ic" title="무료 칩">📺</button>
+        <div class="wallet" id="walletBox">🪙 <span id="balance">10,000</span></div>
+    </header>
+
+    <!-- 난이도 -->
+    <section class="panel">
+        <div class="pTitle"><span>난이도 선택 · 층당 칸</span><b id="diffInfo">EASY · 통과 3/4</b></div>
+        <div class="diffGrid" id="diffGrid">
+            <button class="diffBtn on" data-diff="easy">
+                <strong>EASY</strong><small>4칸 · 함정 1</small><em>x17.22</em>
+            </button>
+            <button class="diffBtn" data-diff="medium">
+                <strong>MEDIUM</strong><small>3칸 · 함정 1</small><em>x55.94</em>
+            </button>
+            <button class="diffBtn" data-diff="hard">
+                <strong>HARD</strong><small>2칸 · 함정 1</small><em>x993.28</em>
+            </button>
+            <button class="diffBtn" data-diff="extreme">
+                <strong>EXTREME</strong><small>3칸 · 함정 2</small><em>x57,277</em>
+            </button>
+        </div>
+    </section>
+
+    <!-- 타워 -->
+    <section class="panel">
+        <div class="pTitle"><span>다이아몬드 타워 · 1F → 10F</span><b id="towerTag">READY</b></div>
+        <div class="tower" id="tower"></div>
+        <div class="status" id="status">베팅을 정하고 <b>등반 시작</b>을 누르세요</div>
+        <div class="towerTools">
+            <button id="randBtn" disabled>🎲 랜덤 픽</button>
+            <button id="turboBtn">⏩ 터보 OFF</button>
+            <button id="infoBtn">📖 배당·규칙</button>
+        </div>
+    </section>
+
+    <!-- 베팅 -->
+    <section class="panel">
+        <div class="betRow">
+            <div class="betView"><small>BET · 라운드 베팅</small><b id="betView">100 <em>칩</em></b></div>
+            <div class="betView" style="align-items: flex-end;">
+                <small>도달 배당</small><b id="curMult" style="color:#7d93bd;">-</b>
+            </div>
+        </div>
+        <div class="chips" id="chips">
+            <button data-chip="100">100</button>
+            <button data-chip="500">500</button>
+            <button data-chip="1000">1K</button>
+            <button data-chip="5000">5K</button>
+            <button data-chip="10000">10K</button>
+        </div>
+        <div class="quick">
+            <button data-act="half">½</button>
+            <button data-act="double">2X</button>
+            <button data-act="max">MAX</button>
+            <button data-act="allin">ALL IN</button>
+        </div>
+        <div class="acts">
+            <button id="startBtn">💎 등반 시작</button>
+            <button id="cashBtn" disabled>💰 캐시아웃</button>
+        </div>
+    </section>
+
+    <!-- 전적 -->
+    <section class="panel">
+        <div class="pTitle"><span>실시간 전적</span><b id="statTag">0 라운드</b></div>
+        <div class="stats">
+            <div class="st"><small>라운드</small><b id="stRounds">0</b></div>
+            <div class="st"><small>승률</small><b id="stRate">0%</b></div>
+            <div class="st"><small>순손익</small><b id="stNet">0</b></div>
+            <div class="st"><small>최고 배수</small><b id="stBestMult" class="gold">-</b></div>
+            <div class="st"><small>WIN</small><b id="stWins" class="pos">0</b></div>
+            <div class="st"><small>최고 도달</small><b id="stBestFloor">-</b></div>
+            <div class="st"><small>10F 완등</small><b id="stPerfect" class="gold">0</b></div>
+            <div class="st"><small>BUST</small><b id="stBusts" class="neg">0</b></div>
+        </div>
+    </section>
+
+    <section class="panel">
+        <div class="histHead"><span>최근 12라운드</span><span id="histCount">0건</span></div>
+        <div class="histList" id="histList"><div class="hEmpty">아직 기록이 없습니다</div></div>
+    </section>
+
+    <div class="foot">RoyMing-Lab · Mini Games Arcade · 공용 코인 지갑 연동</div>
+</div>
+
+<!-- 광고 -->
+<div class="ov" id="adOverlay">
+    <div class="ovBox">
+        <div class="ovTitle">📺 무료 칩 충전</div>
+        <div class="ovDesc">광고를 끝까지 보면 <b>+5,000칩</b>이 공용 지갑에 충전됩니다.</div>
+        <div class="barAd"><i id="adFill"></i></div>
+        <div class="ovTime" id="adTime">5초 후 충전 완료...</div>
+        <div class="ovBtns"><button class="btn ghost" id="adCancel">건너뛰기</button></div>
+    </div>
+</div>
+
+<!-- 구호금 -->
+<div class="ov" id="reliefOverlay">
+    <div class="ovBox">
+        <div class="ovTitle">💸 긴급 구호금</div>
+        <div class="ovDesc">보유 칩이 <b>100칩 미만</b>입니다.<br>긴급 구호금 <b>+2,000칩</b>으로 다시 도전하세요.</div>
+        <div class="ovBtns">
+            <button class="btn primary" id="reliefBtn">+2,000칩 받기</button>
+            <button class="btn ghost" id="reliefClose">닫기</button>
+        </div>
+    </div>
+</div>
+
+<!-- 정산 -->
+<div class="ov" id="resultOverlay">
+    <div class="ovBox">
+        <div class="ovTitle" id="resTitle">SETTLEMENT</div>
+        <div class="resBanner win" id="resBanner">CASHOUT</div>
+        <div class="resTable">
+            <div class="resRow"><span>난이도</span><b id="resDiff">-</b></div>
+            <div class="resRow"><span>도달 층</span><b id="resFloor">-</b></div>
+            <div class="resRow"><span>도달 배당</span><b id="resMult">-</b></div>
+            <div class="resRow"><span>베팅</span><b id="resBet">0</b></div>
+            <div class="resRow big"><span>라운드 순손익</span><b id="resNet">0</b></div>
+        </div>
+        <div class="ovBtns">
+            <button class="btn gold" id="resAgain">🔁 한 판 더</button>
+            <button class="btn ghost" id="resClose">닫기</button>
+        </div>
+    </div>
+</div>
+
+<!-- 10F 메가 -->
+<div class="ov" id="megaOverlay">
+    <div class="ovBox megaBox">
+        <div class="megaCrown">👑</div>
+        <div class="ovTitle" style="color:#fff3c8; margin-top:4px;">10F 정상 등정 · MEGA BONUS</div>
+        <div class="ovDesc">다이아몬드 타워 정상에 오르셨습니다!<br><span id="megaMult" style="color:#ffd76e;font-weight:900;">x17.22</span> 배당이 자동 정산됩니다.</div>
+        <div class="megaAmount" id="megaAmount">+0</div>
+        <div class="ovDesc" id="megaSub" style="margin-bottom:0;">베팅 100칩 · 최종 지급</div>
+        <div class="ovBtns">
+            <button class="btn gold" id="megaAgain">🔁 한 판 더</button>
+            <button class="btn ghost" id="megaClose">닫기</button>
+        </div>
+    </div>
+</div>
+
+<!-- 규칙 -->
+<div class="ov" id="infoOverlay">
+    <div class="ovBox">
+        <div class="ovTitle">📖 하이로우 다이아몬드 타워</div>
+        <div class="ptBox" id="ptBody"></div>
+        <div class="ovBtns"><button class="btn primary" id="infoClose">닫기</button></div>
+    </div>
+</div>
+
+<script src="../shared/wallet.js"></script>
+<script>
+(function () {
+    'use strict';
+
+    /* =========================================================
+       설정 · 배당표
+       ========================================================= */
+    var DIFFS = {
+        easy: {
+            label: 'EASY', cells: 4, safe: 3, traps: 1, p: 0.75,
+            mult: [1.29, 1.72, 2.29, 3.05, 4.07, 5.42, 7.23, 9.64, 12.85, 17.22]
+        },
+        medium: {
+            label: 'MEDIUM', cells: 3, safe: 2, traps: 1, p: 2 / 3,
+            mult: [1.45, 2.17, 3.26, 4.89, 7.33, 10.99, 16.49, 24.73, 37.10, 55.94]
+        },
+        hard: {
+            label: 'HARD', cells: 2, safe: 1, traps: 1, p: 0.5,
+            mult: [1.93, 3.86, 7.72, 15.44, 30.88, 61.76, 123.52, 247.04, 494.08, 993.28]
+        },
+        extreme: {
+            label: 'EXTREME', cells: 3, safe: 1, traps: 2, p: 1 / 3,
+            mult: [2.90, 8.69, 26.05, 78.16, 234.50, 703.49, 2110.45, 6331.36, 18994.10, 57277.53]
+        }
+    };
+    var FLOORS = 10;
+    var MIN_BET = 100, MAX_BET = 100000, BAILOUT_AT = 100;
+    var STORE_STATS = 'dtower_stats_v1', STORE_BET = 'dtower_bet_v1',
+        STORE_SOUND = 'dtower_sound_v1', STORE_DIFF = 'dtower_diff_v1';
+
+    /* =========================================================
+       유틸
+       ========================================================= */
+    function $(id) { return document.getElementById(id); }
+    function fmt(n) { return Math.max(0, Math.round(Number(n) || 0)).toLocaleString('en-US'); }
+    function fmtMult(m) {
+        return 'x' + (m >= 1000 ? Math.round(m).toLocaleString('en-US') : m.toFixed(2));
+    }
+
+    var balance = Wallet.getBalance();
+    var diffKey = 'easy';
+    var bet = 100;
+    var turbo = false;
+    var phase = 'idle';           // idle | climb
+    var round = null;             // 진행 중 라운드
+    var stats = { rounds: 0, wins: 0, busts: 0, net: 0, bestFloor: 0, bestMult: 0, perfect: 0 };
+    var history = [];
+
+    /* =========================================================
+       사운드
+       ========================================================= */
+    var Sound = (function () {
+        var ctx = null, muted = false;
+        try { muted = localStorage.getItem(STORE_SOUND) === 'off'; } catch (e) { }
+        function ac() {
+            if (!ctx) {
+                var AC = window.AudioContext || window.webkitAudioContext;
+                if (AC) ctx = new AC();
+            }
+            return ctx;
+        }
+        function tone(freq, dur, type, vol, delay, slideTo) {
+            var c = ac(); if (!c || muted) return;
+            var t0 = c.currentTime + (delay || 0);
+            var o = c.createOscillator(), g = c.createGain();
+            o.type = type || 'sine';
+            o.frequency.setValueAtTime(freq, t0);
+            if (slideTo) o.frequency.exponentialRampToValueAtTime(Math.max(30, slideTo), t0 + dur);
+            g.gain.setValueAtTime(0.0001, t0);
+            g.gain.exponentialRampToValueAtTime(vol || 0.15, t0 + 0.012);
+            g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+            o.connect(g); g.connect(c.destination);
+            o.start(t0); o.stop(t0 + dur + 0.02);
+        }
+        function noise(dur, vol, delay, hp) {
+            var c = ac(); if (!c || muted) return;
+            var t0 = c.currentTime + (delay || 0);
+            var len = Math.floor(c.sampleRate * dur);
+            var buf = c.createBuffer(1, len, c.sampleRate);
+            var data = buf.getChannelData(0);
+            for (var i = 0; i < len; i++) data[i] = (Math.random() * 2 - 1) * (1 - i / len);
+            var src = c.createBufferSource(); src.buffer = buf;
+            var f = c.createBiquadFilter(); f.type = 'highpass'; f.frequency.value = hp || 900;
+            var g = c.createGain(); g.gain.value = vol || 0.12;
+            src.connect(f); f.connect(g); g.connect(c.destination); src.start(t0);
+        }
+        return {
+            resume: function () { var c = ac(); if (c && c.state === 'suspended') c.resume(); },
+            click: function () { tone(640, 0.05, 'square', 0.11); },
+            chip: function () { tone(880, 0.05, 'triangle', 0.14); tone(1180, 0.05, 'triangle', 0.1, 0.04); },
+            start: function () {
+                noise(0.16, 0.14, 0, 700);
+                [330, 440, 587, 784].forEach(function (f, i) { tone(f, 0.14, 'triangle', 0.16, i * 0.06); });
+            },
+            gem: function (floor) {
+                var base = 523.25 * Math.pow(2, (floor - 1) / 12);
+                tone(base, 0.1, 'sine', 0.17);
+                tone(base * 1.5, 0.14, 'sine', 0.13, 0.05);
+                tone(base * 2, 0.12, 'triangle', 0.08, 0.09);
+                noise(0.05, 0.05, 0.02, 3200);
+            },
+            trap: function () {
+                noise(0.42, 0.42, 0, 180);
+                tone(180, 0.46, 'sawtooth', 0.2, 0, 48);
+                tone(90, 0.5, 'square', 0.14, 0.04, 40);
+            },
+            cash: function () {
+                [523, 659, 784, 1046, 1318].forEach(function (f, i) { tone(f, 0.2, 'triangle', 0.18, i * 0.06); });
+            },
+            mega: function () {
+                [523, 659, 784, 1046, 1318, 1568, 2093].forEach(function (f, i) {
+                    tone(f, 0.26, 'triangle', 0.2, i * 0.085);
+                    tone(f / 2, 0.26, 'sine', 0.12, i * 0.085);
+                });
+                noise(0.5, 0.16, 0.6, 2600);
+            },
+            lose: function () { tone(300, 0.24, 'sawtooth', 0.12); tone(190, 0.34, 'sawtooth', 0.1, 0.14); },
+            bankrupt: function () { tone(150, 0.5, 'sawtooth', 0.16, 0, 70); },
+            toggle: function () {
+                muted = !muted;
+                try { localStorage.setItem(STORE_SOUND, muted ? 'off' : 'on'); } catch (e) { }
+                if (!muted) { Sound.resume(); tone(720, 0.08, 'square', 0.12); }
+                return muted;
+            },
+            muted: function () { return muted; }
+        };
+    })();
+
+    /* =========================================================
+       컨페티
+       ========================================================= */
+    var FX = (function () {
+        var cv = $('fx'), cx = cv.getContext('2d'), parts = [], raf = null;
+        function size() {
+            var dpr = window.devicePixelRatio || 1;
+            cv.width = window.innerWidth * dpr;
+            cv.height = window.innerHeight * dpr;
+            cv.style.width = window.innerWidth + 'px';
+            cv.style.height = window.innerHeight + 'px';
+            cx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        }
+        size();
+        window.addEventListener('resize', size);
+        var COLORS = ['#7fe9ff', '#d9f8ff', '#4a8cff', '#ffd76e', '#fff3c8', '#ffffff', '#3ce8a2'];
+        function frame() {
+            cx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+            for (var i = parts.length - 1; i >= 0; i--) {
+                var p = parts[i];
+                p.vy += 0.16; p.x += p.vx; p.y += p.vy; p.rot += p.vr; p.life -= 1;
+                if (p.life <= 0 || p.y > window.innerHeight + 30) { parts.splice(i, 1); continue; }
+                cx.save(); cx.translate(p.x, p.y); cx.rotate(p.rot);
+                cx.globalAlpha = Math.min(1, p.life / 30);
+                cx.fillStyle = p.c; cx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+                cx.restore();
+            }
+            if (parts.length) raf = requestAnimationFrame(frame);
+            else { raf = null; cx.clearRect(0, 0, window.innerWidth, window.innerHeight); }
+        }
+        return {
+            burst: function (x, y, n, colors) {
+                var pal = colors || COLORS;
+                for (var i = 0; i < n; i++) {
+                    var a = Math.random() * Math.PI * 2, sp = 2 + Math.random() * 8;
+                    parts.push({
+                        x: x, y: y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 4.5,
+                        w: 3 + Math.random() * 5, h: 5 + Math.random() * 8,
+                        rot: Math.random() * 6, vr: (Math.random() - 0.5) * 0.32,
+                        life: 60 + Math.random() * 46, c: pal[(Math.random() * pal.length) | 0]
+                    });
+                }
+                if (!raf) raf = requestAnimationFrame(frame);
+            },
+            rain: function (n) {
+                for (var i = 0; i < n; i++) {
+                    parts.push({
+                        x: Math.random() * window.innerWidth, y: -20 - Math.random() * 160,
+                        vx: (Math.random() - 0.5) * 3, vy: 1 + Math.random() * 3,
+                        w: 3 + Math.random() * 5, h: 6 + Math.random() * 9,
+                        rot: Math.random() * 6, vr: (Math.random() - 0.5) * 0.34,
+                        life: 150 + Math.random() * 120, c: COLORS[(Math.random() * COLORS.length) | 0]
+                    });
+                }
+                if (!raf) raf = requestAnimationFrame(frame);
+            }
+        };
+    })();
+
+    /* =========================================================
+       저장
+       ========================================================= */
+    function loadStore() {
+        try {
+            var s = JSON.parse(localStorage.getItem(STORE_STATS) || 'null');
+            if (s && typeof s === 'object') {
+                stats.rounds = s.rounds || 0;
+                stats.wins = s.wins || 0;
+                stats.busts = s.busts || 0;
+                stats.net = s.net || 0;
+                stats.bestFloor = s.bestFloor || 0;
+                stats.bestMult = s.bestMult || 0;
+                stats.perfect = s.perfect || 0;
+                if (Array.isArray(s.history)) history = s.history.slice(0, 12);
+            }
+        } catch (e) { }
+        try {
+            var b = JSON.parse(localStorage.getItem(STORE_BET) || 'null');
+            if (b && b.bet >= MIN_BET) bet = Math.min(b.bet, MAX_BET);
+        } catch (e2) { }
+        try {
+            var d = localStorage.getItem(STORE_DIFF);
+            if (d && DIFFS[d]) diffKey = d;
+        } catch (e3) { }
+    }
+
+    function saveStore() {
+        try {
+            localStorage.setItem(STORE_STATS, JSON.stringify({
+                rounds: stats.rounds, wins: stats.wins, busts: stats.busts, net: stats.net,
+                bestFloor: stats.bestFloor, bestMult: stats.bestMult, perfect: stats.perfect,
+                history: history.slice(0, 12)
+            }));
+            localStorage.setItem(STORE_BET, JSON.stringify({ bet: bet }));
+            localStorage.setItem(STORE_DIFF, diffKey);
+        } catch (e) { }
+    }
+
+    /* =========================================================
+       렌더
+       ========================================================= */
+    function d() { return DIFFS[diffKey]; }
+
+    function renderBalance(flash) {
+        $('balance').textContent = fmt(balance);
+        if (flash) {
+            var box = $('walletBox');
+            box.classList.remove('flash');
+            void box.offsetWidth;
+            box.classList.add('flash');
+        }
+    }
+
+    function renderBet() {
+        $('betView').innerHTML = fmt(bet) + ' <em>칩</em>';
+        document.querySelectorAll('#chips button').forEach(function (b) {
+            b.classList.toggle('on', Number(b.getAttribute('data-chip')) === bet);
+        });
+        var m = round && phase === 'climb' && round.cleared >= 1 ? d().mult[round.cleared - 1] : null;
+        $('curMult').textContent = m ? fmtMult(m) : '-';
+        $('curMult').style.color = m ? '#ffd76e' : '#7d93bd';
+        $('cashBtn').disabled = !(phase === 'climb' && round && round.cleared >= 1);
+        if (phase === 'climb' && round && round.cleared >= 1) {
+            $('cashBtn').textContent = '💰 캐시아웃 ' + fmt(Math.floor(bet * d().mult[round.cleared - 1]));
+        } else {
+            $('cashBtn').textContent = '💰 캐시아웃';
+        }
+        $('startBtn').disabled = phase === 'climb';
+        $('randBtn').disabled = !(phase === 'climb');
+    }
+
+    function renderDiff() {
+        document.querySelectorAll('#diffGrid .diffBtn').forEach(function (b) {
+            b.classList.toggle('on', b.getAttribute('data-diff') === diffKey);
+            b.disabled = phase === 'climb';
+        });
+        var cfg = d();
+        $('diffInfo').textContent = cfg.label + ' · 통과 ' + cfg.safe + '/' + cfg.cells +
+            ' (' + Math.round(cfg.p * 100) + '%)';
+    }
+
+    function renderTower() {
+        var cfg = d(), cells = cfg.cells, html = '';
+        var cleared = round ? round.cleared : 0;
+        var busted = round && round.bustedFloor ? round.bustedFloor : 0;
+        var current = phase === 'climb' && round ? round.current : 0;
+
+        for (var f = FLOORS; f >= 1; f--) {
+            var cls = 'floor';
+            if (round) {
+                if (busted === f) cls += ' busted';
+                else if (phase === 'climb' && f === current) cls += ' active';
+                else if (f <= cleared) cls += ' cleared';
+                else cls += ' locked';
+            } else {
+                cls += (f === 1 ? '' : ' locked');
+            }
+            html += '<div class="' + cls + '" data-floor="' + f + '">';
+            html += '<div class="flLabel"><b>' + f + 'F</b>' + (f === 10 ? '<i>MEGA</i>' : '') + '</div>';
+            html += '<div class="flCells" style="--n:' + cells + '">';
+            for (var i = 0; i < cells; i++) {
+                var state = cellState(f, i, current, cleared, busted);
+                html += '<button class="cell ' + state.cls + '" data-floor="' + f + '" data-cell="' + i + '"' +
+                    (state.live ? ' aria-label="' + f + '층 ' + (i + 1) + '번 칸"' : ' disabled tabindex="-1"') +
+                    '>' + state.glyph + '</button>';
+            }
+            html += '</div>';
+            var mult = cfg.mult[f - 1];
+            html += '<div class="flPay"><b>' + fmtMult(mult) + '</b><span>' + fmt(Math.floor(bet * mult)) + '</span></div>';
+            html += '</div>';
+        }
+        $('tower').innerHTML = html;
+        $('towerTag').textContent = round
+            ? (busted ? 'BUST ' + busted + 'F' : (phase === 'climb' ? 'CLIMB ' + current + 'F' : 'DONE'))
+            : 'READY';
+    }
+
+    function cellState(f, i, current, cleared, busted) {
+        var r = round;
+        if (!r) return { cls: 'off', glyph: '◆', live: false };
+
+        var isTrap = r.trapMap[f] && r.trapMap[f][i];
+        var picked = r.picks[f];
+
+        // 함정에 걸린 층: 모든 함정 공개
+        if (busted === f) {
+            if (picked === i) return { cls: 'boom', glyph: '💣', live: false };
+            if (isTrap) return { cls: 'tr', glyph: '💣', live: false };
+            return { cls: 'dim', glyph: '◇', live: false };
+        }
+
+        // 이미 통과한 층
+        if (picked !== undefined && picked !== null) {
+            if (picked === i) return { cls: 'gem', glyph: '💎', live: false };
+            return { cls: 'dim', glyph: '◇', live: false };
+        }
+
+        // 현재 도전 층
+        if (phase === 'climb' && f === current) return { cls: 'live', glyph: '◆', live: true };
+
+        return { cls: 'off', glyph: f > cleared ? '🔒' : '◇', live: false };
+    }
+
+    function renderStats() {
+        $('stRounds').textContent = stats.rounds;
+        $('stRate').textContent = stats.rounds ? Math.round(stats.wins / stats.rounds * 1000) / 10 + '%' : '0%';
+        var net = $('stNet');
+        net.textContent = (stats.net > 0 ? '+' : stats.net < 0 ? '-' : '') + fmt(Math.abs(stats.net));
+        net.className = stats.net > 0 ? 'pos' : (stats.net < 0 ? 'neg' : '');
+        $('stBestMult').textContent = stats.bestMult ? fmtMult(stats.bestMult) : '-';
+        $('stWins').textContent = stats.wins;
+        $('stBestFloor').textContent = stats.bestFloor ? stats.bestFloor + 'F' : '-';
+        $('stPerfect').textContent = stats.perfect;
+        $('stBusts').textContent = stats.busts;
+        $('statTag').textContent = stats.rounds + ' 라운드';
+        renderHistory();
+    }
+
+    function renderHistory() {
+        var box = $('histList');
+        $('histCount').textContent = history.length + '건';
+        if (!history.length) {
+            box.innerHTML = '<div class="hEmpty">아직 기록이 없습니다</div>';
+            return;
+        }
+        var html = '';
+        history.forEach(function (h) {
+            var cls = h.p > 0 ? 'pos' : (h.p < 0 ? 'neg' : '');
+            var sign = h.p > 0 ? '+' : (h.p < 0 ? '-' : '');
+            html += '<div class="hItem">' +
+                '<span class="hf">' + (h.floor >= 10 ? '👑 10F' : h.floor + 'F') + '</span>' +
+                '<span class="hd">' + (h.mega ? 'MEGA · ' : '') + h.d + (h.bust ? ' · BUST' : ' · CASH') + '</span>' +
+                '<span class="hm">' + fmtMult(h.mult) + '</span>' +
+                '<span class="hp ' + cls + '">' + sign + fmt(Math.abs(h.p)) + '</span>' +
+                '</div>';
+        });
+        box.innerHTML = html;
+    }
+
+    function renderPaytable() {
+        var cfg = d(), box = $('ptBody'), html = '';
+        html += '<div class="ptHead">💎 ' + cfg.label + ' — 층별 누적 배당 (베팅 ' + fmt(bet) + '칩 기준)</div>';
+        for (var f = FLOORS; f >= 1; f--) {
+            var m = cfg.mult[f - 1];
+            html += '<div class="ptRow' + (f === 10 ? ' hi' : '') + '"><span>' + f + 'F' +
+                (f === 10 ? ' 👑 메가' : '') + '</span><b>' + fmtMult(m) + ' · ' + fmt(Math.floor(bet * m)) + '칩</b></div>';
+        }
+        html += '<div class="ptHead">📊 구조 & RTP</div>';
+        html += '<div class="ptSub">' +
+            '<b>칸 구성</b> — EASY 4칸(안전 3·함정 1, 통과 75%) · MEDIUM 3칸(2·1, 66.7%) · HARD 2칸(1·1, 50%) · EXTREME 3칸(1·2, 33.3%).<br><br>' +
+            '<b>등반</b> — 1F부터 10F까지 아래에서 위로. 안전 칸을 고르면 💎을 얻고 한 층 올라가며, 함정을 밟으면 💣 폭발과 함께 그 층의 함정이 모두 공개되고 라운드가 끝납니다(베팅 몰수).<br><br>' +
+            '<b>캐시아웃</b> — 1F 이상 통과하면 언제든 지금 층의 누적 배당으로 정산할 수 있습니다. 10F 정상 등정은 자동 정산 + 메가 보너스.<br><br>' +
+            '<b>배당 산식</b> — k층 배수 = (1/p)<sup>k</sup> × RTP. 1~9층 RTP <b>96.5%</b>, 10F 완등 RTP <b>97.0%</b>(메가 보너스 포함). 반올림된 실제 배수 기준 층별 이론 RTP는 ' +
+            '<b>96.44% ~ 97.01%</b> 구간이며, 어느 층에서 캐시아웃해도 같은 기대값이 되도록 설계했습니다(전 난이도 20만 라운드 몬테카를로 교차 검증).<br><br>' +
+            '<b>완등 확률</b> — EASY 1/18 · MEDIUM 1/58 · HARD 1/1,024 · EXTREME 1/59,049.<br><br>' +
+            '<b>🪙 잔액</b> — 모든 미니게임과 공용 코인 지갑(localStorage: casino_chips)을 함께 씁니다.';
+        box.innerHTML = html;
+    }
+
+    var toastTimer = null;
+    function toast(msg) {
+        var el = $('toast');
+        el.textContent = msg;
+        el.classList.add('on');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(function () { el.classList.remove('on'); }, 1900);
+    }
+
+    /* =========================================================
+       라운드
+       ========================================================= */
+    function makeTower(cfg) {
+        var trapMap = {};
+        for (var f = 1; f <= FLOORS; f++) {
+            var arr = [];
+            for (var i = 0; i < cfg.cells; i++) arr.push(false);
+            var pool = [];
+            for (var j = 0; j < cfg.cells; j++) pool.push(j);
+            // 함정 위치 무작위 배치
+            for (var t = 0; t < cfg.traps; t++) {
+                var k = Math.floor(Math.random() * pool.length);
+                arr[pool.splice(k, 1)[0]] = true;
+            }
+            trapMap[f] = arr;
+        }
+        return trapMap;
+    }
+
+    function startRound() {
+        if (phase === 'climb') return;
+        var cfg = d();
+        if (bet < MIN_BET) { toast('최소 베팅은 ' + MIN_BET + '칩입니다'); return; }
+        if (balance < bet) {
+            toast('잔액이 부족합니다 · 베팅을 낮추거나 무료 칩을 충전하세요');
+            if (balance < BAILOUT_AT) openRelief();
+            return;
+        }
+        balance = Wallet.setBalance(balance - bet);
+        renderBalance(true);
+
+        round = {
+            diff: diffKey,
+            trapMap: makeTower(cfg),
+            picks: {},
+            cleared: 0,
+            current: 1,
+            bustedFloor: 0,
+            startBal: balance + bet
+        };
+        phase = 'climb';
+        Sound.resume();
+        Sound.start();
+        renderDiff();
+        renderTower();
+        renderBet();
+        $('status').innerHTML = '1F 도전 — <b>안전한 다이아몬드</b>를 고르세요 (함정 ' + cfg.traps + '/' + cfg.cells + ')';
+    }
+
+    function pickCell(floor, idx) {
+        if (phase !== 'climb' || !round || floor !== round.current) return;
+        if (round.picks[floor] !== undefined) return;
+        var cfg = d();
+        if (!(cfg.cells > idx && idx >= 0)) return;
+
+        if (round.trapMap[floor][idx]) {
+            bust(floor, idx);
+            return;
+        }
+
+        round.picks[floor] = idx;
+        round.cleared = floor;
+        Sound.gem(floor);
+
+        var cellEl = document.querySelector('.cell[data-floor="' + floor + '"][data-cell="' + idx + '"]');
+        if (cellEl) {
+            cellEl.classList.remove('live');
+            cellEl.classList.add('gem');
+            cellEl.innerHTML = '💎';
+            var r = cellEl.getBoundingClientRect();
+            FX.burst(r.left + r.width / 2, r.top + r.height / 2, turbo ? 8 : 14,
+                ['#7fe9ff', '#d9f8ff', '#ffffff', '#4a8cff']);
+        }
+
+        if (floor === FLOORS) {
+            setTimeout(winMega, turbo ? 120 : 420);
+            return;
+        }
+
+        round.current = floor + 1;
+        var nextMul = cfg.mult[floor];
+        $('status').innerHTML = '<b>' + floor + 'F 통과!</b> 💎 ' +
+            '현재 배당 <span class="hot">' + fmtMult(cfg.mult[floor - 1]) + '</span> — ' +
+            '계속 오르면 <span class="hot">' + fmtMult(nextMul) + '</span>';
+        setTimeout(function () {
+            if (phase !== 'climb' || !round) return;
+            renderTower();
+            renderBet();
+            $('status').innerHTML = '<b>' + round.current + 'F 도전</b> — 계속 오르거나 캐시아웃(' +
+                fmtMult(cfg.mult[round.cleared - 1]) + ')';
+        }, turbo ? 90 : 380);
+        renderBet();
+    }
+
+    function bust(floor, idx) {
+        Sound.trap();
+        var cfg = d();
+        phase = 'idle';
+        round.bustedFloor = floor;
+        round.picks[floor] = idx;
+
+        var cellEl = document.querySelector('.cell[data-floor="' + floor + '"][data-cell="' + idx + '"]');
+        if (cellEl) {
+            var r = cellEl.getBoundingClientRect();
+            FX.burst(r.left + r.width / 2, r.top + r.height / 2, turbo ? 18 : 34,
+                ['#ff5f8d', '#ff8aa9', '#ffd76e', '#ffffff']);
+        }
+        renderTower();
+        renderDiff();
+        renderBet();
+        $('status').innerHTML = '<b style="color:#ff5f8d;">💣 ' + floor + 'F 함정 폭발!</b> 라운드 종료 — 베팅 ' + fmt(bet) + '칩 몰수';
+
+        var reached = round.cleared;
+        record({ win: false, floor: reached, mult: reached ? cfg.mult[reached - 1] : 0, profit: -bet, bust: true, mega: false });
+        setTimeout(function () {
+            showResult({
+                title: 'BUST', kind: 'bust', banner: '💣 ' + floor + 'F 함정 폭발',
+                floor: reached, mult: reached ? cfg.mult[reached - 1] : 0, net: -bet, payout: 0, betUsed: bet
+            });
+        }, turbo ? 380 : 900);
+    }
+
+    function cashOut() {
+        if (phase !== 'climb' || !round || round.cleared < 1) return;
+        var cfg = d();
+        var m = cfg.mult[round.cleared - 1];
+        var payout = Math.floor(bet * m);
+        balance = Wallet.setBalance(balance + payout);
+        renderBalance(true);
+        Sound.cash();
+        var btn = $('cashBtn');
+        var r = btn.getBoundingClientRect();
+        FX.burst(r.left + r.width / 2, r.top + r.height / 2, 26, ['#ffd76e', '#fff3c8', '#7fe9ff']);
+
+        phase = 'idle';
+        renderTower();
+        renderDiff();
+        renderBet();
+        $('status').innerHTML = '<b style="color:#ffd76e;">💰 ' + round.cleared + 'F 캐시아웃</b> +' + fmt(payout) + '칩';
+        record({ win: true, floor: round.cleared, mult: m, profit: payout - bet, bust: false, mega: false });
+        showResult({
+            title: 'CASHOUT', kind: 'win', banner: '💰 ' + round.cleared + 'F 캐시아웃 성공',
+            floor: round.cleared, mult: m, net: payout - bet, payout: payout, betUsed: bet
+        });
+    }
+
+    function winMega() {
+        var cfg = d();
+        var m = cfg.mult[FLOORS - 1];
+        var payout = Math.floor(bet * m);
+        balance = Wallet.setBalance(balance + payout);
+        renderBalance(true);
+        Sound.mega();
+        FX.rain(90);
+
+        phase = 'idle';
+        round.cleared = FLOORS;
+        renderTower();
+        renderDiff();
+        renderBet();
+        $('status').innerHTML = '<b style="color:#ffd76e;">👑 10F 정상 등정!</b> 메가 보너스 +' + fmt(payout) + '칩';
+        record({ win: true, floor: FLOORS, mult: m, profit: payout - bet, bust: false, mega: true });
+
+        $('megaMult').textContent = fmtMult(m);
+        $('megaAmount').textContent = '+' + fmt(payout);
+        $('megaSub').textContent = '베팅 ' + fmt(bet) + '칩 · 최종 지급 (순이익 +' + fmt(payout - bet) + ')';
+        $('megaOverlay').classList.add('on');
+    }
+
+    function record(res) {
+        stats.rounds += 1;
+        if (res.win) stats.wins += 1; else stats.busts += 1;
+        stats.net += res.profit;
+        if (res.floor > stats.bestFloor) stats.bestFloor = res.floor;
+        if (res.mult > stats.bestMult) stats.bestMult = res.mult;
+        if (res.mega) stats.perfect += 1;
+        history.unshift({
+            d: DIFFS[round.diff].label, floor: res.floor, mult: res.mult,
+            p: res.profit, bust: res.bust, mega: res.mega
+        });
+        history = history.slice(0, 12);
+        saveStore();
+        renderStats();
+    }
+
+    function showResult(o) {
+        $('resTitle').textContent = o.title;
+        var ban = $('resBanner');
+        ban.className = 'resBanner ' + (o.kind === 'win' ? 'win' : o.kind === 'mega' ? 'mega' : 'bust');
+        ban.textContent = o.banner;
+        $('resDiff').textContent = DIFFS[round.diff].label + ' · ' + DIFFS[round.diff].cells + '칸';
+        $('resFloor').textContent = o.floor ? o.floor + 'F' : '-';
+        $('resMult').textContent = o.mult ? fmtMult(o.mult) : '-';
+        $('resBet').textContent = fmt(o.betUsed) + '칩';
+        var net = $('resNet');
+        net.textContent = (o.net > 0 ? '+' : o.net < 0 ? '-' : '') + fmt(Math.abs(o.net)) + '칩';
+        net.className = o.net > 0 ? 'pos' : (o.net < 0 ? 'neg' : '');
+        $('resultOverlay').classList.add('on');
+    }
+
+    function closeResult(andAgain) {
+        $('resultOverlay').classList.remove('on');
+        $('megaOverlay').classList.remove('on');
+        round = null;
+        renderTower();
+        renderDiff();
+        renderBet();
+        $('status').innerHTML = '베팅을 정하고 <b>등반 시작</b>을 누르세요';
+        if (andAgain) {
+            setTimeout(function () {
+                if (balance < bet) {
+                    toast('잔액이 부족합니다 · 베팅을 낮추거나 무료 칩을 충전하세요');
+                    if (balance < BAILOUT_AT) openRelief();
+                    return;
+                }
+                startRound();
+            }, 140);
+        } else if (balance < BAILOUT_AT) {
+            setTimeout(function () { Sound.bankrupt(); openRelief(); }, 420);
+        }
+    }
+
+    /* =========================================================
+       광고 / 구호금
+       ========================================================= */
+    var adTimer = null;
+    function openAd() {
+        var ov = $('adOverlay'), fill = $('adFill'), timeEl = $('adTime');
+        ov.classList.add('on');
+        fill.style.width = '0%';
+        var left = 5;
+        timeEl.textContent = left + '초 후 충전 완료...';
+        clearInterval(adTimer);
+        setTimeout(function () { fill.style.width = '20%'; }, 60);
+        adTimer = setInterval(function () {
+            left -= 1;
+            fill.style.width = ((5 - left) / 5 * 100) + '%';
+            if (left <= 0) {
+                clearInterval(adTimer);
+                timeEl.textContent = '충전 완료!';
+                setTimeout(function () {
+                    ov.classList.remove('on');
+                    balance = Wallet.setBalance(balance + 5000);
+                    renderBalance(true);
+                    renderBet();
+                    toast('📺 광고 시청 완료 · 무료 칩 +5,000');
+                    Sound.cash();
+                }, 320);
+            } else {
+                timeEl.textContent = left + '초 후 충전 완료...';
+            }
+        }, 1000);
+    }
+
+    function openRelief() { $('reliefOverlay').classList.add('on'); }
+
+    /* =========================================================
+       이벤트
+       ========================================================= */
+    function setBet(v) {
+        if (phase === 'climb') { toast('등반 중에는 베팅을 바꿀 수 없습니다'); return; }
+        bet = Math.max(MIN_BET, Math.min(MAX_BET, Math.floor(v / 100) * 100 || MIN_BET));
+        Sound.chip();
+        renderBet();
+        renderTower();
+        saveStore();
+    }
+
+    function bind() {
+        document.querySelectorAll('#diffGrid .diffBtn').forEach(function (b) {
+            b.addEventListener('click', function () {
+                if (phase === 'climb') { toast('등반 중에는 난이도를 바꿀 수 없습니다'); return; }
+                diffKey = b.getAttribute('data-diff');
+                Sound.click();
+                saveStore();
+                renderDiff();
+                renderTower();
+                renderBet();
+                $('status').innerHTML = '<b>' + d().label + '</b> 선택 — 층당 ' + d().cells +
+                    '칸 (안전 ' + d().safe + ' · 함정 ' + d().traps + ')';
+            });
+        });
+
+        document.querySelectorAll('#chips button').forEach(function (b) {
+            b.addEventListener('click', function () { setBet(Number(b.getAttribute('data-chip'))); });
+        });
+
+        document.querySelectorAll('.quick button').forEach(function (b) {
+            b.addEventListener('click', function () {
+                if (phase === 'climb') { toast('등반 중에는 베팅을 바꿀 수 없습니다'); return; }
+                var act = b.getAttribute('data-act');
+                if (act === 'half') setBet(Math.max(MIN_BET, Math.floor(bet / 2 / 100) * 100));
+                else if (act === 'double') setBet(bet * 2);
+                else if (act === 'max') setBet(Math.min(MAX_BET, balance));
+                else if (act === 'allin') setBet(Math.min(MAX_BET, balance));
+                else Sound.click();
+            });
+        });
+
+        $('tower').addEventListener('click', function (e) {
+            var cell = e.target.closest ? e.target.closest('.cell') : null;
+            if (!cell) return;
+            if (cell.classList.contains('off') || cell.classList.contains('dim') ||
+                cell.classList.contains('gem') || cell.classList.contains('boom') || cell.classList.contains('tr')) return;
+            var f = Number(cell.getAttribute('data-floor'));
+            var i = Number(cell.getAttribute('data-cell'));
+            if (isNaN(f) || isNaN(i)) return;
+            Sound.click();
+            pickCell(f, i);
+        });
+
+        $('startBtn').addEventListener('click', startRound);
+        $('cashBtn').addEventListener('click', cashOut);
+
+        $('randBtn').addEventListener('click', function () {
+            if (phase !== 'climb' || !round) return;
+            var cfg = d();
+            var free = [];
+            for (var i = 0; i < cfg.cells; i++) free.push(i);
+            var pick = free[Math.floor(Math.random() * free.length)];
+            Sound.click();
+            $('status').innerHTML = '<b>' + round.current + 'F</b> 랜덤 픽 → ' + (pick + 1) + '번 칸';
+            pickCell(round.current, pick);
+        });
+
+        $('turboBtn').addEventListener('click', function () {
+            turbo = !turbo;
+            $('turboBtn').classList.toggle('on', turbo);
+            $('turboBtn').textContent = turbo ? '⏩ 터보 ON' : '⏩ 터보 OFF';
+        });
+
+        $('infoBtn').addEventListener('click', function () {
+            renderPaytable();
+            $('infoOverlay').classList.add('on');
+        });
+        $('infoClose').addEventListener('click', function () { $('infoOverlay').classList.remove('on'); });
+
+        $('muteBtn').addEventListener('click', function () {
+            var m = Sound.toggle();
+            $('muteBtn').textContent = m ? '🔇' : '🔊';
+        });
+        $('muteBtn').textContent = Sound.muted() ? '🔇' : '🔊';
+
+        $('adBtn').addEventListener('click', openAd);
+        $('adCancel').addEventListener('click', function () {
+            clearInterval(adTimer);
+            $('adOverlay').classList.remove('on');
+        });
+        $('reliefBtn').addEventListener('click', function () {
+            balance = Wallet.setBalance(balance + 2000);
+            renderBalance(true);
+            renderBet();
+            $('reliefOverlay').classList.remove('on');
+            Sound.chip();
+            toast('💸 긴급 구호금 +2,000칩 지급');
+        });
+        $('reliefClose').addEventListener('click', function () { $('reliefOverlay').classList.remove('on'); });
+
+        $('resClose').addEventListener('click', function () { closeResult(false); });
+        $('resAgain').addEventListener('click', function () { closeResult(true); });
+        $('megaClose').addEventListener('click', function () { closeResult(false); });
+        $('megaAgain').addEventListener('click', function () { closeResult(true); });
+
+        document.addEventListener('keydown', function (e) {
+            if (e.code === 'Space' && phase === 'climb') {
+                e.preventDefault();
+                if (round && round.cleared >= 1) cashOut();
+            }
+        });
+
+        Wallet.subscribe(function (shared) {
+            if (shared === balance) return;
+            if (phase === 'climb') return;   // 등반 중 외부 변경은 무시
+            balance = shared;
+            renderBalance(true);
+            renderBet();
+        });
+    }
+
+    /* =========================================================
+       부트
+       ========================================================= */
+    loadStore();
+    bind();
+    renderBalance();
+    renderDiff();
+    renderTower();
+    renderBet();
+    renderStats();
+
+    if (balance < BAILOUT_AT) {
+        setTimeout(function () { Sound.bankrupt(); openRelief(); }, 600);
+    }
+})();
+</script>
+</body>
+</html>
