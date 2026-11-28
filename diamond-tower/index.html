@@ -948,14 +948,11 @@
     /* =========================================================
        라운드
        ========================================================= */
-    var QA_SAVE = /[?&]qa_safe=1/.test(window.location.search);   // QA 전용(검증 후 제거)
-
     function makeTower(cfg) {
         var trapMap = {};
         for (var f = 1; f <= FLOORS; f++) {
             var arr = [];
             for (var i = 0; i < cfg.cells; i++) arr.push(false);
-            if (QA_SAVE) { trapMap[f] = arr; continue; }
             var pool = [];
             for (var j = 0; j < cfg.cells; j++) pool.push(j);
             // 함정 위치 무작위 배치
