@@ -905,10 +905,11 @@
         history.forEach(function (h) {
             var cls = h.p > 0 ? 'pos' : (h.p < 0 ? 'neg' : '');
             var sign = h.p > 0 ? '+' : (h.p < 0 ? '-' : '');
+            var floorTxt = h.floor >= 10 ? '👑 10F' : (h.floor ? h.floor + 'F' : '💣');
             html += '<div class="hItem">' +
-                '<span class="hf">' + (h.floor >= 10 ? '👑 10F' : h.floor + 'F') + '</span>' +
+                '<span class="hf">' + floorTxt + '</span>' +
                 '<span class="hd">' + (h.mega ? 'MEGA · ' : '') + h.d + (h.bust ? ' · BUST' : ' · CASH') + '</span>' +
-                '<span class="hm">' + fmtMult(h.mult) + '</span>' +
+                '<span class="hm">' + (h.mult ? fmtMult(h.mult) : '-') + '</span>' +
                 '<span class="hp ' + cls + '">' + sign + fmt(Math.abs(h.p)) + '</span>' +
                 '</div>';
         });
@@ -947,11 +948,14 @@
     /* =========================================================
        라운드
        ========================================================= */
+    var QA_SAVE = /[?&]qa_safe=1/.test(window.location.search);   // QA 전용(검증 후 제거)
+
     function makeTower(cfg) {
         var trapMap = {};
         for (var f = 1; f <= FLOORS; f++) {
             var arr = [];
             for (var i = 0; i < cfg.cells; i++) arr.push(false);
+            if (QA_SAVE) { trapMap[f] = arr; continue; }
             var pool = [];
             for (var j = 0; j < cfg.cells; j++) pool.push(j);
             // 함정 위치 무작위 배치
